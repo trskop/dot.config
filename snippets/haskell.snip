@@ -1,0 +1,282 @@
+snippet #!
+abbr    #!/usr/bin/env stack ...
+	#!/usr/bin/env stack
+	{- stack script
+		--resolver ${1:lts-8.0}
+		--package ${0:turtle}
+		--
+	-}
+
+snippet lang
+	{-# LANGUAGE ${0:OverloadedStrings} #-}
+
+snippet langDataKinds
+	{-# LANGUAGE DataKinds #-}
+
+snippet langNoImplicitPrelude
+	{-# LANGUAGE NoImplicitPrelude #-}
+
+snippet langRankNTypes
+	{-# LANGUAGE RankNTypes #-}
+
+snippet langTypeOperators
+	{-# LANGUAGE TypeOperators #-}
+
+snippet haddock
+	{-# OPTIONS_HADDOCK ${0:hide} #-}
+
+snippet ghc
+	{-# OPTIONS_GHC ${0:-fno-warn-unused-imports} #-}
+
+snippet inline
+	{-# INLINE ${0:name} #-}
+
+snippet imp
+	import ${0:Data.Text}
+
+snippet import
+	import ${0:Data.Text}
+
+snippet imp2
+	import ${1:Data.Text} (${0:Text})
+
+snippet import2
+	import ${1:Data.Text} (${0:Text})
+
+snippet impq
+	import qualified ${1:Data.Text} as ${0:Text}
+
+snippet importq
+	import qualified ${1:Data.Text} as ${2:Text}
+
+snippet impEq
+	import Data.Eq (Eq${1:, (==)}${2:, (/=)})
+
+snippet impFunction
+	import Data.Function (${1:($), }${2:(&), }${3:(.), }${4:const, flip, id, on})
+
+snippet impFunctor
+	import Data.Functor (${1:Functor, }${2:($>), (<$), }${3:(<$>)}${4:, fmap}${5:, void})
+
+snippet impOrd
+	import Data.Ord (Ord${1:, (<)}${2:, (<=)}${3:, (>)}${4:, (>=)})
+
+snippet impGenerics
+	import GHC.Generic (Generic${0})
+
+snippet impProxy
+	import Data.Proxy (Proxy${1:(Proxy)})
+
+snippet inst
+	instance ${1:Monoid} ${2:Type} where
+		${0}
+
+snippet instSemigroup
+abbr    instance Semigroup ...
+	instance ${1}Semigroup ${2:Type} where
+		${0}
+
+snippet type
+	type ${1:Type} = ${0:Type}
+
+snippet typeFamily
+	type family ${1:Type} ${0}
+
+snippet typeInstance
+	type instance ${1:Type} ${2:TypeArg} = ${0}
+
+snippet data
+	data ${1:Type} = ${2:$1} ${0:Int}
+
+snippet dataFamily
+	data family ${1:Type} ${0}
+
+snippet newtype
+	newtype ${1:Type} = ${2:$1} ${0:Int}
+
+snippet class
+	class ${1:Class} a where
+		${0}
+
+snippet info
+	-- |
+	-- Module:      ${1:`substitute(substitute(expand('%:r'), '[/\\]','.','g'),'^\%(\l*\.\)\?','','')`}
+	-- Description: ${2:TODO: Module synopsis}
+	-- Copyright:   (c) ${3:2017} ${4:Peter Trško}
+	-- License:     ${5:BSD3}
+	--
+	-- Maintainer:  ${6:peter.trsko@gmail.com}
+	-- Stability:   ${7:experimental}
+	-- Portability: ${8:GHC specific language extensible}${9:; POSIX}.
+	--
+	-- ${0:TODO: Module description.}
+
+snippet module
+	-- |
+	-- Module:      ${1:`substitute(substitute(expand('%:r'), '[/\\]','.','g'),'^\%(\l*\.\)\?','','')`}
+	-- Description: ${2:TODO: Module synopsis}
+	-- Copyright:   (c) ${3:2017} ${4:Peter Trško}
+	-- License:     ${5:BSD3}
+	--
+	-- Maintainer:  ${6:peter.trsko@gmail.com}
+	-- Stability:   ${7:experimental}
+	-- Portability: ${8:GHC specific language extensible}${9:; POSIX}.
+	--
+	-- ${0:TODO: Module description.}
+	module $1
+	--  (
+	--  )
+	  where
+	`expand('%') =~ 'Main' ? "\nmain :: IO ()\nmain = undefined" : ""`
+
+snippet main2
+	main :: IO ()
+	main = ${0:undefined}
+
+snippet helloWorld
+	main :: IO ()
+	main = putStrLn "Hello World!"
+
+snippet def
+	-- | TODO: Describe '$1'.
+	${1:name} :: ${2:a}
+	$1 = ${0:undefined}
+
+snippet fn
+	-- | TODO: Describe '$1'.
+	${1:fn} :: ${2:a} -> ${3:a}
+	$1 ${4:_} = ${0:undefined}
+
+snippet fn2
+	-- | TODO: Describe '$1'.
+	${1:fn} :: ${2:a} -> ${3:a} -> ${4:a}
+	$1 ${5:_ _} = ${0:undefined}
+
+snippet fn3
+	-- | TODO: Describe '$1'.
+	${1:fn} :: ${2:a} -> ${3:a} -> ${4:a} -> ${5:a}
+	$1 ${6:_ _ _} = ${0:undefined}
+
+snippet => "Type constraint"
+	(${1:Class} ${2:a}) => $2
+
+snippet ap
+	${1:map} ${2:fn} ${0:list}
+
+snippet \
+	\\${1:x} -> ${0:expression}
+
+snippet $do
+	$ do
+		${0:expression}
+
+snippet $\do
+	$ \\${1:x} -> do
+		${0:expression}
+
+snippet \do
+	\\${1:x} -> do
+		${0:expression}
+
+snippet (\
+	(\\${1:x} -> ${0:expression})
+
+snippet <-
+	${1:a} <- ${0:m a}
+
+snippet ->
+	${1:m a} -> ${0:a}
+
+snippet tup
+	(${1:a}, ${0:b})
+
+snippet tup2
+	(${1:a}, ${2:b}, ${0:c})
+
+snippet tup3
+	(${1:a}, ${2:b}, ${3:c}, ${0:d})
+
+snippet enum
+	-- | TODO
+	data ${1:Enum}
+		= ${2:Value1}
+		-- ^ TODO: Describe '$2'.
+		| ${3:Value2}
+		-- ^ TODO: Describe '$3'.
+		| ${4:Value3}
+		-- ^ TODO: Describe '$4'.
+
+snippet rec
+	-- | TODO: Describe '$1'.
+	data ${1:Record} = ${2:$1}
+		{ ${3:recFieldA} :: ${4:Text}
+		-- ^ TODO: Describe '$3'.
+		, ${5:recFieldB} :: ${0:Text}
+		-- ^ TODO: Describe '$5'.
+		}
+
+snippet recCon
+	-- | TODO: Describe '$1'.
+	| ${1:Record}
+		{ ${2:recFieldA} :: ${3:Text}
+		-- ^ TODO: Describe '$2'.
+		, ${4:recFieldB} :: ${0:Text}
+		-- ^ TODO: Describe '$4'.
+		}
+
+snippet recVal1
+	${1:Record}{${2:recFieldA} = ${0:undefined}}
+
+snippet recVal2
+	${1:Record}
+		{ ${2:recFieldA} = ${3:undefined}
+		, ${4:recFieldB} = ${0:undefined}
+		}
+
+snippet case
+	case ${1:something} of
+		${2} -> ${0}
+
+snippet let2
+	let ${1:x} = ${2:undefined}
+		${3:y} = ${4:undefined}
+	in ${0}
+
+snippet let
+	let ${1} = ${2}
+	in ${3}
+
+snippet where
+	where
+		${1:fn} = ${0:undefined}
+
+snippet spec
+	module `substitute(substitute(expand('%:r'), '[/\\]','.','g'),'^\%(\l*\.\)\?','','')` (main, spec)
+	  where
+
+	import Test.Hspec
+	import Test.QuickCheck
+
+	main :: IO ()
+	main = hspec spec
+
+	spec :: Spec
+	spec =
+		describe "${1}" $ do
+			$0
+
+snippet desc
+	describe "${1}" $ do
+		$0
+
+snippet it
+	it "${1}"
+		$ $0
+
+snippet itp
+	it "${1}" $ property
+		$ $0
+
+snippet der
+abbr    deriving (...)
+	deriving (${0:Eq, Generic, Show})
