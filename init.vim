@@ -273,19 +273,9 @@ let g:cabal_indent_section = 2 " (limited to max. 4 spaces)
 
 " {{{ Plugin -- vim-airline/vim-airline ---------------------------------------
 
-let g:airline_powerline_fonts = 0
-
-if !exists('g:airline_symbols')
-  let g:airline_symbols = {}
-endif
-
-" Following symbols don't work in rxvt-unicode:
-let g:airline_symbols.maxlinenr = ' :'
-let g:airline_symbols.crypt = 'cr'
-
 let g:airline_theme='molokai'
+let g:airline_powerline_fonts = 1
 let g:airline#extensions#tabline#enabled = 1
-let g:airline#extensions#tabline#left_alt_sep = '│'
 
 " }}} Plugin -- vim-airline/vim-airline ---------------------------------------
 
