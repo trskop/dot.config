@@ -15,6 +15,7 @@
 " |   |-- neovimhaskell/haskell-vim
 " |   |-- vim-airline/vim-airline
 " |   |-- scrooloose/nerdtree
+" |   |-- scrooloose/nerdcommenter
 " |   |-- nathanaelkane/vim-indent-guides
 " |   |-- raichoo/purescript-vim
 " |
@@ -146,6 +147,10 @@ if dein#load_state('~/.config/nvim/dein.vim')
   " you manipulate with the keyboard and/or mouse. It also allows you to
   " perform simple filesystem operations.
   call dein#add('scrooloose/nerdtree')
+
+  " Functions for manipulation of comments in source code. For example,
+  " commenting-out lines.
+  call dein#add('scrooloose/nerdcommenter')
 
   " Asynchronous linting and make framework for Neovim/Vim.
   call dein#add('neomake/neomake')
@@ -340,6 +345,23 @@ nmap <silent> <leader>f <ESC>:call ToggleFindNerd()<CR>
 nmap <silent> <leader>F <ESC>:NERDTreeToggle<CR>
 
 " }}} Plugin -- scrooloose/nerdtree -------------------------------------------
+
+" {{{ Plugin -- scrooloose/nerdcommenter --------------------------------------
+
+" Insert spaces after comment delimiters.
+let g:NERDSpaceDelims = 1
+
+" Allow commenting and inverting empty lines (useful when commenting a
+" region).
+let g:NERDCommentEmptyLines = 1
+
+" Enable trimming of trailing whitespace when uncommenting.
+let g:NERDTrimTrailingWhitespace = 1
+
+" Use alternative delimiter "--" by default on Haskell files.
+let g:NERDAltDelims_haskell = 1
+
+" }}} Plugin -- scrooloose/nerdcommenter --------------------------------------
 
 " {{{ Plugin -- nathanaelkane/vim-indent-guides -------------------------------
 
