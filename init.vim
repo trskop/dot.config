@@ -355,6 +355,7 @@ let g:indent_guides_start_level = 2
 highlight IndentGuidesOdd  ctermbg=234
 highlight IndentGuidesEven ctermbg=236
 
+:nmap <silent> <Leader>ig <Plug>IndentGuidesToggle
 
 " }}} Plugin -- nathanaelkane/vim-indent-guides -------------------------------
 
