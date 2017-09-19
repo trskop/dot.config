@@ -10,12 +10,12 @@
 " |   |-- Dein.vim
 " |   |-- Shougo/deoplete.vim
 " |   |-- Shougo/neosnippet.vim
+" |   |-- autozimu/LanguageClient-neovim
 " |   |-- tomasr/molokai
 " |   |-- neovimhaskell/haskell-vim
 " |   |-- vim-airline/vim-airline
 " |   |-- scrooloose/nerdtree
 " |   |-- nathanaelkane/vim-indent-guides
-" |   |-- parsonsmatt/intero-neovim
 " |   |-- raichoo/purescript-vim
 " |
 " `-- Background Hack
@@ -106,6 +106,25 @@ if dein#load_state('~/.config/nvim/dein.vim')
   call dein#add('Shougo/neosnippet.vim')
   call dein#add('Shougo/neosnippet-snippets')
 
+  " Displays function signatures from completions in the command line.
+  call dein#add('Shougo/echodoc.vim')
+
+  " Denite is a dark powered plugin for Neovim/Vim to unite all interfaces. It
+  " can replace many features or plugins with its interface. It is like a
+  " fuzzy finder, but is more generic. You can extend the interface and create
+  " the sources.
+  call dein#add('Shougo/denite.nvim')
+
+  " Fzf is a general-purpose command-line fuzzy finder.
+  "
+  " It's an interactive Unix filter for command-line that can be used with any
+  " list; files, command history, processes, hostnames, bookmarks, git
+  " commits, etc.
+  call dein#add('junegunn/fzf')
+
+  " This is a fast, extensible, async completion framework for Neovim.
+  call dein#add('roxma/nvim-completion-manager')
+
   " Molokai is a Vim port of the monokai theme for TextMate originally created
   " by Wimer Hazenberg.
   call dein#add('tomasr/molokai')
@@ -141,7 +160,10 @@ if dein#load_state('~/.config/nvim/dein.vim')
   " https://github.com/idris-hackers/idris-vim
   call dein#add('neovimhaskell/haskell-vim')
 
-  "call dein#add('parsonsmatt/intero-neovim')
+  " Language Server Protocol support for Neovim. See
+  " https://github.com/Microsoft/language-server-protocol for more
+  " information.
+  call dein#add('autozimu/LanguageClient-neovim')
 
   " Syntax highlighting and indentation for Purescript based on idris-vim and
   " haskell-vim.
@@ -205,6 +227,23 @@ let g:neosnippet#enable_snipmate_compatibility = 1
 let g:neosnippet#snippets_directory='~/.config/snippets'
 
 " }}} Plugin -- Shougo/neosnippet.vim -----------------------------------------
+
+" {{{ Plugin -- autozimu/LanguageClient-neovim --------------------------------
+
+" Required for operations modifying multiple buffers like rename.
+set hidden
+
+" Automatically start language servers.
+let g:LanguageClient_autoStart = 1
+
+let g:LanguageClient_selectionUI = "fzf"
+"let g:LanguageClient_selectionUI = "location-list"
+
+let g:LanguageClient_serverCommands = {
+    \ 'haskell': ['hie', '--lsp'],
+    \ }
+
+" }}} Plugin -- autozimu/LanguageClient-neovim --------------------------------
 
 " {{{ Plugin -- tomasr/molokai ------------------------------------------------
 
@@ -316,37 +355,8 @@ let g:indent_guides_start_level = 2
 highlight IndentGuidesOdd  ctermbg=234
 highlight IndentGuidesEven ctermbg=236
 
+
 " }}} Plugin -- nathanaelkane/vim-indent-guides -------------------------------
-
-" {{{ Plugin -- parsonsmatt/intero-neovim -------------------------------------
-
-" Process management:
-nnoremap <Leader>hio :InteroOpen<CR>
-nnoremap <Leader>hik :InteroKill<CR>
-nnoremap <Leader>hic :InteroHide<CR>
-nnoremap <Leader>hih :InteroHide<CR>
-nnoremap <Leader>hil :InteroLoadCurrentModule<CR>
-
-" REPL commands
-nnoremap <Leader>hie :InteroEval<CR>
-nnoremap <Leader>hit :InteroGenericType<CR>
-nnoremap <Leader>hiT :InteroType<CR>
-nnoremap <Leader>hii :InteroInfo<CR>
-nnoremap <Leader>hiI :InteroTypeInsert<CR>
-
-" Go to definition:
-nnoremap <Leader>hid :InteroGoToDef<CR>
-
-" Highlight uses of identifier:
-nnoremap <Leader>hiu :InteroUses<CR>
-
-" Reload the file in Intero after saving
-"autocmd! BufWritePost *.hs InteroReload
-
-" TODO: Implement this!
-let g:intero_args = '-Wno-missing-import-lists'
-
-" }}} Plugin -- parsonsmatt/intero-neovim -------------------------------------
 
 " {{{ Plugin -- raichoo/purescript-vim ----------------------------------------
 

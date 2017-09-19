@@ -9,7 +9,6 @@ CONTENTS							     *rituals*
 Introduction		|rituals-introduction|
 Bindings		|rituals-bindings|
   Leader sequence	  |rituals-bindings-leader|
-  Intero		  |rituals-bindings-intero|
 
 ==============================================================================
 INTRODUCTION						*rituals-introduction*
@@ -25,56 +24,6 @@ LEADER SEQUENCE					     *rituals-bindings-leader*
 Leader sequence is set as:
 >
 	<leader> = ","
-<
-------------------------------------------------------------------------------
-INTERO						     *rituals-bindings-intero*
-
-All sequences start with "<Leader>hi" sequence, where "hi" stands for Haskell
-Intero.
-
-Open Intero console:
->
- 	<Leader>hio
-<
-Hide Intero console:
->
-	<Leader>hic
-<
-	or
->
-	<Leader>hih
-<
-Load current module in Intero:
->
-	<Leader>hil
-<
-Evaluate Haskell expression by Intero:
->
-	<Leader>hie
-<
-Get generic type information for current (below cursor) expression:
->
-	<Leader>hit
-<
-Get type information for current (below cursor) expression:
->
-	<Leader>hiT
-<
-Get detailed information about current (below cursor) definition:
->
-	<Leader>hii
-<
-Insert current (below cursor) expression's type:
->
-	<Leader>hiI
->
-Go to definition:
->
-	<Leader>hid
->
-Highlight uses of identifier:
->
-	<Leader>hiu
 <
 ==============================================================================
 vim:tw=78:ts=8:ft=help:norl:noet:fen:noet:

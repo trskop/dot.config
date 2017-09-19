@@ -20,6 +20,14 @@ Urxvt it can be by done in `.Xresources`/`.Xdefaults`, e.g.:
 URxvt.font: xft:DejaVu Sans Mono for Powerline:size=14:style=Book
 ```
 
+Install Haskell IDE Engine
+
+```Bash
+git clone https://github.com/haskell/haskell-ide-engine ~/.local/src/haskell/haskell-ide-engine
+cd ~/.local/src/haskell/haskell-ide-engine
+stack install
+```
+
 Configure Neovim:
 
 ```Bash
