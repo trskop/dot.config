@@ -19,7 +19,7 @@
 " |   |-- nathanaelkane/vim-indent-guides
 " |   |-- raichoo/purescript-vim
 " |
-" `-- Background Hack
+" `-- Terminal
 "
 " }}} Table of Contents -------------------------------------------------------
 
@@ -413,3 +413,10 @@ let g:purescript_indent_do = 3
 " }}} Plugin -- raichoo/purescript-vim ----------------------------------------
 
 " }}} Plugin ------------------------------------------------------------------
+
+" {{{ Terminal ----------------------------------------------------------------
+
+nmap <silent> <leader>t <ESC>:belowright split +terminal<CR>
+nmap <silent> <leader>T <ESC>:belowright vsplit +terminal<CR>
+
+" }}} Terminal ----------------------------------------------------------------
