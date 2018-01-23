@@ -2,13 +2,16 @@ snippet #!
 abbr    #!/usr/bin/env stack ...
 	#!/usr/bin/env stack
 	{- stack script
-		--resolver ${1:lts-8.0}
+		--resolver ${1:lts-10.3}
 		--package ${0:turtle}
 		--
 	-}
 
 snippet lang
 	{-# LANGUAGE ${0:OverloadedStrings} #-}
+
+snippet langStrictData
+	{-# LANGUAGE StrictData #-}
 
 snippet langDataKinds
 	{-# LANGUAGE DataKinds #-}
@@ -26,7 +29,7 @@ snippet haddock
 	{-# OPTIONS_HADDOCK ${0:hide} #-}
 
 snippet ghc
-	{-# OPTIONS_GHC ${0:-fno-warn-unused-imports} #-}
+	{-# OPTIONS_GHC ${0:-Wno-unused-imports -Wno-orphans} #-}
 
 snippet inline
 	{-# INLINE ${0:name} #-}
@@ -102,7 +105,7 @@ snippet info
 	-- |
 	-- Module:      ${1:`substitute(substitute(expand('%:r'), '[/\\]','.','g'),'^\%(\l*\.\)\?','','')`}
 	-- Description: ${2:TODO: Module synopsis}
-	-- Copyright:   (c) ${3:2017} ${4:Peter Trško}
+	-- Copyright:   (c) ${3:2018} ${4:Peter Trško}
 	-- License:     ${5:BSD3}
 	--
 	-- Maintainer:  ${6:peter.trsko@gmail.com}
@@ -115,7 +118,7 @@ snippet module
 	-- |
 	-- Module:      ${1:`substitute(substitute(expand('%:r'), '[/\\]','.','g'),'^\%(\l*\.\)\?','','')`}
 	-- Description: ${2:TODO: Module synopsis}
-	-- Copyright:   (c) ${3:2017} ${4:Peter Trško}
+	-- Copyright:   (c) ${3:2018} ${4:Peter Trško}
 	-- License:     ${5:BSD3}
 	--
 	-- Maintainer:  ${6:peter.trsko@gmail.com}
