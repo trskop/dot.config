@@ -253,6 +253,9 @@ let g:LanguageClient_serverCommands = {
     \ 'haskell': ['hie', '--lsp'],
     \ }
 
+nmap <silent> <leader>d <ESC>:call LanguageClient_textDocument_definition()<CR>
+nmap <silent> <leader>f <ESC>:call LanguageClient_textDocument_hover()<CR>
+
 " }}} Plugin -- autozimu/LanguageClient-neovim --------------------------------
 
 " {{{ Plugin -- tomasr/molokai ------------------------------------------------
