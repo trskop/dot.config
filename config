@@ -1,0 +1,10 @@
+# This is Git's per-user configuration file.
+[user]
+	name = Peter Trško
+	email = peter.trsko@gmail.com
+[alias]
+	co = checkout
+	egrep = grep -E -n
+	amend = commit --amend
+[commit]
+	verbose = true
