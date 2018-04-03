@@ -173,7 +173,14 @@ if dein#load_state('~/.config/nvim/dein.vim')
   " Language Server Protocol support for Neovim. See
   " https://github.com/Microsoft/language-server-protocol for more
   " information.
-  call dein#add('autozimu/LanguageClient-neovim')
+  "
+  " Installation instructions:
+  "
+  "   https://github.com/autozimu/LanguageClient-neovim/blob/next/INSTALL.md#deinvim-user
+  call dein#add('autozimu/LanguageClient-neovim', {
+    \ 'rev': 'next',
+    \ 'build': 'bash install.sh',
+    \ })
 
   " Syntax highlighting and indentation for Purescript based on idris-vim and
   " haskell-vim.
