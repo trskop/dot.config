@@ -8,3 +8,5 @@
 	amend = commit --amend
 [commit]
 	verbose = true
+[push]
+	default = simple
