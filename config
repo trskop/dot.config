@@ -3,6 +3,7 @@
 	name = Peter Trško
 	email = peter.trsko@gmail.com
 [alias]
+	pretty-log = log --graph --decorate --stat
 	co = checkout
 	egrep = grep -E -n
 	amend = commit --amend
