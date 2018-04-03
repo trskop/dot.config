@@ -7,6 +7,8 @@
 	co = checkout
 	egrep = grep -E -n
 	amend = commit --amend
+[grep]
+	lineNumber = true
 [commit]
 	verbose = true
 [push]
