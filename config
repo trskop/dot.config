@@ -13,3 +13,5 @@
 	verbose = true
 [push]
 	default = simple
+[rebase]
+	autoStash = true
