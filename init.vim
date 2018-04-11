@@ -18,6 +18,7 @@
 " |   |-- scrooloose/nerdcommenter
 " |   |-- nathanaelkane/vim-indent-guides
 " |   |-- raichoo/purescript-vim
+" |   |-- aklt/plantuml-syntax
 " |
 " `-- Terminal
 "
@@ -189,6 +190,9 @@ if dein#load_state('~/.config/nvim/dein.vim')
   " Syntax highlighting for the Smart Game Format, which is the default
   " savegame format for the two-player Go game.
   call dein#add('vim-scripts/sgf.vim')
+
+  " Syntax highlighting for PlantUML (http://plantuml.com).
+  call dein#add('aklt/plantuml-syntax')
 
   " }}} Plugin -- Dein.vim -- Plugins to Install ------------------------------
 
