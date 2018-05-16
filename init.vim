@@ -1,4 +1,4 @@
-" {{{ Table of Contents -------------------------------------------------------
+", {{{ Table of Contents -------------------------------------------------------
 "
 " ~/.config/nvim/init.vim
 " |-- Basics
@@ -11,6 +11,7 @@
 " |   |-- Shougo/deoplete.vim
 " |   |-- Shougo/neosnippet.vim
 " |   |-- autozimu/LanguageClient-neovim
+" |   |-- junegunn/fzf.vim
 " |   |-- tomasr/molokai
 " |   |-- neovimhaskell/haskell-vim
 " |   |-- vim-airline/vim-airline
@@ -127,7 +128,17 @@ if dein#load_state('~/.config/nvim/dein.vim')
   " It's an interactive Unix filter for command-line that can be used with any
   " list; files, command history, processes, hostnames, bookmarks, git
   " commits, etc.
-  call dein#add('junegunn/fzf')
+  "
+  " Repository 'junegunn/fzf' is used to install Fzf command-line tool. It also
+  " provides basic Vim/Neovim integration (:FZF command). Full Vim/Neovim
+  " integration is provided by 'junegunn/fzf.vim'.
+  "
+  " Install command `./install --all` is there so the interactive script
+  " doesn't block.
+  "
+  " Instructions taken from <https://github.com/Shougo/dein.vim/issues/74>
+  call dein#add('junegunn/fzf', { 'build': './install --all', 'merged': 0 })
+  call dein#add('junegunn/fzf.vim', { 'depends': 'fzf' })
 
   " This is a fast, extensible, async completion framework for Neovim.
   call dein#add('roxma/nvim-completion-manager')
@@ -265,9 +276,57 @@ let g:LanguageClient_serverCommands = {
     \ }
 
 nmap <silent> <leader>d <ESC>:call LanguageClient_textDocument_definition()<CR>
-nmap <silent> <leader>f <ESC>:call LanguageClient_textDocument_hover()<CR>
+nmap <silent> <leader>D <ESC>:call LanguageClient_textDocument_hover()<CR>
 
 " }}} Plugin -- autozimu/LanguageClient-neovim --------------------------------
+
+" {{{ Plugin -- junegunn/fzf.vim ----------------------------------------------
+
+if has('nvim') || has('gui_running')
+  let $FZF_DEFAULT_OPTS .= ' --inline-info'
+endif
+
+" Hide statusline of terminal buffer
+autocmd! FileType fzf
+autocmd  FileType fzf set laststatus=0 noshowmode noruler
+  \| autocmd BufLeave <buffer> set laststatus=2 showmode ruler
+
+let g:fzf_colors =
+\ { 'fg':      ['fg', 'Normal'],
+  \ 'bg':      ['bg', 'Normal'],
+  \ 'hl':      ['fg', 'Comment'],
+  \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
+  \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
+  \ 'hl+':     ['fg', 'Statement'],
+  \ 'info':    ['fg', 'PreProc'],
+  \ 'border':  ['fg', 'Ignore'],
+  \ 'prompt':  ['fg', 'Conditional'],
+  \ 'pointer': ['fg', 'Exception'],
+  \ 'marker':  ['fg', 'Keyword'],
+  \ 'spinner': ['fg', 'Label'],
+  \ 'header':  ['fg', 'Comment'] }
+
+command! -bang -nargs=? -complete=dir Files
+  \ call fzf#vim#files(<q-args>, fzf#vim#with_preview(), <bang>0)
+
+" nnoremap <silent> <Leader><Leader> :Files<CR>
+nnoremap <silent> <expr> <Leader><Leader> (expand('%') =~ 'NERD_tree' ? "\<c-w>\<c-w>" : '').":Files\<cr>"
+
+nnoremap <silent> <Leader><Enter>  :Buffers<CR>
+nnoremap <silent> <Leader>l        :Lines<CR>
+nnoremap <silent> <Leader>`        :Marks<CR>
+
+nmap <leader><tab> <plug>(fzf-maps-n)
+xmap <leader><tab> <plug>(fzf-maps-x)
+omap <leader><tab> <plug>(fzf-maps-o)
+
+"inoremap <expr> <c-x><c-t> fzf#complete('tmuxwords.rb --all-but-current --scroll 500 --min 5')
+imap <c-x><c-k> <plug>(fzf-complete-word)
+imap <c-x><c-f> <plug>(fzf-complete-path)
+inoremap <expr> <c-x><c-d> fzf#vim#complete#path('blsd')
+imap <c-x><c-l> <plug>(fzf-complete-line)
+
+" }}} Plugin -- junegunn/fzf.vim ----------------------------------------------
 
 " {{{ Plugin -- tomasr/molokai ------------------------------------------------
 
@@ -396,7 +455,7 @@ let g:indent_guides_start_level = 2
 highlight IndentGuidesOdd  ctermbg=234
 highlight IndentGuidesEven ctermbg=236
 
-:nmap <silent> <Leader>ig <Plug>IndentGuidesToggle
+nmap <silent> <Leader>ig <Plug>IndentGuidesToggle
 
 " }}} Plugin -- nathanaelkane/vim-indent-guides -------------------------------
 
