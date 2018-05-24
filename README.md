@@ -33,20 +33,8 @@ Urxvt it can be by done in `.Xresources`/`.Xdefaults`, e.g.:
 URxvt.font: xft:DejaVu Sans Mono for Powerline:size=14:style=Book
 ```
 
-Install *Haskell IDE Engine* (by default for GHC 8.2.2):
-
-```Bash
-git clone https://github.com/haskell/haskell-ide-engine ~/.local/src/haskell/haskell-ide-engine
-cd ~/.local/src/haskell/haskell-ide-engine
-stack install
-```
-
-When installing *Haskell IDE Engine* for GHC 8.0.2 use following
-`stack install` command instead:
-
-```Bash
-stack --stack-yaml=stack-8.0.2.yaml install
-```
+Install *Haskell IDE Engine* using [official installation instructions
+](https://github.com/haskell/haskell-ide-engine#installation).
 
 
 ### Mac OS X
@@ -82,20 +70,18 @@ directory. Press "Open".
 brew install icu4c
 ```
 
-Install *Haskell IDE Engine* (by default for GHC 8.2.2):
+Install *Haskell IDE Engine*:
 
-```Bash
-git clone https://github.com/haskell/haskell-ide-engine ~/.local/src/haskell/haskell-ide-engine
-cd ~/.local/src/haskell/haskell-ide-engine
-stack --extra-lib-dirs=/usr/local/opt/icu4c/lib --extra-include-dirs=/usr/local/opt/icu4c/include install
-```
+* [Official instructions for installing *Haskell IDE Engine*
+  ](https://github.com/haskell/haskell-ide-engine#installation)
 
-When installing *Haskell IDE Engine* for GHC 8.0.2 use following
-`stack install` command instead:
+* When using Brew the build command had to be modified. Installation example:
 
-```Bash
-stack --stack-yaml=stack-8.0.2.yaml --extra-lib-dirs=/usr/local/opt/icu4c/lib --extra-include-dirs=/usr/local/opt/icu4c/include install
-```
+    ```Bash
+    git clone --recursive https://github.com/haskell/haskell-ide-engine ~/.local/src/haskell/haskell-ide-engine
+    cd ~/.local/src/haskell/haskell-ide-engine
+    stack [--stack-yaml=FILE] --extra-lib-dirs=/usr/local/opt/icu4c/lib --extra-include-dirs=/usr/local/opt/icu4c/include install
+    ```
 
 
 ### All Platforms
