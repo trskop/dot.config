@@ -105,6 +105,9 @@ nvim -c ':helptags ~/.config/nvim/doc/ | :UpdateRemotePlugins'
 Somewhat annotated and incomplete list of used Neovim plugins and integrated
 command line tools. See [`init.vim`](init.vim) for more.
 
+Custom commands and shortcuts are documented in `:help rituals`, i.e.
+[`doc/rituals.txt`](rituals.txt).
+
 
 ### Git Integration (plugins)
 
@@ -135,49 +138,66 @@ used outside of Neovim, e.g. for use in bash scripts.
 [github.com/scrooloose/nerdtree](https://github.com/scrooloose/nerdtree)
 (plugin)
 
-[github.com/Xuyuanp/nerdtree-git-plugin](https://github.com/Xuyuanp/nerdtree-git-plugin)
-(plugin) which extends `scrooloose/nerdtree`.
+[github.com/Xuyuanp/nerdtree-git-plugin
+](https://github.com/Xuyuanp/nerdtree-git-plugin) (plugin) which extends
+`scrooloose/nerdtree`.
 
 See also [`init.vim`](init.vim) for more information.
 
 
 ### Syntax Highlighting for PureScript (plugin)
 
-[github.com/purescript-contrib/purescript-vim](https://github.com/purescript-contrib/purescript-vim)
+[github.com/purescript-contrib/purescript-vim
+](https://github.com/purescript-contrib/purescript-vim)
 
-Installation and configuration: [README.md#installation](https://github.com/purescript-contrib/purescript-vim#installation).
+Installation and configuration: [purescript-vim/README.md#installation
+](https://github.com/purescript-contrib/purescript-vim#installation).
 
 
 ### Better Syntax Highlighting for Haskell (plugin)
 
-[github.com/neovimhaskell/haskell-vim](https://github.com/neovimhaskell/haskell-vim)
+[github.com/neovimhaskell/haskell-vim
+](https://github.com/neovimhaskell/haskell-vim)
 
-Installation and configuration: [README.md#installation](https://github.com/neovimhaskell/haskell-vim#installation).
+Installation and configuration: [haskell-vim/README.md#installation
+](https://github.com/neovimhaskell/haskell-vim#installation).
 
 
 ### LSP (Language Server Protocol) Client for Neovim (plugin)
 
-Pligin: [LanguageClient-neovim](https://github.com/autozimu/LanguageClient-neovim)
+Pligin: [github.com/autozimu/LanguageClient-neovim
+](https://github.com/autozimu/LanguageClient-neovim)
 
-Installation and configuration: [INSTALL.md](https://github.com/autozimu/LanguageClient-neovim/blob/next/INSTALL.md)
+Installation and configuration: [LanguageClient-neovim/INSTALL.md
+](https://github.com/autozimu/LanguageClient-neovim/blob/next/INSTALL.md)
 
 
 ### Haskell IDE Engine (command line tool)
 
-[github.com/haskell/haskell-ide-engine](https://github.com/haskell/haskell-ide-engine)
+[github.com/haskell/haskell-ide-engine
+](https://github.com/haskell/haskell-ide-engine)
 
-Requires: *LanguageClient-neovim* plugin (see above)
+Requires: [*LanguageClient-neovim*
+](#lsp-language-server-protocol-client-for-neovim-plugin) plugin
 
-Installation instructions:
-[README.md#installation](https://github.com/haskell/haskell-ide-engine#installation)
+Installation instructions: [haskell-ide-engine/README.md#installation
+](https://github.com/haskell/haskell-ide-engine#installation)
 
 Configuration instructions:
 
 * *LanguageClient-neovim* configuration:
-  [README.md#using-hie-with-neovim](https://github.com/haskell/haskell-ide-engine#using-hie-with-neovim)
+  [haskell-ide-engine/README.md#using-hie-with-neovim
+  ](https://github.com/haskell/haskell-ide-engine#using-hie-with-neovim)
 
 * Docs on hover/completion:
-  [README.md#docs-on-hovercompletion](https://github.com/haskell/haskell-ide-engine#docs-on-hovercompletion)
+  [haskell-ide-engine/README.md#docs-on-hovercompletion
+  ](https://github.com/haskell/haskell-ide-engine#docs-on-hovercompletion)
+
+After installation users don't interact with Haskell IDE Engine directly, but
+through [*LanguageClient-neovim*
+](#lsp-language-server-protocol-client-for-neovim-plugin) plugin. See its
+documentation (`:help LanguageClient`) and [`init.vim`](init.vim) for more
+information.
 
 
 ### PlantUML (command line tool, plugin)
