@@ -98,3 +98,97 @@ wget https://raw.githubusercontent.com/Shougo/dein.vim/master/bin/installer.sh
 sh installer.sh dein.vim
 nvim -c ':helptags ~/.config/nvim/doc/ | :UpdateRemotePlugins'
 ```
+
+
+## Notes
+
+Somewhat annotated and incomplete list of used Neovim plugins and integrated
+command line tools. See [`init.vim`](init.vim) for more.
+
+
+### Git Integration (plugins)
+
+[tpope/vim-fugitive](https://github.com/tpope/vim-fugitive)
+
+[int3/vim-extradite](https://github.com/int3/vim-extradite) which extends
+`vim-fugitive`
+
+Ubuntu PPA with latest Git packages:
+<https://launchpad.net/~git-core/+archive/ubuntu/ppa>
+
+Personalised Git configuration:
+[github.com/trskop/dot.config-git](https://github.com/trskop/dot.config-git)
+
+
+### FZF (Fuzzy Finder) Integration (command line tool, plugins)
+
+[junegunn/fzf](https://github.com/junegunn/fzf) (command line tool, plugin)
+
+[junegunn/fzf.vim](https://github.com/junegunn/fzf.vim) (plugin)
+
+See also [`init.vim`](init.vim) for more information. Fzf can be installed and
+used outside of Neovim, e.g. for use in bash scripts.
+
+
+### NERDTree (Hierarchical File System Browser) plugin
+
+[github.com/scrooloose/nerdtree](https://github.com/scrooloose/nerdtree)
+(plugin)
+
+[github.com/Xuyuanp/nerdtree-git-plugin](https://github.com/Xuyuanp/nerdtree-git-plugin)
+(plugin) which extends `scrooloose/nerdtree`.
+
+See also [`init.vim`](init.vim) for more information.
+
+
+### Syntax Highlighting for PureScript (plugin)
+
+[github.com/purescript-contrib/purescript-vim](https://github.com/purescript-contrib/purescript-vim)
+
+Installation and configuration: [README.md#installation](https://github.com/purescript-contrib/purescript-vim#installation).
+
+
+### Better Syntax Highlighting for Haskell (plugin)
+
+[github.com/neovimhaskell/haskell-vim](https://github.com/neovimhaskell/haskell-vim)
+
+Installation and configuration: [README.md#installation](https://github.com/neovimhaskell/haskell-vim#installation).
+
+
+### LSP (Language Server Protocol) Client for Neovim (plugin)
+
+Pligin: [LanguageClient-neovim](https://github.com/autozimu/LanguageClient-neovim)
+
+Installation and configuration: [INSTALL.md](https://github.com/autozimu/LanguageClient-neovim/blob/next/INSTALL.md)
+
+
+### Haskell IDE Engine (command line tool)
+
+[github.com/haskell/haskell-ide-engine](https://github.com/haskell/haskell-ide-engine)
+
+Requires: *LanguageClient-neovim* plugin (see above)
+
+Installation instructions:
+[README.md#installation](https://github.com/haskell/haskell-ide-engine#installation)
+
+Configuration instructions:
+
+* *LanguageClient-neovim* configuration:
+  [README.md#using-hie-with-neovim](https://github.com/haskell/haskell-ide-engine#using-hie-with-neovim)
+
+* Docs on hover/completion:
+  [README.md#docs-on-hovercompletion](https://github.com/haskell/haskell-ide-engine#docs-on-hovercompletion)
+
+
+### PlantUML (command line tool, plugin)
+
+[plantuml.com](http://plantuml.com) (command line tool)
+
+[github.com/aklt/plantuml-syntax](https://github.com/aklt/plantuml-syntax)
+(plugin)
+
+Installation *PlantUML* command line tool on Debian-compatible systems:
+
+```bash
+apt install plantuml graphviz
+```

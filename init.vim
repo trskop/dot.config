@@ -9,6 +9,7 @@
 " |-- Plugin
 " |   |-- Dein.vim
 " |   |-- Shougo/deoplete.vim
+" |   |-- Shougo/echodoc.vim
 " |   |-- Shougo/neosnippet.vim
 " |   |-- autozimu/LanguageClient-neovim
 " |   |-- junegunn/fzf.vim
@@ -163,7 +164,11 @@ if dein#load_state('~/.config/nvim/dein.vim')
   " directories. It presents the filesystem to you in the form of a tree which
   " you manipulate with the keyboard and/or mouse. It also allows you to
   " perform simple filesystem operations.
+  "
+  " Plugin 'Xuyuanp/nerdtree-git-plugin' provides functionality for showing
+  " Git flags (modified, staged, untracked, etc.) in NERDTree.
   call dein#add('scrooloose/nerdtree')
+  call dein#add('Xuyuanp/nerdtree-git-plugin')
 
   " Functions for manipulation of comments in source code. For example,
   " commenting-out lines.
@@ -228,6 +233,13 @@ endif
 let g:deoplete#enable_at_startup = 1
 
 " }}} Plugin -- Shougo/deoplete.vim -------------------------------------------
+
+" {{{ Plugin -- Shougo/echodoc.vim --------------------------------------------
+
+" Prevent mode information in cmdline to overwrite echodoc's output:
+set cmdheight=2
+
+" }}} Plugin -- Shougo/echodoc.vim --------------------------------------------
 
 " {{{ Plugin -- Shougo/neosnippet.vim -----------------------------------------
 
