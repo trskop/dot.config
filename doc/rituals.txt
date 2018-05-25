@@ -65,12 +65,18 @@ Make a vertical split and open terminal in the new window:
 ------------------------------------------------------------------------------
 LANGUAGE CLIENT 				     *rituals-language-client*
 
+Show context menu, i.e. list of possible LanguageClient actions allowing user
+to select one:
+>
+	<leader>c
+>
+
 Goto definition:
 >
 	<Leader>d
 <
 
-Goto definition:
+Show type info (and short doc) of identifier under cursor:
 >
 	<Leader>D
 <
