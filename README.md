@@ -33,8 +33,17 @@ Urxvt it can be by done in `.Xresources`/`.Xdefaults`, e.g.:
 URxvt.font: xft:DejaVu Sans Mono for Powerline:size=14:style=Book
 ```
 
-Install *Haskell IDE Engine* using [official installation instructions
-](https://github.com/haskell/haskell-ide-engine#installation).
+Install *Haskell IDE Engine* using instructions in section [Haskell IDE Engine
+(command line tool)](#haskell-ide-engine-command-line-tool).
+
+
+#### Debian
+
+Dependencies required by installation of Haskell IDE Engine:
+
+```Bash
+apt install libtinfo-dev
+```
 
 
 ### Mac OS X
@@ -72,10 +81,10 @@ brew install icu4c
 
 Install *Haskell IDE Engine*:
 
-* [Official instructions for installing *Haskell IDE Engine*
-  ](https://github.com/haskell/haskell-ide-engine#installation)
+* Follow instructions in section [Haskell IDE Engine (command line tool)
+  ](#haskell-ide-engine-command-line-tool).
 
-* When using Brew the build command had to be modified. Installation example:
+* When using Brew, the build command had to be modified:
 
     ```Bash
     git clone --recursive https://github.com/haskell/haskell-ide-engine ~/.local/src/haskell/haskell-ide-engine
@@ -198,6 +207,12 @@ through [*LanguageClient-neovim*
 ](#lsp-language-server-protocol-client-for-neovim-plugin) plugin. See its
 documentation (`:help LanguageClient`) and [`init.vim`](init.vim) for more
 information.
+
+Build script and *Haskell IDE Eengine* wrapper for GHC 8.0.2, 8.2.2, and 8.4.2:
+[gist.github.com/trskop/1c8f78a62f92906763437bc3ead56539
+](https://gist.github.com/trskop/1c8f78a62f92906763437bc3ead56539). The way
+*HIE* is installed, along with the wrapper script, allows using it for all
+three GHC versions without any additional configuration or manual intervention.
 
 
 ### PlantUML (command line tool, plugin)
