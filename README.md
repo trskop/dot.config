@@ -23,3 +23,10 @@ git remote add origin git@github.com:trskop/dot.config.git
 git fetch --all
 git checkout -b master origin/master
 ```
+
+
+Other Resources
+---------------
+
+* [XDG Base Directory Specification
+  ](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html)
