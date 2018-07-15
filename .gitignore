@@ -1,3 +1,6 @@
+# We have to be careful when committing changes into this repository. By
+# default everything is ignored and only specific files/directories are allowed
+# back. For more information see https://git-scm.com/docs/gitignore
 /*
 !.gitignore
 !/ghc/
