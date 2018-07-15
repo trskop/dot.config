@@ -1,4 +1,4 @@
-Tmux doesn't support XDG directoriessee their [GitHub issue #142
+Tmux doesn't support XDG directories see their [GitHub issue #142
 ](https://github.com/tmux/tmux/issues/142) for more details. To get around this
 we can either create a symlink:
 
