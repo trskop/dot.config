@@ -1,6 +1,7 @@
 User configuration files (dot–files)
 ====================================
 
+* GHCi configuration, see [ghc/README.md](ghc/README.md) for more information.
 * Git configuration, see [git/README.md](git/README.md) for more information.
 * Haskeline configuration, see [haskeline/README.md](haskeline/README.md) for
   more information.

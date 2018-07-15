@@ -1,5 +1,7 @@
 /*
 !.gitignore
+!/ghc/
+/ghc/ghci_history
 !/git/
 !/haskeline/
 !/tmux/
