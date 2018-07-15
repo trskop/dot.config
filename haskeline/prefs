@@ -1,0 +1,4 @@
+editMode: Vi
+-- completionType: MenuCompletion
+maxhistorysize: Just 10000
+historyDuplicates: IgnoreConsecutive

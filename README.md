@@ -2,6 +2,8 @@ User configuration files (dot–files)
 ====================================
 
 * Git configuration, see [git/README.md](git/README.md) for more information.
+* Haskeline configuration, see [haskeline/README.md](haskeline/README.md) for
+  more information.
 * Tmux configuration, see [tmux/README.md](tmux/README.md) for more
   information.
 

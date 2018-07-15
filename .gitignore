@@ -1,5 +1,6 @@
 /*
 !.gitignore
-!README.md
-!/tmux/
 !/git/
+!/haskeline/
+!/tmux/
+!README.md
