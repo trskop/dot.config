@@ -23,6 +23,7 @@ git init
 git remote add origin git@github.com:trskop/dot.config.git
 git fetch --all
 git checkout -b master origin/master
+~/.config/dot.config.init.hs
 ```
 
 
