@@ -12,3 +12,7 @@ Or we can use shell alias which specifies configuration file:
 ```Bash
 alias tmux='TERM=xterm-256color tmux -f "${XDG_CONFIG_HOME}"/tmux/tmux.conf'
 ```
+
+Reading material:
+
+* [tmux-sensible](zhttps://github.com/tmux-plugins/tmux-sensible)
