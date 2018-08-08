@@ -34,6 +34,9 @@ set scrolloff=2
 " Show commands, as they are constructed, in the status line.
 set showcmd
 
+" Show the effects of a command incrementatlly, as you type.
+set inccommand=nosplit
+
 " {{{ Basics -- Leader --------------------------------------------------------
 
 " With a map leader it's possible to do extra key combinations
