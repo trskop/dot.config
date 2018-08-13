@@ -213,6 +213,9 @@ if dein#load_state('~/.config/nvim/dein.vim')
   " Syntax highlighting for PlantUML (http://plantuml.com).
   call dein#add('aklt/plantuml-syntax')
 
+  " Syntax highlighting for Dhall (https://github.com/dhall-lang/dhall-lang)
+  call dein#add('vmchale/dhall-vim')
+
   " }}} Plugin -- Dein.vim -- Plugins to Install ------------------------------
 
   " Required:
