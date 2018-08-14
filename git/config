@@ -13,9 +13,16 @@
 	verbose = true
 [push]
 	default = simple
+[pull]
+	ff = only
 [rebase]
 	autoStash = true
 [merge]
 	ff = only
-[pull]
-	ff = only
+	tool = vimdiff
+	# Include original text in the conflictin file.
+	conflictstyle = diff3
+[mergetool]
+	prompt = true
+[mergetool "vimdiff"]
+	cmd = nvim -d -O ${LOCAL} ${REMOTE} ${MERGED}
