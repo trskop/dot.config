@@ -8,6 +8,7 @@
 !/ghc/
 !/git/
 !/haskeline/
+!/sensible-editor/
 !/tmux/
 !README.md
 !dot.config.init.hs

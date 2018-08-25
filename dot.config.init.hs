@@ -1,6 +1,6 @@
 #!/usr/bin/env stack
 {- stack script
-    --resolver lts-12.0
+    --resolver lts-12.7
     --package directory
     --package executable-path
     --package shake
@@ -59,12 +59,16 @@ install home srcDir opts = shakeArgs opts $ do
     want
         [ home </> ".ghc/ghci.conf"
         , home </> ".haskeline"
+        , home </> ".selected_editor"
         ]
 
     (home </> ".ghc/ghci.conf") %> \out -> do
         let src = srcDir </> "ghc"
             dst = (takeDirectory out)
         targetExists <- doesDirectoryExist dst
+        -- TODO: If target is a symbolic link, then it should be removed
+        --       instead of renamed, since there will be no permanent
+        --       information loss.
         when targetExists
           $ cmd "mv" dst (takeDirectory dst </> ".ghc-bac")
         () <- cmd "chmod 700" src
@@ -72,6 +76,10 @@ install home srcDir opts = shakeArgs opts $ do
 
     (home </> ".haskeline") %> \out ->
         let src = (srcDir </> "haskeline" </> "prefs") `dropPrefix` home
+        in cmd "ln -sf" src out
+
+    (home </> ".selected_editor") %> \out ->
+        let src = (srcDir </> "sensible-editor" </> "selected_editor") `dropPrefix` home
         in cmd "ln -sf" src out
 
 dropPrefix :: FilePath -> FilePath -> FilePath
