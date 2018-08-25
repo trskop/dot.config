@@ -15,3 +15,9 @@
 
 # Contains private information.
 /ghc/ghci_history
+
+!/command-wrapper/
+# Top-level Dhall configs are generated:
+/command-wrapper/*.dhall
+# This is machine specific, and it exposes too much information:
+/command-wrapper/cd/directories.dhall
