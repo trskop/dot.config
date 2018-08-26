@@ -16,8 +16,15 @@
 # Contains private information.
 /ghc/ghci_history
 
+# {{{ Command Wrapper #########################################################
+
 !/command-wrapper/
+!/yx/
 # Top-level Dhall configs are generated:
+/yx/*.dhall
 /command-wrapper/*.dhall
 # This is machine specific, and it exposes too much information:
 /command-wrapper/cd/directories.dhall
+/yx/default/aliases.dhall
+
+# }}} Command Wrapper #########################################################
