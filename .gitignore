@@ -11,6 +11,7 @@
 !/sensible-editor/
 !/tmux/
 !README.md
+!Xresources
 !dot.config.init.hs
 
 # Contains private information.

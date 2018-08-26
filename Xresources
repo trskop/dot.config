@@ -1,0 +1,17 @@
+! xrdb -merge ~/.Xresources
+
+! {{{ URxvt settings !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! Same result as using: rxvt -depth 32 -bg '[80]black' -fg gray +sb -bl
+URxvt.depth: 32
+URxvt.background: [80]black
+URxvt.foreground: gray
+URxvt.cursorColor: lightblue
+URxvt.scrollBar: False
+URxvt.borderLess: True
+! URxvt.font: xft:DejaVu Sans Mono:size=14:style=Book
+! URxvt.font: xft:DejaVu Sans Mono:size=14
+URxvt.font: xft:DejaVu Sans Mono for Powerline:size=16:style=Book
+URxvt.visualBell: True
+
+! }}} URxvt settings !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

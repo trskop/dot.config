@@ -60,6 +60,7 @@ install home srcDir opts = shakeArgs opts $ do
         [ home </> ".ghc/ghci.conf"
         , home </> ".haskeline"
         , home </> ".selected_editor"
+        , home </> ".Xresources"
         ]
 
     (home </> ".ghc/ghci.conf") %> \out -> do
@@ -80,6 +81,10 @@ install home srcDir opts = shakeArgs opts $ do
 
     (home </> ".selected_editor") %> \out ->
         let src = (srcDir </> "sensible-editor" </> "selected_editor") `dropPrefix` home
+        in cmd "ln -sf" src out
+
+    (home </> ".Xresources") %> \out ->
+        let src = (srcDir </> "Xresources") `dropPrefix` home
         in cmd "ln -sf" src out
 
 dropPrefix :: FilePath -> FilePath -> FilePath
