@@ -1,8 +1,8 @@
   let
-    CommandWrapper = ~/Devel/command-wrapper/dhall/CommandWrapper/Type/package.dhall
+    CommandWrapper = ~/.local/src/trskop/command-wrapper/dhall/CommandWrapper/Type/package.dhall
 
 in let
-    commandWrapper = ~/Devel/command-wrapper/dhall/CommandWrapper/package.dhall
+    commandWrapper = ~/.local/src/trskop/command-wrapper/dhall/CommandWrapper/package.dhall
 
 in let
     context =
