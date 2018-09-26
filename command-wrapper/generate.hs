@@ -60,6 +60,7 @@ install opts = shakeArgs opts $ do
     want
         [ "default.dhall"
         , "command-wrapper-cd.dhall"
+        , "command-wrapper-exec.dhall"
         , "command-wrapper-skel.dhall"
         ]
 

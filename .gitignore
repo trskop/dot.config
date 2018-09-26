@@ -26,6 +26,7 @@
 /command-wrapper/*.dhall
 # This is machine specific, and it exposes too much information:
 /command-wrapper/cd/directories.dhall
+/command-wrapper/exec/commands.dhall
 /yx/default/aliases.dhall
 
 # }}} Command Wrapper #########################################################
