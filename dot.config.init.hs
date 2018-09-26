@@ -61,6 +61,7 @@ install home srcDir opts = shakeArgs opts $ do
         , home </> ".haskeline"
         , home </> ".selected_editor"
         , home </> ".Xresources"
+        , home </> ".psqlrc"
         ]
 
     (home </> ".ghc/ghci.conf") %> \out -> do
@@ -85,6 +86,10 @@ install home srcDir opts = shakeArgs opts $ do
 
     (home </> ".Xresources") %> \out ->
         let src = (srcDir </> "Xresources") `dropPrefix` home
+        in cmd "ln -sf" src out
+
+    (home </> ".psqlrc") %> \out ->
+        let src = (srcDir </> "psql" </> "psqlrc") `dropPrefix` home
         in cmd "ln -sf" src out
 
 dropPrefix :: FilePath -> FilePath -> FilePath

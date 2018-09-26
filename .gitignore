@@ -8,6 +8,7 @@
 !/ghc/
 !/git/
 !/haskeline/
+!/psql/
 !/sensible-editor/
 !/tmux/
 !README.md

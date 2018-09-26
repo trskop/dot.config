@@ -6,6 +6,7 @@ in let
 
 in
       λ(pgpassFile : Optional Text)
+    → λ(psqlrcFile : Optional Text)
     → λ(hostname : Text)
     → λ(username : Text)
     → λ(database : Text)
@@ -14,21 +15,33 @@ in
     → λ(environment : List CommandWrapper.EnvironmentVariable)
     → { command = "psql"
       , arguments =
-          ["-h", hostname, "-U", username, database] # arguments
+          [ "--host=${hostname}"
+          , "--username=${username}"
+          , "--dbname=${database}"
+          ] # arguments
           -- TODO: Handle case when verbosity is set to `Silent` by passing
           -- `-q`/`--quiet` option to `psql`.
       , environment =
-          optional Text pgpassFile
-            (List CommandWrapper.EnvironmentVariable)
-            (   λ(file : Text)
-              → [ { name = "PGPASSFILE"
-                  , value = file
-                  }
-                ]
-            )
-            ([] : List CommandWrapper.EnvironmentVariable)
+          environment
+          # optional Text pgpassFile
+              (List CommandWrapper.EnvironmentVariable)
+              (   λ(file : Text)
+                → [ { name = "PGPASSFILE"
+                    , value = file
+                    }
+                  ]
+              )
+              ([] : List CommandWrapper.EnvironmentVariable)
+          # optional Text psqlrcFile
+              (List CommandWrapper.EnvironmentVariable)
+              (   λ(file : Text)
+                → [ { name = "PSQLRC"
+                    , value = file
+                    }
+                  ]
+              )
+              ([] : List CommandWrapper.EnvironmentVariable)
           -- TODO: Handle case when verbosity is set to ohter values than
           -- `Silent` by defining `VERBOSITY` environment variable.
-          # environment
       , searchPath = True
       }

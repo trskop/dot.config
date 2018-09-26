@@ -1,0 +1,25 @@
+\set HISTFILE ~/.psql-history- :HOST :DBNAME
+
+-- \set PROMPT1 '%[%033[1m%]%M %n@%/%R%[%033[0m%]%# '
+\set PROMPT1 '%[%033[38;5;140m%]%n%[%033[38;5;255m%]@%[%033[38;5;120m%]%m%[%033[38;5;102m%]/%/ %[%033[0m%] %# '
+\set PROMPT2 '[more] %R > '
+
+\x auto
+\set COMP_KEYWORD_CASE upper
+\set ON_ERROR_STOP on
+\set ON_ERROR_ROLLBACK interactive
+\set intervalstyle to 'postgres_verbose'; 
+
+\timing
+
+\pset pager always
+\setenv PAGER less
+\setenv LESS  -iMSx4FX
+
+\pset null '<null>'
+
+\pset linestyle 'unicode'
+\pset unicode_border_linestyle single
+\pset unicode_column_linestyle single
+\pset unicode_header_linestyle double
+
