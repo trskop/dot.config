@@ -4,20 +4,21 @@
 in let
     optional = Optional/fold
 
+in let
+    ConnectToDatabase = ./ConnectToDatabase.dhall
+
 in
       λ(pgpassFile : Optional Text)
     → λ(psqlrcFile : Optional Text)
-    → λ(hostname : Text)
-    → λ(username : Text)
-    → λ(database : Text)
+    → λ(connect : ConnectToDatabase)
+    → λ(environment : List CommandWrapper.EnvironmentVariable)
     → λ(verbosity : CommandWrapper.Verbosity)
     → λ(arguments : List Text)
-    → λ(environment : List CommandWrapper.EnvironmentVariable)
     → { command = "psql"
       , arguments =
-          [ "--host=${hostname}"
-          , "--username=${username}"
-          , "--dbname=${database}"
+          [ "--host=${connect.hostname}"
+          , "--username=${connect.username}"
+          , "--dbname=${connect.database}"
           ] # arguments
           -- TODO: Handle case when verbosity is set to `Silent` by passing
           -- `-q`/`--quiet` option to `psql`.
