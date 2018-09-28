@@ -11,6 +11,7 @@
 !/psql/
 !/sensible-editor/
 !/tmux/
+!/readline/
 !README.md
 !Xresources
 !dot.config.init.hs
