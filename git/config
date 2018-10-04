@@ -7,6 +7,7 @@
 	co = checkout
 	egrep = grep -E -n
 	amend = commit --amend
+	push-force = push --force-with-lease
 [grep]
 	lineNumber = true
 [commit]
