@@ -2,6 +2,8 @@
 
 set -e
 
+source ~/.local/src/trskop/command-wrapper/bash/lib.sh
+
 function declareCfg() {
     local -r configFile="$1"; shift
     local -r name="$1"; shift
@@ -18,34 +20,29 @@ function main() {
                 printHelp
                 exit 0
                 ;;
+            # TODO: Define options.
             -*)
-                error 1 "'%s': %s" "${arg}" 'Unknown option.'
+                die 1 "'%s': %s" "${arg}" 'Unknown option.'
                 ;;
             *)
-                error 1 "'%s': %s" "${arg}" 'Too many arguments.'
+                die 1 "'%s': %s" "${arg}" 'Too many arguments.'
                 ;;
         esac
     done
 
-    if  [[ -n "${COMMAND_WRAPPER_EXE}" ]]; then
-        error 1 'Error: COMMAND_WRAPPER_EXE: %s: %s' \
-            'Missing environment variable' \
-            'This command must be executed inside command-wrapper environment.'
+    dieIfExecutedOutsideOfCommandWrapperEnvironment
+
+    if [[ ! -e "${COMMAND_WRAPPER_CONFIG}" ]]; then
+        info "'%s': Generating default configuration file." \
+            "${COMMAND_WRAPPER_CONFIG}"
+
+        # TODO: Define defaults.
+        cat > "${COMMAND_WRAPPER_CONFIG}" <<< '{=}'
     fi
 
-    if  [[ -n "${COMMAND_WRAPPER_NAME}" ]]; then
-        error 1 'Error: COMMAND_WRAPPER_NAME: %s: %s' \
-            'Missing environment variable' \
-            'This command must be executed inside command-wrapper environment.'
-    fi
-
-    if  [[ -n "${COMMAND_WRAPPER_CONFIG}" ]]; then
-        error 1 'Error: COMMAND_WRAPPER_CONFIG: %s: %s' \
-            'Missing environment variable' \
-            'This command must be executed inside command-wrapper environment.'
-    fi
-
+    info "'%s': Loading configuration file." "${COMMAND_WRAPPER_CONFIG}"
     eval "$(declareCfg "${COMMAND_WRAPPER_CONFIG}" 'config')"
+    info "'%s': Configuration file loaded." "${COMMAND_WRAPPER_CONFIG}"
 
     # TODO: Implement me!
 }
