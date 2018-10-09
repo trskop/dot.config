@@ -45,4 +45,5 @@ in
           -- TODO: Handle case when verbosity is set to ohter values than
           -- `Silent` by defining `VERBOSITY` environment variable.
       , searchPath = True
+      , workingDirectory = [] : Optional Text
       }

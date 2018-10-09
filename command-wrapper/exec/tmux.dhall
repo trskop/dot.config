@@ -32,5 +32,5 @@ in
               )
               ([] : List CommandWrapper.EnvironmentVariable)
       , searchPath = True
---    , workingDirectory = workingDirectory
+      , workingDirectory = workingDirectory
       }
