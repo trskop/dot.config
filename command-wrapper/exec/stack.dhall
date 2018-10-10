@@ -1,37 +1,16 @@
   let
-    CommandWrapper = ~/.local/src/trskop/command-wrapper/dhall/CommandWrapper/Type/package.dhall
+    CommandWrapper =
+      ~/.local/src/trskop/command-wrapper/dhall/CommandWrapper/Type/package.dhall
+
+in let
+    commandWrapper =
+      ~/.local/src/trskop/command-wrapper/dhall/CommandWrapper/package.dhall
 
 in let
     optional = Optional/fold
 
 in let
-    FromVerbosity =
-        ∀(r : Type)
-      → ∀ (handler
-            : { Silent : ∀(_ : {}) → r
-              , Normal : ∀(_ : {}) → r
-              , Verbose : ∀(_ : {}) → r
-              , Annoying : ∀(_ : {}) → r
-              }
-          )
-      → ∀(verbosity : CommandWrapper.Verbosity)
-      → r
-
-in let
-    fromVerbosity : FromVerbosity =
-        λ(r : Type)
-      → λ(handler
-            : { Silent : ∀(_ : {}) → r
-              , Normal : ∀(_ : {}) → r
-              , Verbose : ∀(_ : {}) → r
-              , Annoying : ∀(_ : {}) → r
-              }
-          )
-      → λ(verbosity : CommandWrapper.Verbosity)
-      → merge handler verbosity
-
-in let
-    verbosityOption = fromVerbosity (List Text)
+    verbosityOption = commandWrapper.verbosity.fold (List Text)
       { Silent = λ(_ : {}) → ["--silent"]
       , Normal = λ(_ : {}) → [] : List Text
       , Verbose = λ(_ : {}) → ["--verbosity=info"]

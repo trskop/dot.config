@@ -1,5 +1,10 @@
   let
-    CommandWrapper = ~/.local/src/trskop/command-wrapper/dhall/CommandWrapper/Type/package.dhall
+    CommandWrapper =
+      ~/.local/src/trskop/command-wrapper/dhall/CommandWrapper/Type/package.dhall
+
+in let
+    commandWrapper =
+      ~/.local/src/trskop/command-wrapper/dhall/CommandWrapper/package.dhall
 
 in let
     optional = Optional/fold
@@ -16,12 +21,18 @@ in
     → λ(arguments : List Text)
     → { command = "psql"
       , arguments =
-          [ "--host=${connect.hostname}"
-          , "--username=${connect.username}"
-          , "--dbname=${connect.database}"
-          ] # arguments
-          -- TODO: Handle case when verbosity is set to `Silent` by passing
-          -- `-q`/`--quiet` option to `psql`.
+          commandWrapper.verbosity.fold (List Text)
+            { Silent = λ(_ : {}) → ["--quiet"]
+            , Normal = λ(_ : {}) → [] : List Text
+            , Verbose = λ(_ : {}) → [] : List Text
+            , Annoying = λ(_ : {}) → [] : List Text
+            }
+            verbosity
+          # [ "--host=${connect.hostname}"
+            , "--username=${connect.username}"
+            , "--dbname=${connect.database}"
+            ]
+          # arguments
       , environment =
           environment
           # optional Text pgpassFile
@@ -42,8 +53,30 @@ in
                   ]
               )
               ([] : List CommandWrapper.EnvironmentVariable)
-          -- TODO: Handle case when verbosity is set to ohter values than
-          -- `Silent` by defining `VERBOSITY` environment variable.
+          # commandWrapper.verbosity.fold
+              (List CommandWrapper.EnvironmentVariable)
+              { Silent =
+                  λ(_ : {}) → [] : List CommandWrapper.EnvironmentVariable
+
+              , Normal =
+                  -- Alternative is to set `VERBOSITY=default`.
+                  λ(_ : {}) → [] : List CommandWrapper.EnvironmentVariable
+
+              , Verbose =
+                    λ(_ : {})
+                  → [ { name = "VERBOSITY"
+                      , value = "verbose"
+                      }
+                    ]
+
+              , Annoying =
+                    λ(_ : {})
+                  → [ { name = "VERBOSITY"
+                      , value = "verbose"
+                      }
+                    ]
+              }
+              verbosity
       , searchPath = True
       , workingDirectory = [] : Optional Text
       }
