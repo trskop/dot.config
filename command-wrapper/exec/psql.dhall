@@ -18,6 +18,7 @@ in
     → λ(connect : ConnectToDatabase)
     → λ(environment : List CommandWrapper.EnvironmentVariable)
     → λ(verbosity : CommandWrapper.Verbosity)
+    → λ(colourOutput : CommandWrapper.ColourOutput)
     → λ(arguments : List Text)
     → { command = "psql"
       , arguments =

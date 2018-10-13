@@ -10,6 +10,7 @@ in
     → λ(workingDirectory : Optional Text)
     → λ(environment : List CommandWrapper.EnvironmentVariable)
     → λ(verbosity : CommandWrapper.Verbosity)
+    → λ(colourOutput : CommandWrapper.ColourOutput)
     → λ(arguments : List Text)
     → { command = "tmux"
       , arguments =

@@ -18,6 +18,11 @@ in let
       }
 
 in let
+    colorOption =
+        λ(colourOutput : CommandWrapper.ColourOutput)
+      → ["--color=${commandWrapper.colourOutput.toText colourOutput}"]
+
+in let
     stackYamlOption =
         λ(stackYaml : Optional Text)
       → optional Text stackYaml
@@ -33,10 +38,12 @@ in
         )
     → λ(args : List Text)
     → λ(verbosity : CommandWrapper.Verbosity)
+    → λ(colourOutput : CommandWrapper.ColourOutput)
     → λ(arguments : List Text)
     → { command = "stack"
       , arguments =
             verbosityOption verbosity
+          # colorOption colourOutput
           # stackYamlOption context.stackYaml
           # args
           # arguments
