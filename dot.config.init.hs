@@ -1,6 +1,6 @@
 #!/usr/bin/env stack
 {- stack script
-    --resolver lts-12.7
+    --resolver lts-12.13
     --package directory
     --package executable-path
     --package shake
@@ -8,6 +8,7 @@
 -}
 
 {-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE RecordWildCards #-}
 
 -- |
 -- Module:      Main
@@ -26,6 +27,8 @@ module Main (main)
   where
 
 import Control.Monad (unless, when)
+import Data.List (isPrefixOf)
+
 import System.Directory
     ( XdgDirectory(XdgCache, XdgConfig)
     , getHomeDirectory
@@ -36,8 +39,15 @@ import qualified System.Directory as Directory (doesDirectoryExist)
 import System.Environment.Executable (ScriptPath(..), getScriptPath)
 
 import Development.Shake
+import Development.Shake.Command
 import Development.Shake.FilePath
 
+
+data Directories = Directories
+    { home :: FilePath
+    , srcDir :: FilePath
+    , configDir :: FilePath
+    }
 
 main :: IO ()
 main = do
@@ -47,15 +57,20 @@ main = do
         Interactive -> getXdgDirectory XdgConfig ""
 
     cacheDir <- getXdgDirectory XdgCache "dot.config"
-    homeDir <- getHomeDirectory
+    home <- getHomeDirectory
+    configDir <- getXdgDirectory XdgConfig ""
 
-    setCurrentDirectory homeDir
-    install homeDir srcDir $ shakeOptions
+    setCurrentDirectory home
+    install Directories{..} $ shakeOptions
         { shakeFiles = cacheDir
         }
 
-install :: FilePath -> FilePath -> ShakeOptions -> IO ()
-install home srcDir opts = shakeArgs opts $ do
+install :: Directories -> ShakeOptions -> IO ()
+install Directories{..} opts = shakeArgs opts $ do
+    let commandWrapperDir = configDir </> "command-wrapper"
+        yxDir = configDir </> "yx"
+        habitDir = configDir </> "habit"
+
     want
         [ home </> ".ghc/ghci.conf"
         , home </> ".haskeline"
@@ -63,6 +78,17 @@ install home srcDir opts = shakeArgs opts $ do
         , home </> ".Xresources"
         , home </> ".psqlrc"
         , home </> ".inputrc"
+
+        , commandWrapperDir </> "default" <.> "dhall"
+        , commandWrapperDir </> "command-wrapper-cd" <.> "dhall"
+        , commandWrapperDir </> "command-wrapper-exec" <.> "dhall"
+        , commandWrapperDir </> "command-wrapper-skel" <.> "dhall"
+
+        , yxDir </> "default" <.> "dhall"
+
+        , habitDir </> "default.dhall"
+        , habitDir </> "pgpass.conf"
+
         ]
 
     (home </> ".ghc/ghci.conf") %> \out -> do
@@ -75,30 +101,64 @@ install home srcDir opts = shakeArgs opts $ do
         when targetExists
           $ cmd "mv" dst (takeDirectory dst </> ".ghc-bac")
         () <- cmd "chmod 700" src
-        cmd "ln -sf" (src `dropPrefix` home) (takeDirectory out)
+        cmd "ln -sf" (src `dropPrefixDir` home) (takeDirectory out)
 
     (home </> ".haskeline") %> \out ->
-        let src = (srcDir </> "haskeline" </> "prefs") `dropPrefix` home
+        let src = (srcDir </> "haskeline" </> "prefs") `dropPrefixDir` home
         in cmd "ln -sf" src out
 
     (home </> ".selected_editor") %> \out ->
-        let src = (srcDir </> "sensible-editor" </> "selected_editor") `dropPrefix` home
+        let src = (srcDir </> "sensible-editor" </> "selected_editor") `dropPrefixDir` home
         in cmd "ln -sf" src out
 
     (home </> ".Xresources") %> \out ->
-        let src = (srcDir </> "Xresources") `dropPrefix` home
+        let src = (srcDir </> "Xresources") `dropPrefixDir` home
         in cmd "ln -sf" src out
 
     (home </> ".psqlrc") %> \out ->
-        let src = (srcDir </> "psql" </> "psqlrc") `dropPrefix` home
+        let src = (srcDir </> "psql" </> "psqlrc") `dropPrefixDir` home
         in cmd "ln -sf" src out
 
     (home </> ".inputrc") %> \out ->
-        let src = (srcDir </> "readline" </> "inputrc") `dropPrefix` home
+        let src = (srcDir </> "readline" </> "inputrc") `dropPrefixDir` home
         in cmd "ln -sf" src out
 
-dropPrefix :: FilePath -> FilePath -> FilePath
-dropPrefix path prefix = dropPrefix' path' prefix'
+    (commandWrapperDir </> "*.dhall") %> \out -> do
+        let subdir = takeBaseName out `dropPrefix` "command-wrapper-"
+            dir = commandWrapperDir </> subdir
+            src = dir </> "constructor.dhall"
+
+        getDirectoryFiles dir ["*"] >>= need . map (dir </>)
+        cmd (Stdin src) (FileStdout out) "dhall"
+
+    (yxDir </> "*.dhall") %> \out -> do
+        let subdir = takeBaseName out `dropPrefix` "yx-"
+            dir = yxDir </> subdir
+            src = dir </> "constructor.dhall"
+
+        getDirectoryFiles dir ["*"] >>= need . map (dir </>)
+        cmd (Stdin src) (FileStdout out) "dhall"
+
+    (habitDir </> "*.dhall") %> \out -> do
+        let subdir = takeBaseName out `dropPrefix` "habit-"
+            dir = habitDir </> subdir
+            src = dir </> "constructor.dhall"
+
+        getDirectoryFiles dir ["*"] >>= need . map (dir </>)
+        cmd (Stdin src) (FileStdout out) "dhall"
+
+    (habitDir </> "pgpass.conf") %> \out -> do
+        let pgpassDir = habitDir </> "pgpass.d"
+        srcs <- map (pgpassDir </>) <$> getDirectoryFiles pgpassDir ["*"]
+        if null srcs
+            then
+                writeFile' out "# Empty\n"
+            else do
+                need srcs
+                cmd (FileStdout out) "sed" "/^#/d" srcs
+
+dropPrefixDir :: FilePath -> FilePath -> FilePath
+dropPrefixDir path prefix = dropPrefix' path' prefix'
   where
     path' = splitPath path
     prefix' = splitPath (addTrailingPathSeparator prefix)
@@ -108,3 +168,8 @@ dropPrefix path prefix = dropPrefix' path' prefix'
     dropPrefix' (x : xs) (y : ys)
       | x == y                    = dropPrefix' xs ys
       | otherwise                 = path  -- Prefix doesn't match.
+
+dropPrefix :: FilePath -> String -> FilePath
+dropPrefix file prefix
+  | prefix `isPrefixOf` file = drop (length prefix) file
+  | otherwise                = file

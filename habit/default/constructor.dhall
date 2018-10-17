@@ -7,24 +7,24 @@ in let
 in let
     context =
       { home = "${env:HOME as Text}"
-      , toolset = "yx"
+      , toolset = "habit"
       }
 
 in let
-    yxDefaults =
+    habitDefaults =
       { aliases = [] : List CommandWrapper.SubcommandAlias
       , helpMessage = ""
       }
 
 in let
-    yx = ./aliases.dhall ? yxDefaults
+    habit = ./aliases.dhall ? habitDefaults
 
 in let
     customise =
         λ(defaults : CommandWrapper.DefaultConfig)
       → commandWrapper.toolsetConfig.addSubcommandAliases
-          yx.aliases
-          yx.helpMessage
+          habit.aliases
+          habit.helpMessage
           defaults
         : CommandWrapper.DefaultConfig
 

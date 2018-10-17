@@ -22,13 +22,20 @@
 # {{{ Command Wrapper #########################################################
 
 !/command-wrapper/
+!/habit/
 !/yx/
 # Top-level Dhall configs are generated:
-/yx/*.dhall
 /command-wrapper/*.dhall
+/habit/*.dhall
+/yx/*.dhall
 # This is machine specific, and it exposes too much information:
 /command-wrapper/cd/directories.dhall
 /command-wrapper/exec/commands.dhall
+/habit/default/aliases.dhall
+/habit/default/help-msg.txt
+/habit/pgpass.conf
+/habit/pgpass.d/*
+!/habit/pgpass.d/.gitkeep
 /yx/default/aliases.dhall
 
 # }}} Command Wrapper #########################################################
