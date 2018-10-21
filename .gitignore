@@ -10,6 +10,7 @@
 !/haskeline/
 !/psql/
 !/sensible-editor/
+!/stack/
 !/tmux/
 !/readline/
 !README.md

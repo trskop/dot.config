@@ -79,6 +79,10 @@ install Directories{..} opts = shakeArgs opts $ do
         , home </> ".psqlrc"
         , home </> ".inputrc"
 
+        , home </> ".stack/config.yaml"
+        , home </> ".stack/global-project/README.txt"
+        , home </> ".stack/global-project/stack.yaml"
+
         , commandWrapperDir </> "default" <.> "dhall"
         , commandWrapperDir </> "command-wrapper-cd" <.> "dhall"
         , commandWrapperDir </> "command-wrapper-exec" <.> "dhall"
@@ -88,7 +92,6 @@ install Directories{..} opts = shakeArgs opts $ do
 
         , habitDir </> "default.dhall"
         , habitDir </> "pgpass.conf"
-
         ]
 
     (home </> ".ghc/ghci.conf") %> \out -> do
@@ -123,6 +126,10 @@ install Directories{..} opts = shakeArgs opts $ do
         let src = (srcDir </> "readline" </> "inputrc") `dropPrefixDir` home
         in cmd "ln -sf" src out
 
+    stackRules home srcDir
+
+    -- {{{ CommandWrapper -----------------------------------------------------
+
     (commandWrapperDir </> "*.dhall") %> \out -> do
         let subdir = takeBaseName out `dropPrefix` "command-wrapper-"
             dir = commandWrapperDir </> subdir
@@ -139,6 +146,34 @@ install Directories{..} opts = shakeArgs opts $ do
         getDirectoryFiles dir ["*"] >>= need . map (dir </>)
         cmd (Stdin src) (FileStdout out) "dhall"
 
+    habitRules home habitDir
+
+    -- }}} CommandWrapper -----------------------------------------------------
+
+stackRules :: FilePath -> FilePath -> Rules ()
+stackRules home srcDir = do
+    (home </> ".stack/config.yaml") %> \out ->
+        symlink ("stack" </> takeFileName out) out
+
+    (home </> ".stack/global-project/README.txt") %> \out ->
+        symlink ("stack" </> "global-project" </> takeFileName out) out
+
+    (home </> ".stack/global-project/stack.yaml") %> \out ->
+        symlink ("stack" </> "global-project" </> takeFileName out) out
+  where
+    symlink src' dst = do
+        let src = srcDir </> src'
+
+        targetExists <- doesFileExist dst
+        when targetExists
+          $ cmd "mv" dst (dst <.> "bac")
+
+        cmd "ln -sf" src dst
+
+-- | CommandWrapper toolset `habit` is used at work. Most of the configuration
+-- is not actually in the repository, only the skeleton.
+habitRules :: FilePath -> FilePath -> Rules ()
+habitRules home habitDir = do
     (habitDir </> "*.dhall") %> \out -> do
         let subdir = takeBaseName out `dropPrefix` "habit-"
             dir = habitDir </> subdir
@@ -147,6 +182,7 @@ install Directories{..} opts = shakeArgs opts $ do
         getDirectoryFiles dir ["*"] >>= need . map (dir </>)
         cmd (Stdin src) (FileStdout out) "dhall"
 
+    -- See `psql(1)` for more details about `pgpass` file.
     (habitDir </> "pgpass.conf") %> \out -> do
         let pgpassDir = habitDir </> "pgpass.d"
         srcs <- map (pgpassDir </>) <$> getDirectoryFiles pgpassDir ["*"]
