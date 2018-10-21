@@ -1,11 +1,3 @@
-#!/usr/bin/env stack
-{- stack script
-    --resolver lts-12.5
-    --package dhall
-    --package turtle
-    --
--}
-
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
@@ -20,8 +12,11 @@ import System.Exit (die)
 
 import qualified Dhall
 import qualified Turtle
--- TODO: Get rid of this if it's interpreted:
-import CommandWrapper.Environment (askVar, parseEnvIO)
+import CommandWrapper.Environment
+    ( Params(Params, config)
+    , askParams
+    , parseEnvIO
+    )
 
 
 data Config = Config
@@ -34,22 +29,17 @@ data Mode = Mode
 
 main :: IO ()
 main = do
-    (configFile, _wrapperName) <- parseEnvIO (die . show) $ do
-        void (askVar "COMMAND_WRAPPER_EXE")
-            <|> fail "This command must be executed as part of some command-wrapper environment"
-
-        (,) <$> askVar "COMMAND_WRAPPER_CONFIG"
-            <*> askVar "COMMAND_WRAPPER_NAME"
-
+    params@Params{config = configFile} <- getEnvironment
     mode <- Turtle.options "TODO: Describe me!" parseOptions
     config <- Dhall.inputFile Dhall.auto configFile
-    realMain config mode
+    realMain params config mode
+
+getEnvironment :: IO Params
+getEnvironment = parseEnvIO (die . show) askParams
 
 parseOptions :: Turtle.Parser Mode
 parseOptions = pure Mode
 
-realMain :: Config -> Mode -> IO ()
-realMain _config = \case
+realMain :: Params -> Config -> Mode -> IO ()
+realMain _params _config = \case
     Mode -> die "Error: TODO: Implement me!"
-
--- vim:ft=haskell

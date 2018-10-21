@@ -1,0 +1,48 @@
+name: command-wrapper-toolset-yx
+version: 0.1.0.0
+synopsis: TODO
+description: TODO
+github: trskop/dot.config
+license: BSD3
+license-file: LICENSE
+author: Peter Trško
+maintainer: peter.trsko@gmail.com
+copyright: (c) 2018 Peter Trško
+category: Tools
+
+extra-source-files:
+  - README.md
+  - dhall/*.dhall
+
+dependencies:
+  - base
+
+  - case-insensitive
+  - comonad
+  - dhall >=1.17
+  - dhall-bash
+  - dhall-json
+  - directory
+  - endo
+  - executable-path
+  - filepath
+  - generic-lens
+  - host-and-port
+  - mainplate
+  - mtl
+  - optparse-applicative
+  - projectroot
+  - terminfo
+  - text
+  - turtle
+  - unix
+  - unordered-containers
+  - verbosity >=0.3
+
+  - command-wrapper
+
+executables:
+  yx-this:
+    source-dirs: app-yx-this
+    main: Main.hs
+    dependencies: []
