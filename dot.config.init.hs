@@ -155,7 +155,8 @@ install Directories{..} opts = shakeArgs opts $ do
                 writeFile' out "# Empty\n"
             else do
                 need srcs
-                cmd (FileStdout out) "sed" "/^#/d" srcs
+                () <- cmd (FileStdout out) "sed" "/^#/d" srcs
+                cmd "chmod" "u=rw,go=" out
 
 dropPrefixDir :: FilePath -> FilePath -> FilePath
 dropPrefixDir path prefix = dropPrefix' path' prefix'
