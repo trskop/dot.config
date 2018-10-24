@@ -7,10 +7,9 @@ in let
       ~/.local/src/trskop/command-wrapper/dhall/CommandWrapper/package.dhall
 
 in let
-    optional = Optional/fold
-
-in let
-    ConnectToDatabase = ./ConnectToDatabase.dhall
+    ConnectToDatabase =
+      ./ConnectToDatabase.dhall
+      sha256:f764a5130c77a2b34136e5c96680c7e95e7870e73c3035f272f58aafd4fc03f1
 
 in
       λ(connect : ConnectToDatabase)
@@ -35,4 +34,4 @@ in
       , environment = environment
       , searchPath = True
       , workingDirectory = [] : Optional Text
-      }
+      } : CommandWrapper.ExecCommand

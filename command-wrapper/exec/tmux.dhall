@@ -1,8 +1,6 @@
   let
-    CommandWrapper = ~/.local/src/trskop/command-wrapper/dhall/CommandWrapper/Type/package.dhall
-
-in let
-    optional = Optional/fold
+    CommandWrapper =
+      ~/.local/src/trskop/command-wrapper/dhall/CommandWrapper/Type/package.dhall
 
 in
       λ(term : Optional Text)
@@ -14,7 +12,7 @@ in
     → λ(arguments : List Text)
     → { command = "tmux"
       , arguments =
-          optional Text tmuxConfig (List Text)
+          Optional/fold Text tmuxConfig (List Text)
             ( λ(value : Text) → ["-f", value]
             )
             ([] : List Text)
@@ -23,7 +21,7 @@ in
           # arguments
       , environment =
           environment
-          # optional Text term
+          # Optional/fold Text term
               (List CommandWrapper.EnvironmentVariable)
               (   λ(value : Text)
                 → [ { name = "TERM"
@@ -34,4 +32,4 @@ in
               ([] : List CommandWrapper.EnvironmentVariable)
       , searchPath = True
       , workingDirectory = workingDirectory
-      }
+      } : CommandWrapper.ExecCommand

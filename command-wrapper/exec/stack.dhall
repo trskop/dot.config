@@ -7,9 +7,6 @@ in let
       ~/.local/src/trskop/command-wrapper/dhall/CommandWrapper/package.dhall
 
 in let
-    optional = Optional/fold
-
-in let
     verbosityOption = commandWrapper.verbosity.fold (List Text)
       { Silent = λ(_ : {}) → ["--silent"]
       , Normal = λ(_ : {}) → [] : List Text
@@ -25,7 +22,7 @@ in let
 in let
     stackYamlOption =
         λ(stackYaml : Optional Text)
-      → optional Text stackYaml
+      → Optional/fold Text stackYaml
           (List Text)
           (λ(file : Text) → ["--stack-yaml=${file}"])
           ([] : List Text)
@@ -50,4 +47,4 @@ in
       , environment = [] : List CommandWrapper.EnvironmentVariable
       , searchPath = True
       , workingDirectory = context.workingDirectory
-      }
+      } : CommandWrapper.ExecCommand
