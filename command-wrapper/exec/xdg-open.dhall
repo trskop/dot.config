@@ -16,5 +16,5 @@ in    λ(fileOrUrl : Optional Text)
           # arguments
       , environment = environment
       , searchPath = True
-      , workingDirectory = [] : Optional Text
+      , workingDirectory = None Text
       } : CommandWrapper.ExecCommand

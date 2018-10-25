@@ -31,9 +31,9 @@ in
               # arguments
           , environment = environment
           , searchPath = True
-          , workingDirectory = [] : Optional Text
+          , workingDirectory = None Text
           } : CommandWrapper.ExecCommand
 
-    , noProfile = [] : Optional Text
-    , profile = λ(profile : Text) → [profile] : Optional Text
+    , noProfile = None Text
+    , profile = λ(profile : Text) → Some profile
     }

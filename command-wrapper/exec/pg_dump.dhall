@@ -35,5 +35,5 @@ in
           # arguments
       , environment = environment
       , searchPath = True
-      , workingDirectory = [] : Optional Text
+      , workingDirectory = None Text
       } : CommandWrapper.ExecCommand

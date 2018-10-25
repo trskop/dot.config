@@ -14,13 +14,12 @@ in    λ(description : Text)
     → λ(wrapper : Text)
     → λ(subcommand : Text)
     → { haskell =
-          { targetFile =
-              [haskellSubcommandFileName wrapper subcommand] : Optional Text
+          { targetFile = Some (haskellSubcommandFileName wrapper subcommand)
           , executable = False
           , template = ./haskell-skel.dhall
           }
       , bash =
-          { targetFile = [] : Optional Text
+          { targetFile = None Text
           , executable = True
           , template = ./bash-skel.dhall bashLib
           }

@@ -94,8 +94,8 @@ in let
       { interactive = False
       , allocateTty = False
       , detach = False
-      , user = [] : Optional Text
-      , workingDirectory = [] : Optional Text
+      , user = None Text
+      , workingDirectory = None Text
       } : DockerExecOptions
 
 in let
@@ -103,8 +103,8 @@ in let
       { interactive = True
       , allocateTty = True
       , detach = False
-      , user = [] : Optional Text
-      , workingDirectory = [] : Optional Text
+      , user = None Text
+      , workingDirectory = None Text
       } : DockerExecOptions
 
 in
@@ -140,7 +140,7 @@ in
                   # command.arguments
               , environment = [] : List CommandWrapper.EnvironmentVariable
               , searchPath = True
-              , workingDirectory = [] : Optional Text
+              , workingDirectory = None Text
               } : CommandWrapper.ExecCommand
 
     -- Transform a command into:
@@ -175,13 +175,13 @@ in
                   # command.arguments
               , environment = [] : List CommandWrapper.EnvironmentVariable
               , searchPath = True
-              , workingDirectory = [] : Optional Text
+              , workingDirectory = None Text
               } : CommandWrapper.ExecCommand
 
     , defaultGlobalOptions =
         { host = [] : List Text
-        , logLevel = [] : Optional Text
-        , config = [] : Optional Text
+        , logLevel = None Text
+        , config = None Text
         } : DockerGlobalOptions
 
     , defaultExecOptions = defaultExecOptions

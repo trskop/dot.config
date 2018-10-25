@@ -80,5 +80,5 @@ in
               }
               verbosity
       , searchPath = True
-      , workingDirectory = [] : Optional Text
+      , workingDirectory = None Text
       } : CommandWrapper.ExecCommand

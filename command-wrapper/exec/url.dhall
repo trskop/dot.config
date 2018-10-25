@@ -32,7 +32,7 @@ in  { mk =
         → "${schemaToText schema}://${host}${portToText port}${path}"
 
     , schema = schema
-    , port = λ(port : Natural) → [port] : Optional Natural
-    , defaultPort = [] : Optional Natural
+    , port = λ(port : Natural) → Some port
+    , defaultPort = None Natural
     , noPath = "" : Text
     }
