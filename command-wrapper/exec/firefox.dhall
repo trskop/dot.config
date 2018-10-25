@@ -1,15 +1,17 @@
   let
     CommandWrapper =
       ~/.local/src/trskop/command-wrapper/dhall/CommandWrapper/Type/package.dhall
+      sha256:08d2673948c732c338f5322ee7c15a3f4b92c27dce731d7c678026eb9309efe6
 
 in let
     commandWrapper =
       ~/.local/src/trskop/command-wrapper/dhall/CommandWrapper/package.dhall
+      sha256:ca555d6f0c8621b29bb8b7fc7566c2617efa634b5ec1e909cd10346b0ad15faf
 
 in let
     Schema =
       ./Schema.dhall
-      sha256:7744398ab254c2f3ae7034a56d8f5f616fed1f7569b7cebeb6fef56bbe055838
+      sha256:6a8978aae0ebeaabbe46517a2fdae360835d1cd37f62c5aea46d86bce2505b63
 
 in
     { invoke =

@@ -1,35 +1,32 @@
   let
     CommandWrapper =
       ~/.local/src/trskop/command-wrapper/dhall/CommandWrapper/Type/package.dhall
+      sha256:08d2673948c732c338f5322ee7c15a3f4b92c27dce731d7c678026eb9309efe6
 
 in let
     commandWrapper =
       ~/.local/src/trskop/command-wrapper/dhall/CommandWrapper/package.dhall
+      sha256:ca555d6f0c8621b29bb8b7fc7566c2617efa634b5ec1e909cd10346b0ad15faf
 
 in let
     null =
       http://prelude.dhall-lang.org/List/null
-      sha256:c199cbd6960227e70057ee9b791d506b776e0ac98dadde8b2955d5154ff96d21
-
-in let
-    ConnectToDatabase : Type =
-      ./ConnectToDatabase.dhall
-      sha256:f764a5130c77a2b34136e5c96680c7e95e7870e73c3035f272f58aafd4fc03f1
+      sha256:5f9cb7c6e63e3448509266a3954758f91f32b8540b9115b85dac35e3782b32a5
 
 in let
     DockerGlobalOptions : Type =
       ./DockerGlobalOptions.dhall
-      sha256:5b0874eb31f38d2cd7b164703b9047c81479c6df541a4d31c2ba28be6bc6f04a
+      sha256:27154126ac849019c5767d3de6793a23f914be553ba5cc395d494f739a9edc46
 
 in let
     DockerExecOptions : Type =
       ./DockerExecOptions.dhall
-      sha256:4c5fcb96707e8d3ce1395151e60ec7191310c733578578211ec73a4da1d9a98b
+      sha256:8de3098208653ed27e9890ccea2a5d70bad199c149eb5b93edcf951d6407ec8a
 
 in let
     DockerRunOptions : Type =
       ./DockerRunOptions.dhall
---    sha256:68489955ac37ddf3fa0c34aa5251ecae8ee7fa960a634d2c7e6e6df47aeca255
+      sha256:d8e96b50e8ef405d9a1b7a2ca942afac5387c62005f4162b3f4ddc9b01f2fd21
 
 in let
     dockerGlobalOptions =

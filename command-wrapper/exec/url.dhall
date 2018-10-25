@@ -1,12 +1,12 @@
 let
     Schema =
       ./Schema.dhall
-      sha256:7744398ab254c2f3ae7034a56d8f5f616fed1f7569b7cebeb6fef56bbe055838
+      sha256:6a8978aae0ebeaabbe46517a2fdae360835d1cd37f62c5aea46d86bce2505b63
 
 in let
     schema =
       ./schema.dhall
-      sha256:2ddad34b2457a17bc96efeb9b92bef283b9aae1b0bed02732f5b9752b49b8744
+      sha256:50b66bc3d23e6918043d4da2647ceaa6aec3ba191a0e48aeea9451ed55602b7c
 
 in let
     schemaToText =

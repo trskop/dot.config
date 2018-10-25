@@ -1,11 +1,11 @@
 let
     DockerExecOptions =
       ./DockerExecOptions.dhall
-      sha256:4c5fcb96707e8d3ce1395151e60ec7191310c733578578211ec73a4da1d9a98b
+      sha256:8de3098208653ed27e9890ccea2a5d70bad199c149eb5b93edcf951d6407ec8a
 
 in let
     DockerRunOptions = DockerExecOptions
-      //\\  { remove : Bool
-            }
+      ⩓ { remove : Bool
+        }
 
 in  DockerRunOptions
