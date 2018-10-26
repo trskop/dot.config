@@ -38,6 +38,7 @@
 /habit/default/help-msg.txt
 /habit/pgpass.conf
 /habit/pgpass.d/*
+/habit/toolset
 !/habit/pgpass.d/.gitkeep
 /yx/default/aliases.dhall
 

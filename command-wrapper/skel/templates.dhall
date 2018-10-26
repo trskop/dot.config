@@ -21,6 +21,6 @@ in    λ(description : Text)
       , bash =
           { targetFile = None Text
           , executable = True
-          , template = ./bash-skel.dhall bashLib
+          , template = ./bash-skel.dhall bashLib subcommand
           }
       }

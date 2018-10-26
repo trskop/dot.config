@@ -19,13 +19,23 @@ packages:
     extra-dep: True
   - location:
       git: https://github.com/trskop/command-wrapper.git
-      commit: cff227876a7d66034cf7d759d08128fae12d2929
+      commit: fb5dcc66cd25149501605df018d55d2feb0f012b
     extra-dep: True
 
 extra-deps:
   - endo-0.3.0.1
-  - dhall-1.17.0
-  - serialise-0.2.0.0 # dhall dependency
+  - fuzzy-0.1.0.0
+
+  - dhall-1.18.0
+  - dhall-bash-1.0.16
+  - dhall-json-1.2.4
+  - dhall-text-1.0.13
+
+  # Dhall dependencies:
+  - serialise-0.2.1.0
+  - megaparsec-7.0.2
+  - repline-0.2.0.0
+  - neat-interpolation-0.3.2.4  # dhall-bash
 
 flags:
   verbosity:

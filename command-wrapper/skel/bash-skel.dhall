@@ -1,10 +1,18 @@
   λ(libFile : Text)
+→ λ(subcommandName : Text)
 → ''
   #!/usr/bin/env bash
 
   set -e
 
   source '${libFile}'
+
+  function printHelp() {
+      cat <<EOF
+  ''${COMMAND_WRAPPER_NAME} ''${subcommandName}
+  ''${COMMAND_WRAPPER_NAME} ''${subcommandName} {-h|--help}
+  EOF
+  }
 
   function declareCfg() {
       local -r configFile="$1"; shift
@@ -14,6 +22,8 @@
   }
 
   function main() {
+      dieIfExecutedOutsideOfCommandWrapperEnvironment
+
       local arg
       while (( $# )); do
           arg="$1"; shift
@@ -26,13 +36,12 @@
               -*)
                   die 1 "'%s': %s" "''${arg}" 'Unknown option.'
                   ;;
+              # TODO: Define arguments.
               *)
                   die 1 "'%s': %s" "''${arg}" 'Too many arguments.'
                   ;;
           esac
       done
-
-      dieIfExecutedOutsideOfCommandWrapperEnvironment
 
       if [[ ! -e "''${COMMAND_WRAPPER_CONFIG}" ]]; then
           info "'%s': Generating default configuration file." \

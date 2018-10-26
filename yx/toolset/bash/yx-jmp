@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+set -e
+
+source ~/.local/src/trskop/command-wrapper/bash/lib.sh
+
+function printHelp() {
+    cat <<EOF
+${COMMAND_WRAPPER_NAME} jmp [-h|--help]
+EOF
+}
+
+function main() {
+    dieIfExecutedOutsideOfCommandWrapperEnvironment
+
+    local arg
+    while (( $# )); do
+        arg="$1"; shift
+        case "${arg}" in
+            -h|--help)
+                printHelp
+                exit 0
+                ;;
+            -*)
+                die 1 "'%s': %s" "${arg}" 'Unknown option.'
+                ;;
+            *)
+                die 1 "'%s': %s" "${arg}" 'Too many arguments.'
+                ;;
+        esac
+    done
+
+    if [[ -z "${TMUX}" || -z "${TMUX_PANE}" ]]; then
+        die 1 "Not running in a Tmux pane."
+        exit 1
+    fi
+
+    tmux capture-pane -S - -b scroll-buffer \; show-buffer -b scroll-buffer \; delete-buffer -b scroll-buffer \
+    | sed -rn 's/^ *(.*):([0-9]+):[0-9]+: error:$/\1 +\2/;T;p' \
+    | ~/.config/nvim/dein.vim/repos/github.com/junegunn/fzf/bin/fzf \
+    | xargs -r nvim
+}
+
+main "$@"

@@ -1,3 +1,17 @@
 #!/usr/bin/env bash
 
-stack --local-bin-path="${HOME}/.local/lib/yx" install
+# TODO: This should go into `dot.config.init.hs`.
+
+readonly stackYaml="$(dirname "$(readlink -e "$0")")/stack.yaml"
+readonly target="${HOME}/.local/lib/yx"
+
+if ! hash 'yx' &>/dev/null; then
+    echo "Error: 'yx' command-wrapper instance is missing." 1>&2
+    exit 1
+fi
+
+if [[ ! -e "${target}" ]]; then
+    mkdir -p "${target}"
+fi
+
+exec stack --stack-yaml="${stackYaml}" --local-bin-path="${target}" install
