@@ -1,13 +1,15 @@
 #!/usr/bin/env stack
 {- stack script
-    --resolver lts-12.13
+    --resolver lts-12.16
     --package directory
     --package executable-path
     --package shake
     --
 -}
 
+{-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE RecordWildCards #-}
 
 -- |
@@ -70,6 +72,7 @@ install Directories{..} opts = shakeArgs opts $ do
     let commandWrapperDir = configDir </> "command-wrapper"
         yxDir = configDir </> "yx"
         habitDir = configDir </> "habit"
+        yxLibDir = home </> ".local" </> "lib" </> "yx"
 
     want
         [ home </> ".ghc/ghci.conf"
@@ -89,6 +92,7 @@ install Directories{..} opts = shakeArgs opts $ do
         , commandWrapperDir </> "command-wrapper-skel" <.> "dhall"
 
         , yxDir </> "default" <.> "dhall"
+        , yxLibDir </> "yx-jmp"
 
         , habitDir </> "default.dhall"
         , habitDir </> "pgpass.conf"
@@ -102,7 +106,7 @@ install Directories{..} opts = shakeArgs opts $ do
         --       instead of renamed, since there will be no permanent
         --       information loss.
         when targetExists
-          $ cmd "mv" dst (takeDirectory dst </> ".ghc-bac")
+            $ cmd "mv" dst (takeDirectory dst </> ".ghc-bac")
         () <- cmd "chmod 700" src
         cmd "ln -sf" (src `dropPrefixDir` home) (takeDirectory out)
 
@@ -126,7 +130,10 @@ install Directories{..} opts = shakeArgs opts $ do
         let src = (srcDir </> "readline" </> "inputrc") `dropPrefixDir` home
         in cmd "ln -sf" src out
 
-    stackRules home srcDir
+    stackRules StackRulesParams
+        { home
+        , srcDir
+        }
 
     -- {{{ CommandWrapper -----------------------------------------------------
 
@@ -138,20 +145,24 @@ install Directories{..} opts = shakeArgs opts $ do
         getDirectoryFiles dir ["*"] >>= need . map (dir </>)
         cmd (Stdin src) (FileStdout out) "dhall"
 
-    (yxDir </> "*.dhall") %> \out -> do
-        let subdir = takeBaseName out `dropPrefix` "yx-"
-            dir = yxDir </> subdir
-            src = dir </> "constructor.dhall"
+    yxRules YxRulesParams
+        { configDir = yxDir
+        , libDir = yxLibDir
+        }
 
-        getDirectoryFiles dir ["*"] >>= need . map (dir </>)
-        cmd (Stdin src) (FileStdout out) "dhall"
-
-    habitRules home habitDir
+    habitRules HabitRulesParamams
+        { configDir = habitDir
+        }
 
     -- }}} CommandWrapper -----------------------------------------------------
 
-stackRules :: FilePath -> FilePath -> Rules ()
-stackRules home srcDir = do
+data StackRulesParams = StackRulesParams
+    { home :: FilePath
+    , srcDir :: FilePath
+    }
+
+stackRules :: StackRulesParams -> Rules ()
+stackRules StackRulesParams{..} = do
     (home </> ".stack/config.yaml") %> \out ->
         symlink ("stack" </> takeFileName out) out
 
@@ -170,21 +181,45 @@ stackRules home srcDir = do
 
         cmd "ln -sf" src dst
 
+data YxRulesParams = YxRulesParams
+    { configDir :: FilePath
+    , libDir :: FilePath
+    }
+
+-- | CommandWrapper toolset `yx` is used for personal tools.
+yxRules :: YxRulesParams -> Rules ()
+yxRules YxRulesParams{..} = do
+    (configDir </> "*.dhall") %> \out -> do
+        let subdir = takeBaseName out `dropPrefix` "yx-"
+            dir = configDir </> subdir
+            src = dir </> "constructor.dhall"
+
+        getDirectoryFiles dir ["*"] >>= need . map (dir </>)
+        cmd (Stdin src) (FileStdout out) "dhall"
+
+    (libDir </> "yx-jmp") %> \out ->
+        let src = configDir </> "toolset" </> "bash" </> "yx-jmp"
+        in cmd "ln -sf" src out
+
+newtype HabitRulesParamams = HabitRulesParamams
+    { configDir :: FilePath
+    }
+
 -- | CommandWrapper toolset `habit` is used at work. Most of the configuration
 -- is not actually in the repository, only the skeleton.
-habitRules :: FilePath -> FilePath -> Rules ()
-habitRules home habitDir = do
-    (habitDir </> "*.dhall") %> \out -> do
+habitRules :: HabitRulesParamams -> Rules ()
+habitRules HabitRulesParamams{..} = do
+    (configDir </> "*.dhall") %> \out -> do
         let subdir = takeBaseName out `dropPrefix` "habit-"
-            dir = habitDir </> subdir
+            dir = configDir </> subdir
             src = dir </> "constructor.dhall"
 
         getDirectoryFiles dir ["*"] >>= need . map (dir </>)
         cmd (Stdin src) (FileStdout out) "dhall"
 
     -- See `psql(1)` for more details about `pgpass` file.
-    (habitDir </> "pgpass.conf") %> \out -> do
-        let pgpassDir = habitDir </> "pgpass.d"
+    (configDir </> "pgpass.conf") %> \out -> do
+        let pgpassDir = configDir </> "pgpass.d"
         srcs <- map (pgpassDir </>) <$> getDirectoryFiles pgpassDir ["*"]
         if null srcs
             then
