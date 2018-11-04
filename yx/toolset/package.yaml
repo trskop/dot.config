@@ -41,8 +41,18 @@ dependencies:
 
   - command-wrapper
 
+ghc-options: -Wall
+
 executables:
   yx-this:
     source-dirs: app-yx-this
     main: Main.hs
     dependencies: []
+
+  yx-path:
+    source-dirs: app-yx-path
+    main: Main.hs
+    dependencies:
+      - prettyprinter
+      - process
+      - lens
