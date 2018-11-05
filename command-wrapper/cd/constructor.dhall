@@ -1,6 +1,7 @@
   let
     CommandWrapper =
       ~/.local/src/trskop/command-wrapper/dhall/CommandWrapper/Type/package.dhall
+      sha256:08d2673948c732c338f5322ee7c15a3f4b92c27dce731d7c678026eb9309efe6
 
 in let
     commandWrapper =
@@ -13,13 +14,17 @@ in let
       }
 
 in let
+    commonDirectories =
+      ./common-directories.dhall : List Text
+
+in let
     directories =
       ./directories.dhall ? ([] : List Text)
 
 in let
     customise =
         λ(defaults : CommandWrapper.CdConfig)
-      → { directories = defaults.directories # directories
+      → { directories = defaults.directories # commonDirectories # directories
         , menuTool = ./fzf.dhall
         , shell = "${env:SHELL as Text ? "/bin/bash"}"
         , terminalEmulator = defaults.terminalEmulator
