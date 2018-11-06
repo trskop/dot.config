@@ -4,7 +4,6 @@ let
 in let
     config = "${home}/.config"
 
-
 in let
     local = "${home}/.local"
 
@@ -22,4 +21,5 @@ in
     , "${local}/src/trskop/genbashrc"
     , "${home}/Devel"
     , "${home}/Downloads"
+    , "${home}/.ssh"
     ] : List Text
