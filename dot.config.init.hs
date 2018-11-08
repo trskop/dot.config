@@ -35,6 +35,7 @@ import System.Directory
     ( XdgDirectory(XdgCache, XdgConfig)
     , getHomeDirectory
     , getXdgDirectory
+    , pathIsSymbolicLink
     , setCurrentDirectory
     )
 import qualified System.Directory as Directory (doesDirectoryExist)
@@ -70,9 +71,12 @@ main = do
 install :: Directories -> ShakeOptions -> IO ()
 install Directories{..} opts = shakeArgs opts $ do
     let commandWrapperDir = configDir </> "command-wrapper"
+        binDir = home </> "bin"
         yxDir = configDir </> "yx"
         habitDir = configDir </> "habit"
-        yxLibDir = home </> ".local" </> "lib" </> "yx"
+        dotLocalDir = home </> ".local"
+        yxLibDir = dotLocalDir </> "lib" </> "yx"
+        commandWrapperLibDir = dotLocalDir </> "lib" </> "command-wrapper"
 
     want
         [ home </> ".ghc/ghci.conf"
@@ -85,12 +89,14 @@ install Directories{..} opts = shakeArgs opts $ do
         , home </> ".stack/config.yaml"
         , home </> ".stack/global-project/README.txt"
         , home </> ".stack/global-project/stack.yaml"
+        , binDir </> "stack-help"
 
         , commandWrapperDir </> "default" <.> "dhall"
         , commandWrapperDir </> "command-wrapper-cd" <.> "dhall"
         , commandWrapperDir </> "command-wrapper-exec" <.> "dhall"
         , commandWrapperDir </> "command-wrapper-skel" <.> "dhall"
 
+        , binDir </> "yx"
         , yxDir </> "default" <.> "dhall"
         , yxLibDir </> "yx-jmp"
 
@@ -102,37 +108,37 @@ install Directories{..} opts = shakeArgs opts $ do
         let src = srcDir </> "ghc"
             dst = (takeDirectory out)
         targetExists <- doesDirectoryExist dst
-        -- TODO: If target is a symbolic link, then it should be removed
-        --       instead of renamed, since there will be no permanent
-        --       information loss.
-        when targetExists
-            $ cmd "mv" dst (takeDirectory dst </> ".ghc-bac")
+        when targetExists $ do
+            targetIsSymlink <- liftIO (pathIsSymbolicLink dst)
+            unless targetIsSymlink
+                $ cmd "mv" dst (takeDirectory dst </> ".ghc-bac")
         () <- cmd "chmod 700" src
         cmd "ln -sf" (src `dropPrefixDir` home) (takeDirectory out)
 
     (home </> ".haskeline") %> \out ->
         let src = (srcDir </> "haskeline" </> "prefs") `dropPrefixDir` home
-        in cmd "ln -sf" src out
+        in symlink src out
 
     (home </> ".selected_editor") %> \out ->
         let src = (srcDir </> "sensible-editor" </> "selected_editor") `dropPrefixDir` home
-        in cmd "ln -sf" src out
+        in symlink src out
 
     (home </> ".Xresources") %> \out ->
         let src = (srcDir </> "Xresources") `dropPrefixDir` home
-        in cmd "ln -sf" src out
+        in symlink src out
 
     (home </> ".psqlrc") %> \out ->
         let src = (srcDir </> "psql" </> "psqlrc") `dropPrefixDir` home
-        in cmd "ln -sf" src out
+        in symlink src out
 
     (home </> ".inputrc") %> \out ->
         let src = (srcDir </> "readline" </> "inputrc") `dropPrefixDir` home
-        in cmd "ln -sf" src out
+        in symlink src out
 
     stackRules StackRulesParams
         { home
-        , srcDir
+        , srcDir = srcDir </> "stack"
+        , binDir
         }
 
     -- {{{ CommandWrapper -----------------------------------------------------
@@ -148,6 +154,8 @@ install Directories{..} opts = shakeArgs opts $ do
     yxRules YxRulesParams
         { configDir = yxDir
         , libDir = yxLibDir
+        , binDir
+        , commandWrapperLibDir
         }
 
     habitRules HabitRulesParamams
@@ -159,31 +167,38 @@ install Directories{..} opts = shakeArgs opts $ do
 data StackRulesParams = StackRulesParams
     { home :: FilePath
     , srcDir :: FilePath
+    , binDir :: FilePath
     }
 
 stackRules :: StackRulesParams -> Rules ()
 stackRules StackRulesParams{..} = do
     (home </> ".stack/config.yaml") %> \out ->
-        symlink ("stack" </> takeFileName out) out
+        symlink (srcDir </> takeFileName out) out
 
     (home </> ".stack/global-project/README.txt") %> \out ->
-        symlink ("stack" </> "global-project" </> takeFileName out) out
+        symlink (srcDir </> "global-project" </> takeFileName out) out
 
     (home </> ".stack/global-project/stack.yaml") %> \out ->
-        symlink ("stack" </> "global-project" </> takeFileName out) out
-  where
-    symlink src' dst = do
-        let src = srcDir </> src'
+        symlink (srcDir </> "global-project" </> takeFileName out) out
 
-        targetExists <- doesFileExist dst
-        when targetExists
-          $ cmd "mv" dst (dst <.> "bac")
+    (binDir </> "stack-help") %> \out ->
+        symlink (srcDir </> "bin" </> takeFileName out) out
 
-        cmd "ln -sf" src dst
+symlink :: FilePath -> FilePath -> Action ()
+symlink src dst = do
+    targetExists <- doesFileExist dst
+    when targetExists $ do
+        targetIsSymlink <- liftIO (pathIsSymbolicLink dst)
+        unless targetIsSymlink
+            $ cmd "mv" dst (dst <.> "bac")
+
+    cmd "ln -sf" src dst
 
 data YxRulesParams = YxRulesParams
     { configDir :: FilePath
     , libDir :: FilePath
+    , binDir :: FilePath
+    , commandWrapperLibDir :: FilePath
     }
 
 -- | CommandWrapper toolset `yx` is used for personal tools.
@@ -199,7 +214,11 @@ yxRules YxRulesParams{..} = do
 
     (libDir </> "yx-jmp") %> \out ->
         let src = configDir </> "toolset" </> "bash" </> "yx-jmp"
-        in cmd "ln -sf" src out
+        in symlink src out
+
+    (binDir </> "yx") %> \out ->
+        let src = commandWrapperLibDir </> "command-wrapper"
+        in symlink src out
 
 newtype HabitRulesParamams = HabitRulesParamams
     { configDir :: FilePath
