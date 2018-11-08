@@ -26,7 +26,7 @@ import Control.Applicative (many)
 --import Data.String (fromString)
 
 import CommandWrapper.Environment
-    ( Params --(Params, name)
+    ( Params(Params, config)
     , askParams
     , parseEnvIO
     )
@@ -44,11 +44,15 @@ import qualified Main.Paths as Paths (mk)
 
 main :: IO ()
 main = do
-    params <- getEnvironment
+    params@Params{config} <- getEnvironment
+
+    configExists <- Turtle.testfile (Turtle.fromString config)
+
     (dhallOptions, possibleExpressionText) <- parseOptions
     paths <- Paths.mk params
-    dhall dhallOptions paths =<< case possibleExpressionText of
-        "" -> pure "paths : Paths"
+    let configFile = if configExists then Just config else Nothing
+    dhall dhallOptions paths configFile =<< case possibleExpressionText of
+        "" -> pure "data : {paths : Paths, config : Config}"
         "-" -> Text.getContents
         _ -> pure possibleExpressionText
 
