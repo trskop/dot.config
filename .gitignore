@@ -16,6 +16,8 @@
 !README.md
 !Xresources
 !dot.config.init.hs
+!user-dirs.dirs
+!user-dirs.locale
 
 # Contains private information.
 /ghc/ghci_history
