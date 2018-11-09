@@ -39,7 +39,18 @@ import Data.Text.Prettyprint.Doc (pretty)
 import Data.Text.Prettyprint.Doc.Render.Text (putDoc)
 import qualified Dhall
 import qualified Dhall.Core as Dhall
-    ( Expr(Annot, App, Integer, Lam, Let, Natural, Record, RecordLit, Text)
+    ( Expr
+        ( Annot
+        , App
+        , Integer
+        , Lam
+        , Let
+        , List
+        , Natural
+        , Record
+        , RecordLit
+        , Text
+        )
     , Import
     , normalize
     )
@@ -101,18 +112,23 @@ printPlain paths expression possiblyConfigExpression =
   where
     result :: Either [Dhall.TypeError Dhall.Src Dhall.X] (IO ())
     result = runExcept $ asum
-        [ printText <$> mkExpressionAndTypeCheck' Dhall.Text
-        , printNatural <$> mkExpressionAndTypeCheck' Dhall.Natural
-        , printInteger <$> mkExpressionAndTypeCheck' Dhall.Integer
+        [ printText <$> mkExpression Dhall.Text
+        , printNatural <$> mkExpression Dhall.Natural
+        , printInteger <$> mkExpression Dhall.Integer
+        , printTextList <$> mkExpression (listOf Dhall.Text)
+        , printNaturalList <$> mkExpression (listOf Dhall.Natural)
+        , printIntegerList <$> mkExpression (listOf Dhall.Integer)
         ]
+
+    listOf = (Dhall.List `Dhall.App`)
 
     configExpression = fromMaybe emptyRecord possiblyConfigExpression
 
-    mkExpressionAndTypeCheck' t = withExcept pure . liftEither
+    mkExpression t = withExcept pure . liftEither
         $ fst <$> mkExpressionAndTypeCheck (Just t) expression configExpression paths
 
-    dieWithNotPlainType _ =
-        die "Error: Expected Text, Natural or Integer as result."
+    dieWithNotPlainType _ = die
+        "Error: Expected Text, Natural, Integer, or List of them as result."
 
     dieWithUnexpectedType t =
         die ("Error: Expected " <> t <> " as result.")
@@ -120,6 +136,9 @@ printPlain paths expression possiblyConfigExpression =
     Dhall.Type{extract = extractText} = Dhall.auto @Text
     Dhall.Type{extract = extractNatural} = Dhall.auto @Natural
     Dhall.Type{extract = extractInteger} = Dhall.auto @Integer
+    Dhall.Type{extract = extractTextList} = Dhall.auto @[Text]
+    Dhall.Type{extract = extractNaturalList} = Dhall.auto @[Natural]
+    Dhall.Type{extract = extractIntegerList} = Dhall.auto @[Integer]
 
     printText, printNatural, printInteger
         :: Dhall.Expr Dhall.Src Dhall.X
@@ -133,8 +152,22 @@ printPlain paths expression possiblyConfigExpression =
         . extractNatural
 
     printInteger =
-        maybe (dieWithUnexpectedType "Natural") (Text.putStrLn . showing)
+        maybe (dieWithUnexpectedType "Integer") (Text.putStrLn . showing)
         . extractInteger
+
+    printTextList =
+        maybe (dieWithUnexpectedType "List Text") (mapM_ Text.putStrLn)
+        . extractTextList
+
+    printNaturalList =
+        maybe (dieWithUnexpectedType "List Natural")
+            (mapM_ $ Text.putStrLn . showing)
+        . extractNaturalList
+
+    printIntegerList =
+        maybe (dieWithUnexpectedType "List Integer")
+            (mapM_ $ Text.putStrLn . showing)
+        . extractIntegerList
 
     showing :: Show a => a -> Text
     showing = fromString . show
