@@ -1,16 +1,21 @@
 #!/usr/bin/env stack
 {- stack script
-    --resolver lts-12.16
+    --resolver lts-12.17
     --package directory
     --package executable-path
     --package shake
     --
 -}
 
+{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeFamilies #-}
 
 -- |
 -- Module:      Main
@@ -30,6 +35,7 @@ module Main (main)
 
 import Control.Monad (unless, when)
 import Data.List (isPrefixOf)
+import GHC.TypeLits (Symbol)
 
 import System.Directory
     ( XdgDirectory(XdgCache, XdgConfig)
@@ -44,7 +50,50 @@ import System.Environment.Executable (ScriptPath(..), getScriptPath)
 import Development.Shake
 import Development.Shake.Command
 import Development.Shake.FilePath
+import Development.Shake.Classes (Binary, Hashable, NFData)
 
+
+newtype GitRepo (name :: Symbol) = GitRepo ()
+  deriving (Binary, Eq, Hashable, NFData, Show)
+
+data GitRepoConfig (name :: Symbol) = GitRepoConfig
+    { directory :: FilePath
+    , url :: String
+    }
+  deriving (Show)
+
+gitRepo :: GitRepoConfig name -> GitRepo name -> Action String
+gitRepo GitRepoConfig{..} GitRepo{} = do
+    repoExists <- doesDirectoryExist directory
+    unless repoExists
+        $ cmd "git clone" url directory
+    () <- cmd "git -C" directory "fetch --all"
+    Stdout hash <- cmd "git -C" directory "show-ref -s origin/HEAD"
+    pure hash
+
+type instance RuleResult (GitRepo "command-wrapper") = String
+
+mkCommandWrapperRepoConfig :: FilePath -> GitRepoConfig "command-wrapper"
+mkCommandWrapperRepoConfig dotLocalDir = GitRepoConfig
+    { directory = dotLocalDir </> "src" </> "trskop" </> "command-wrapper"
+    , url = "https://github.com/trskop/command-wrapper.git"
+    }
+
+type instance RuleResult (GitRepo "genbashrc") = String
+
+mkGenbashrcRepoConfig :: FilePath -> GitRepoConfig "genbashrc"
+mkGenbashrcRepoConfig dotLocalDir = GitRepoConfig
+    { directory = dotLocalDir </> "src" </> "trskop" </> "genbashrc"
+    , url = "https://github.com/trskop/genbashrc.git"
+    }
+
+type instance RuleResult (GitRepo "powerline-fonts") = String
+
+mkPowerlineFontsRepoConfig :: FilePath -> GitRepoConfig "powerline-fonts"
+mkPowerlineFontsRepoConfig dotLocalDir = GitRepoConfig
+    { directory = dotLocalDir </> "src" </> "powerline" </> "fonts"
+    , url = "https://github.com/powerline/fonts.git"
+    }
 
 data Directories = Directories
     { home :: FilePath
@@ -77,6 +126,13 @@ install Directories{..} opts = shakeArgs opts $ do
         dotLocalDir = home </> ".local"
         yxLibDir = dotLocalDir </> "lib" </> "yx"
         commandWrapperLibDir = dotLocalDir </> "lib" </> "command-wrapper"
+        commandWrapperRepoConfig = mkCommandWrapperRepoConfig dotLocalDir
+        genbashrcRepoConfig = mkGenbashrcRepoConfig dotLocalDir
+        powerlineFontsRepoConfig = mkPowerlineFontsRepoConfig dotLocalDir
+
+        dejaVuSansMonoPowerlineTtf =
+            dotLocalDir </> "share" </> "fonts"
+            </> "DejaVu Sans Mono for Powerline.ttf"
 
     want
         [ home </> ".ghc/ghci.conf"
@@ -91,6 +147,11 @@ install Directories{..} opts = shakeArgs opts $ do
         , home </> ".stack/global-project/stack.yaml"
         , binDir </> "stack-help"
 
+        , dejaVuSansMonoPowerlineTtf
+
+        , dotLocalDir </> "bin" </> "genbashrc"
+
+        , commandWrapperLibDir </> "command-wrapper"
         , commandWrapperDir </> "default" <.> "dhall"
         , commandWrapperDir </> "command-wrapper-cd" <.> "dhall"
         , commandWrapperDir </> "command-wrapper-exec" <.> "dhall"
@@ -141,7 +202,28 @@ install Directories{..} opts = shakeArgs opts $ do
         , binDir
         }
 
+    genbashrcUpToDate <- addOracle (gitRepo genbashrcRepoConfig)
+
+    (dotLocalDir </> "bin" </> "genbashrc") %> \_ -> do
+        _ <- genbashrcUpToDate (GitRepo ())
+        let GitRepoConfig{directory} = genbashrcRepoConfig
+        cmd "stack --stack-yaml" (directory </> "stack.yaml") "install"
+
+    powerlineFontsUpToDate <- addOracle (gitRepo powerlineFontsRepoConfig)
+
+    dejaVuSansMonoPowerlineTtf %> \_ -> do
+        _ <- powerlineFontsUpToDate (GitRepo ())
+        let GitRepoConfig{directory} = powerlineFontsRepoConfig
+        cmd (Cwd directory) "./install"
+
     -- {{{ CommandWrapper -----------------------------------------------------
+
+    commandWrapperUpToDate <- addOracle (gitRepo commandWrapperRepoConfig)
+
+    (commandWrapperLibDir </> "command-wrapper") %> \_ -> do
+        _ <- commandWrapperUpToDate (GitRepo ())
+        let GitRepoConfig{directory} = commandWrapperRepoConfig
+        cmd (Cwd directory) "./install"
 
     (commandWrapperDir </> "*.dhall") %> \out -> do
         let subdir = takeBaseName out `dropPrefix` "command-wrapper-"
