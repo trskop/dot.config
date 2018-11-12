@@ -207,6 +207,7 @@ install Directories{..} opts = shakeArgs opts $ do
     (dotLocalDir </> "bin" </> "genbashrc") %> \_ -> do
         _ <- genbashrcUpToDate (GitRepo ())
         let GitRepoConfig{directory} = genbashrcRepoConfig
+        () <- cmd "git -C" directory "pull"
         cmd "stack --stack-yaml" (directory </> "stack.yaml") "install"
 
     powerlineFontsUpToDate <- addOracle (gitRepo powerlineFontsRepoConfig)
@@ -214,6 +215,7 @@ install Directories{..} opts = shakeArgs opts $ do
     dejaVuSansMonoPowerlineTtf %> \_ -> do
         _ <- powerlineFontsUpToDate (GitRepo ())
         let GitRepoConfig{directory} = powerlineFontsRepoConfig
+        () <- cmd "git -C" directory "pull"
         cmd (Cwd directory) "./install.sh"
 
     -- {{{ CommandWrapper -----------------------------------------------------
@@ -223,6 +225,7 @@ install Directories{..} opts = shakeArgs opts $ do
     (commandWrapperLibDir </> "command-wrapper") %> \_ -> do
         _ <- commandWrapperUpToDate (GitRepo ())
         let GitRepoConfig{directory} = commandWrapperRepoConfig
+        () <- cmd "git -C" directory "pull"
         cmd (Cwd directory) "./install"
 
     (commandWrapperDir </> "*.dhall") %> \out -> do
