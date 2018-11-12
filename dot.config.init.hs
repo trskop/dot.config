@@ -214,7 +214,7 @@ install Directories{..} opts = shakeArgs opts $ do
     dejaVuSansMonoPowerlineTtf %> \_ -> do
         _ <- powerlineFontsUpToDate (GitRepo ())
         let GitRepoConfig{directory} = powerlineFontsRepoConfig
-        cmd (Cwd directory) "./install"
+        cmd (Cwd directory) "./install.sh"
 
     -- {{{ CommandWrapper -----------------------------------------------------
 
