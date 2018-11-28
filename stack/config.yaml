@@ -12,3 +12,5 @@ templates:
 #    author-email:
 #    copyright:
 #    github-username:
+
+allow-newer: true
