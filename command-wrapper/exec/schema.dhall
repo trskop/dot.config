@@ -1,7 +1,5 @@
 let
-    Schema =
-      ./Schema.dhall
-      sha256:6a8978aae0ebeaabbe46517a2fdae360835d1cd37f62c5aea46d86bce2505b63
+    Schema = ./Schema.dhall
 
 in let
     foldSchema

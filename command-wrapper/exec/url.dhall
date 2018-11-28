@@ -1,14 +1,10 @@
 let
-    Schema =
-      ./Schema.dhall
-      sha256:6a8978aae0ebeaabbe46517a2fdae360835d1cd37f62c5aea46d86bce2505b63
+    Schema = ./Schema.dhall
 
-in let
-    schema =
-      ./schema.dhall
-      sha256:50b66bc3d23e6918043d4da2647ceaa6aec3ba191a0e48aeea9451ed55602b7c
+let
+    schema = ./schema.dhall
 
-in let
+let
     schemaToText =
         λ(s : Schema)
       → schema.fold Text
@@ -17,7 +13,7 @@ in let
           }
           s
 
-in let
+let
     portToText =
         λ(port : Optional Natural)
       → Optional/fold Natural port Text

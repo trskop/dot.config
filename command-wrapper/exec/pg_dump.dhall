@@ -1,17 +1,15 @@
-  let
+let
     CommandWrapper =
       ~/.local/src/trskop/command-wrapper/dhall/CommandWrapper/Type/package.dhall
-      sha256:08d2673948c732c338f5322ee7c15a3f4b92c27dce731d7c678026eb9309efe6
+      sha256:95094b3603fce0a6374a216904826d5b68168414d117de4fe3786673f38e3c6c
 
-in let
+let
     commandWrapper =
       ~/.local/src/trskop/command-wrapper/dhall/CommandWrapper/package.dhall
-      sha256:ca555d6f0c8621b29bb8b7fc7566c2617efa634b5ec1e909cd10346b0ad15faf
+      sha256:6a3233bf9edea9300226f8842a20152288cd37f4deb53128378352487169a639
 
-in let
-    ConnectToDatabase =
-      ./ConnectToDatabase.dhall
-      sha256:4b2567ac9b4cb64394df716190a7d8e28d2d1e5fefaeff038108182a9a5a8550
+let
+    ConnectToDatabase = ./ConnectToDatabase.dhall
 
 in
       λ(connect : ConnectToDatabase)

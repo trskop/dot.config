@@ -1,7 +1,7 @@
 let
     CommandWrapper =
       ~/.local/src/trskop/command-wrapper/dhall/CommandWrapper/Type/package.dhall
-      sha256:08d2673948c732c338f5322ee7c15a3f4b92c27dce731d7c678026eb9309efe6
+      sha256:95094b3603fce0a6374a216904826d5b68168414d117de4fe3786673f38e3c6c
 
 in    λ(fileOrUrl : Optional Text)
     → λ(environment : List CommandWrapper.EnvironmentVariable)

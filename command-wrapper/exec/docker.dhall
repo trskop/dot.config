@@ -1,34 +1,28 @@
-  let
+let
     CommandWrapper =
       ~/.local/src/trskop/command-wrapper/dhall/CommandWrapper/Type/package.dhall
-      sha256:08d2673948c732c338f5322ee7c15a3f4b92c27dce731d7c678026eb9309efe6
+      sha256:95094b3603fce0a6374a216904826d5b68168414d117de4fe3786673f38e3c6c
 
-in let
+let
     commandWrapper =
       ~/.local/src/trskop/command-wrapper/dhall/CommandWrapper/package.dhall
-      sha256:ca555d6f0c8621b29bb8b7fc7566c2617efa634b5ec1e909cd10346b0ad15faf
+      sha256:6a3233bf9edea9300226f8842a20152288cd37f4deb53128378352487169a639
 
-in let
+let
     null =
       http://prelude.dhall-lang.org/List/null
-      sha256:5f9cb7c6e63e3448509266a3954758f91f32b8540b9115b85dac35e3782b32a5
+      sha256:0c3dcbe024ab37387dc2c24854921f586f4c83c3600fbe34ae5233ea2d924783
 
-in let
-    DockerGlobalOptions : Type =
-      ./DockerGlobalOptions.dhall
-      sha256:27154126ac849019c5767d3de6793a23f914be553ba5cc395d494f739a9edc46
+let
+    DockerGlobalOptions : Type = ./DockerGlobalOptions.dhall
 
-in let
-    DockerExecOptions : Type =
-      ./DockerExecOptions.dhall
-      sha256:8de3098208653ed27e9890ccea2a5d70bad199c149eb5b93edcf951d6407ec8a
+let
+    DockerExecOptions : Type = ./DockerExecOptions.dhall
 
-in let
-    DockerRunOptions : Type =
-      ./DockerRunOptions.dhall
-      sha256:d8e96b50e8ef405d9a1b7a2ca942afac5387c62005f4162b3f4ddc9b01f2fd21
+let
+    DockerRunOptions : Type = ./DockerRunOptions.dhall
 
-in let
+let
     dockerGlobalOptions =
         λ(globalOptions : DockerGlobalOptions)
       →   List/fold Text globalOptions.host (List Text)
@@ -44,7 +38,7 @@ in let
             (λ(config : Text) → ["--config", config])
             ([] : List Text)
 
-in let
+let
     dockerExecOptions =
         λ(execOptions : DockerExecOptions)
       →   ( if execOptions.interactive
@@ -66,7 +60,7 @@ in let
             (λ(dir : Text) → ["--workdir", dir])
             ([] : List Text)
 
-in let
+let
     dockerRunOptions =
         λ(runOptions : DockerRunOptions)
       →   dockerExecOptions
@@ -76,7 +70,7 @@ in let
               else [] : List Text
           )
 
-in let
+let
     dockerEnvOptions =
         λ(environment : List CommandWrapper.EnvironmentVariable)
       → List/fold
@@ -89,7 +83,7 @@ in let
           )
           ([] : List Text)
 
-in let
+let
     defaultExecOptions =
       { interactive = False
       , allocateTty = False
@@ -98,7 +92,7 @@ in let
       , workingDirectory = None Text
       } : DockerExecOptions
 
-in let
+let
     execInteractiveCommand =
       { interactive = True
       , allocateTty = True

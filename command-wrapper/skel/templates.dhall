@@ -1,10 +1,10 @@
 let
     home = "${env:HOME as Text}"
 
-in let
+let
     bashLib = "${home}/.local/trskop/command-wrapper/bash/lib.sh"
 
-in let
+let
     haskellSubcommandFileName =
         λ(toolsetName : Text)
       → λ(subcommandName : Text)
