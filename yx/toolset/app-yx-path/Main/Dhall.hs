@@ -39,7 +39,13 @@ import Data.Text.Prettyprint.Doc (pretty)
 import Data.Text.Prettyprint.Doc.Render.Text (putDoc)
 import qualified Dhall
 import qualified Dhall.Core as Dhall
-    ( Expr
+    ( Binding
+        ( Binding
+        , annotation
+        , value
+        , variable
+        )
+    , Expr
         ( Annot
         , App
         , Integer
@@ -230,8 +236,20 @@ mkExpressionAndTypeCheck possiblyResultType bodyExpression configExpression path
         maybe bodyExpression (Dhall.Annot bodyExpression) possiblyResultType
 
     mkExpression configExpressionType =
-        Dhall.Let "Paths" Nothing declared
-            ( Dhall.Let "Config" Nothing configExpressionType
+        Dhall.Let
+            ( pure Dhall.Binding
+                { Dhall.variable = "Paths"
+                , Dhall.annotation = Nothing
+                , Dhall.value = declared
+                }
+            )
+            ( Dhall.Let
+                ( pure Dhall.Binding
+                    { Dhall.variable = "Config"
+                    , Dhall.annotation = Nothing
+                    , Dhall.value = configExpressionType
+                    }
+                )
                 ( Dhall.Lam "data"
                     ( recordType
                         [ ("paths", declared)
