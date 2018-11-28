@@ -19,7 +19,7 @@ dependencies:
 
   - case-insensitive
   - comonad
-  - dhall >=1.17
+  - dhall >=1.19
   - dhall-bash
   - dhall-json
   - directory

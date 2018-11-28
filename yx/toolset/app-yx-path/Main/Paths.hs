@@ -37,12 +37,14 @@ import System.Directory
     ( XdgDirectory(XdgCache, XdgConfig, XdgData)
     , getXdgDirectory
     )
+import System.Directory.ProjectRoot (getProjectRootCurrent)
 import System.FilePath ((</>))
 import System.Process (readProcess)
 
 
 data Paths = Paths
     { xdg :: Xdg
+    , projectRoot :: Maybe Text
     , commandWrapper :: CommandWrapper
     }
   deriving (Generic, Show)
@@ -129,6 +131,8 @@ mk Params{name, exePath} = do
     pictures <- execXdgUserDir Pictures
     videos <- execXdgUserDir Videos
 
+    projectRoot <- fmap fromString <$> getProjectRootCurrent
+
     pure Paths
         { xdg = Xdg
             { configDir
@@ -145,6 +149,7 @@ mk Params{name, exePath} = do
                 , videos
                 }
             }
+        , projectRoot
         , commandWrapper
         }
 
