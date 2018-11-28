@@ -178,6 +178,22 @@ in
               , workingDirectory = None Text
               } : CommandWrapper.ExecCommand
 
+    , prune =
+          λ(globalOptions : DockerGlobalOptions)
+        → λ(environment : List CommandWrapper.EnvironmentVariable)
+        → λ(verbosity : CommandWrapper.Verbosity)
+        → λ(colourOutput : CommandWrapper.ColourOutput)
+        → λ(arguments : List Text)
+        → { command = "docker"
+          , arguments =
+                dockerGlobalOptions globalOptions
+              # ["system", "prune", "--volumes"]
+              # arguments
+          , environment = environment
+          , searchPath = True
+          , workingDirectory = None Text
+          } : CommandWrapper.ExecCommand
+
     , defaultGlobalOptions =
         { host = [] : List Text
         , logLevel = None Text
