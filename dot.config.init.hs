@@ -67,32 +67,44 @@ gitRepo GitRepoConfig{..} GitRepo{} = do
     repoExists <- doesDirectoryExist directory
     unless repoExists
         $ cmd "git clone" url directory
-    () <- cmd "git -C" directory "fetch --all"
+    cmd_ "git -C" directory "fetch --all"
     Stdout hash <- cmd "git -C" directory "show-ref -s origin/HEAD"
     pure hash
 
-type instance RuleResult (GitRepo "command-wrapper") = String
+type instance RuleResult (GitRepo "github.com/trskop/command-wrapper") = String
 
-mkCommandWrapperRepoConfig :: FilePath -> GitRepoConfig "command-wrapper"
+mkCommandWrapperRepoConfig
+    :: FilePath
+    -> GitRepoConfig "github.com/trskop/command-wrapper"
 mkCommandWrapperRepoConfig dotLocalDir = GitRepoConfig
     { directory = dotLocalDir </> "src" </> "trskop" </> "command-wrapper"
     , url = "https://github.com/trskop/command-wrapper.git"
     }
 
-type instance RuleResult (GitRepo "genbashrc") = String
+type instance RuleResult (GitRepo "github.com/trskop/genbashrc") = String
 
-mkGenbashrcRepoConfig :: FilePath -> GitRepoConfig "genbashrc"
+mkGenbashrcRepoConfig :: FilePath -> GitRepoConfig "github.com/trskop/genbashrc"
 mkGenbashrcRepoConfig dotLocalDir = GitRepoConfig
     { directory = dotLocalDir </> "src" </> "trskop" </> "genbashrc"
     , url = "https://github.com/trskop/genbashrc.git"
     }
 
-type instance RuleResult (GitRepo "powerline-fonts") = String
+type instance RuleResult (GitRepo "github.com/powerline/fonts") = String
 
-mkPowerlineFontsRepoConfig :: FilePath -> GitRepoConfig "powerline-fonts"
+mkPowerlineFontsRepoConfig
+    :: FilePath
+    -> GitRepoConfig "github.com/powerline/fonts"
 mkPowerlineFontsRepoConfig dotLocalDir = GitRepoConfig
     { directory = dotLocalDir </> "src" </> "powerline" </> "fonts"
     , url = "https://github.com/powerline/fonts.git"
+    }
+
+type instance RuleResult (GitRepo "github.com/junegunn/fzf") = String
+
+mkFzfRepoConfig :: FilePath -> GitRepoConfig "github.com/junegunn/fzf"
+mkFzfRepoConfig dotLocalDir = GitRepoConfig
+    { directory = dotLocalDir </> "src" </> "junegunn" </> "fzf"
+    , url = "https://github.com/junegunn/fzf.git"
     }
 
 data Directories = Directories
@@ -129,6 +141,7 @@ install Directories{..} opts = shakeArgs opts $ do
         commandWrapperRepoConfig = mkCommandWrapperRepoConfig dotLocalDir
         genbashrcRepoConfig = mkGenbashrcRepoConfig dotLocalDir
         powerlineFontsRepoConfig = mkPowerlineFontsRepoConfig dotLocalDir
+        fzfRepoConfig = mkFzfRepoConfig dotLocalDir
 
         dejaVuSansMonoPowerlineTtf =
             dotLocalDir </> "share" </> "fonts"
@@ -163,6 +176,8 @@ install Directories{..} opts = shakeArgs opts $ do
 
         , habitDir </> "default.dhall"
         , habitDir </> "pgpass.conf"
+
+        , binDir </> "fzf"
         ]
 
     (home </> ".ghc/ghci.conf") %> \out -> do
@@ -173,8 +188,8 @@ install Directories{..} opts = shakeArgs opts $ do
             targetIsSymlink <- liftIO (pathIsSymbolicLink dst)
             unless targetIsSymlink
                 $ cmd "mv" dst (takeDirectory dst </> ".ghc-bac")
-        () <- cmd "chmod 700" src
-        cmd "ln -sf" (src `dropPrefixDir` home) (takeDirectory out)
+        cmd_ "chmod 700" src
+        cmd_ "ln -sf" (src `dropPrefixDir` home) (takeDirectory out)
 
     (home </> ".haskeline") %> \out ->
         let src = (srcDir </> "haskeline" </> "prefs") `dropPrefixDir` home
@@ -207,16 +222,16 @@ install Directories{..} opts = shakeArgs opts $ do
     (dotLocalDir </> "bin" </> "genbashrc") %> \_ -> do
         _ <- genbashrcUpToDate (GitRepo ())
         let GitRepoConfig{directory} = genbashrcRepoConfig
-        () <- cmd "git -C" directory "pull"
-        cmd "stack --stack-yaml" (directory </> "stack.yaml") "install"
+        cmd_ "git -C" directory "pull"
+        cmd_ "stack --stack-yaml" (directory </> "stack.yaml") "install"
 
     powerlineFontsUpToDate <- addOracle (gitRepo powerlineFontsRepoConfig)
 
     dejaVuSansMonoPowerlineTtf %> \_ -> do
         _ <- powerlineFontsUpToDate (GitRepo ())
         let GitRepoConfig{directory} = powerlineFontsRepoConfig
-        () <- cmd "git -C" directory "pull"
-        cmd (Cwd directory) "./install.sh"
+        cmd_ "git -C" directory "pull"
+        cmd_ (Cwd directory) "./install.sh"
 
     -- {{{ CommandWrapper -----------------------------------------------------
 
@@ -225,8 +240,8 @@ install Directories{..} opts = shakeArgs opts $ do
     (commandWrapperLibDir </> "command-wrapper") %> \_ -> do
         _ <- commandWrapperUpToDate (GitRepo ())
         let GitRepoConfig{directory} = commandWrapperRepoConfig
-        () <- cmd "git -C" directory "pull"
-        cmd (Cwd directory) "./install"
+        cmd_ "git -C" directory "pull"
+        cmd_ (Cwd directory) "./install"
 
     (commandWrapperDir </> "*.dhall") %> \out -> do
         let subdir = takeBaseName out `dropPrefix` "command-wrapper-"
@@ -234,7 +249,7 @@ install Directories{..} opts = shakeArgs opts $ do
             src = dir </> "constructor.dhall"
 
         getDirectoryFiles dir ["*"] >>= need . map (dir </>)
-        cmd (Stdin src) (FileStdout out) "dhall"
+        cmd_ (Stdin src) (FileStdout out) "dhall"
 
     yxRules YxRulesParams
         { configDir = yxDir
@@ -248,6 +263,14 @@ install Directories{..} opts = shakeArgs opts $ do
         }
 
     -- }}} CommandWrapper -----------------------------------------------------
+
+    fzfRepoUpToDate <- addOracle (gitRepo fzfRepoConfig)
+
+    (binDir </> "fzf") %> \out -> do
+        _ <- fzfRepoUpToDate (GitRepo ())
+        let GitRepoConfig{directory = srcDir} = fzfRepoConfig
+        cmd_ (srcDir </> "install") "--all" "--xdg" "--no-update-rc"
+        symlink (srcDir </> "bin" </> takeFileName out) out
 
 data StackRulesParams = StackRulesParams
     { home :: FilePath
@@ -277,7 +300,7 @@ symlink src dst = do
         unless targetIsSymlink
             $ cmd "mv" dst (dst <.> "bac")
 
-    cmd "ln -sf" src dst
+    cmd_ "ln -sf" src dst
 
 data YxRulesParams = YxRulesParams
     { configDir :: FilePath
@@ -295,7 +318,7 @@ yxRules YxRulesParams{..} = do
             src = dir </> "constructor.dhall"
 
         getDirectoryFiles dir ["*"] >>= need . map (dir </>)
-        cmd (Stdin src) (FileStdout out) "dhall"
+        cmd_ (Stdin src) (FileStdout out) "dhall"
 
     (libDir </> "yx-jmp") %> \out ->
         let src = configDir </> "toolset" </> "bash" </> "yx-jmp"
@@ -319,7 +342,7 @@ habitRules HabitRulesParamams{..} = do
             src = dir </> "constructor.dhall"
 
         getDirectoryFiles dir ["*"] >>= need . map (dir </>)
-        cmd (Stdin src) (FileStdout out) "dhall"
+        cmd_ (Stdin src) (FileStdout out) "dhall"
 
     -- See `psql(1)` for more details about `pgpass` file.
     (configDir </> "pgpass.conf") %> \out -> do
@@ -330,8 +353,8 @@ habitRules HabitRulesParamams{..} = do
                 writeFile' out "# Empty\n"
             else do
                 need srcs
-                () <- cmd (FileStdout out) "sed" "/^#/d" srcs
-                cmd "chmod" "u=rw,go=" out
+                cmd_ (FileStdout out) "sed" "/^#/d" srcs
+                cmd_ "chmod" "u=rw,go=" out
 
 dropPrefixDir :: FilePath -> FilePath -> FilePath
 dropPrefixDir path prefix = dropPrefix' path' prefix'
