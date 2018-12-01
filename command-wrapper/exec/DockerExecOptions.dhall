@@ -1,5 +1,4 @@
-let
-    DockerExecOptions =
+let DockerExecOptions =
       { interactive : Bool
       , allocateTty : Bool
       , detach : Bool

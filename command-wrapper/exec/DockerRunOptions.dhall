@@ -1,8 +1,6 @@
-let
-    DockerExecOptions = ./DockerExecOptions.dhall
+let DockerExecOptions = ./DockerExecOptions.dhall
 
-let
-    DockerRunOptions = DockerExecOptions
+let DockerRunOptions = DockerExecOptions
       ⩓ { remove : Bool
         }
 

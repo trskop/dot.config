@@ -1,11 +1,8 @@
-let
-    home = "${env:HOME as Text}"
+let home = "${env:HOME as Text}"
 
-let
-    bashLib = "${home}/.local/trskop/command-wrapper/bash/lib.sh"
+let bashLib = "${home}/.local/trskop/command-wrapper/bash/lib.sh"
 
-let
-    haskellSubcommandFileName =
+let haskellSubcommandFileName =
         λ(toolsetName : Text)
       → λ(subcommandName : Text)
       → "${home}/.config/${toolsetName}/toolset/app-${subcommandName}/Main.hs"

@@ -1,7 +1,15 @@
-  let
-    home = env:HOME as Text
+let CommandWrapper =
+      ~/.local/src/trskop/command-wrapper/dhall/CommandWrapper/Type/package.dhall
 
-in let
-    fzf = "${home}/.config/nvim/dein.vim/repos/github.com/junegunn/fzf/bin/fzf"
+let home = env:HOME as Text
 
-in  fzf : Text
+let fzf =
+      { command = "fzf"
+      , arguments =
+          [ "--height", "40%"
+          , "--reverse"
+          ]
+      , environment = [] : List CommandWrapper.EnvironmentVariable
+      }
+
+in  fzf : CommandWrapper.CommandWithEnvironment

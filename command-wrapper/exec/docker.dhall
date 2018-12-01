@@ -1,29 +1,18 @@
-let
-    CommandWrapper =
-      ~/.local/src/trskop/command-wrapper/dhall/CommandWrapper/Type/package.dhall
-      sha256:95094b3603fce0a6374a216904826d5b68168414d117de4fe3786673f38e3c6c
+let CommandWrapper = ../lib/Types.dhall
 
-let
-    commandWrapper =
-      ~/.local/src/trskop/command-wrapper/dhall/CommandWrapper/package.dhall
-      sha256:6a3233bf9edea9300226f8842a20152288cd37f4deb53128378352487169a639
+let commandWrapper = ../lib/lib.dhall
 
-let
-    null =
+let null =
       http://prelude.dhall-lang.org/List/null
       sha256:0c3dcbe024ab37387dc2c24854921f586f4c83c3600fbe34ae5233ea2d924783
 
-let
-    DockerGlobalOptions : Type = ./DockerGlobalOptions.dhall
+let DockerGlobalOptions : Type = ./DockerGlobalOptions.dhall
 
-let
-    DockerExecOptions : Type = ./DockerExecOptions.dhall
+let DockerExecOptions : Type = ./DockerExecOptions.dhall
 
-let
-    DockerRunOptions : Type = ./DockerRunOptions.dhall
+let DockerRunOptions : Type = ./DockerRunOptions.dhall
 
-let
-    dockerGlobalOptions =
+let dockerGlobalOptions =
         λ(globalOptions : DockerGlobalOptions)
       →   List/fold Text globalOptions.host (List Text)
             (   λ(host : Text)
@@ -38,8 +27,7 @@ let
             (λ(config : Text) → ["--config", config])
             ([] : List Text)
 
-let
-    dockerExecOptions =
+let dockerExecOptions =
         λ(execOptions : DockerExecOptions)
       →   ( if execOptions.interactive
               then ["--interactive"]
@@ -60,8 +48,7 @@ let
             (λ(dir : Text) → ["--workdir", dir])
             ([] : List Text)
 
-let
-    dockerRunOptions =
+let dockerRunOptions =
         λ(runOptions : DockerRunOptions)
       →   dockerExecOptions
             runOptions.{interactive, allocateTty, detach, user, workingDirectory}
@@ -70,8 +57,7 @@ let
               else [] : List Text
           )
 
-let
-    dockerEnvOptions =
+let dockerEnvOptions =
         λ(environment : List CommandWrapper.EnvironmentVariable)
       → List/fold
           CommandWrapper.EnvironmentVariable
@@ -83,8 +69,7 @@ let
           )
           ([] : List Text)
 
-let
-    defaultExecOptions =
+let defaultExecOptions =
       { interactive = False
       , allocateTty = False
       , detach = False
@@ -92,8 +77,7 @@ let
       , workingDirectory = None Text
       } : DockerExecOptions
 
-let
-    execInteractiveCommand =
+let execInteractiveCommand =
       { interactive = True
       , allocateTty = True
       , detach = False

@@ -244,6 +244,7 @@ install Directories{..} opts = shakeArgs opts $ do
         cmd_ (Cwd directory) "./install"
 
     (commandWrapperDir </> "*.dhall") %> \out -> do
+        need [commandWrapperLibDir </> "command-wrapper"]
         let subdir = takeBaseName out `dropPrefix` "command-wrapper-"
             dir = commandWrapperDir </> subdir
             src = dir </> "constructor.dhall"

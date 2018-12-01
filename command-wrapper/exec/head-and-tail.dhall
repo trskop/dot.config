@@ -1,5 +1,4 @@
-let
-    step =
+let step =
         λ(a : Type)
       → λ(elem : a)
       → λ(input : {head : Optional a, tail : List a})

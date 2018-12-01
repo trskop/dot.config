@@ -1,11 +1,8 @@
-let
-    Schema = ./Schema.dhall
+let Schema = ./Schema.dhall
 
-let
-    schema = ./schema.dhall
+let schema = ./schema.dhall
 
-let
-    schemaToText =
+let schemaToText =
         λ(s : Schema)
       → schema.fold Text
           { Http = λ(_ : {}) → "http"
@@ -13,8 +10,7 @@ let
           }
           s
 
-let
-    portToText =
+let portToText =
         λ(port : Optional Natural)
       → Optional/fold Natural port Text
           (λ(p : Natural) → ":${Natural/show p}")

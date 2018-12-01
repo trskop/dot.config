@@ -1,8 +1,6 @@
-let
-    Schema = ./Schema.dhall
+let Schema = ./Schema.dhall
 
-in let
-    foldSchema
+let foldSchema
       : ∀(r : Type)
       → ∀ (handler
             : { Http : {} → r
@@ -20,7 +18,6 @@ in let
           )
       → λ(schema : Schema)
       → merge handler schema
-
 
 in  { Http = <Http = {=} | Https : {}> : Schema
     , Https = <Http : {} | Https = {=}> : Schema

@@ -1,14 +1,10 @@
-let
-    home = "${env:HOME as Text}"
+let home = "${env:HOME as Text}"
 
-in let
-    config = "${home}/.config"
+let config = "${home}/.config"
 
-in let
-    local = "${home}/.local"
+let local = "${home}/.local"
 
-in
-    [ "${config}"
+in  [ "${config}"
     , "${config}/command-wrapper"
     , "${config}/git"
     , "${config}/nvim"
