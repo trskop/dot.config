@@ -1,6 +1,6 @@
 #!/usr/bin/env stack
 {- stack script
-    --resolver lts-12.17
+    --resolver lts-12.20
     --package directory
     --package executable-path
     --package shake
@@ -16,6 +16,8 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeFamilies #-}
+
+{-# OPTIONS_GHC -Wall #-}
 
 -- |
 -- Module:      Main
@@ -44,11 +46,9 @@ import System.Directory
     , pathIsSymbolicLink
     , setCurrentDirectory
     )
-import qualified System.Directory as Directory (doesDirectoryExist)
 import System.Environment.Executable (ScriptPath(..), getScriptPath)
 
 import Development.Shake
-import Development.Shake.Command
 import Development.Shake.FilePath
 import Development.Shake.Classes (Binary, Hashable, NFData)
 
@@ -67,8 +67,8 @@ gitRepo GitRepoConfig{..} GitRepo{} = do
     repoExists <- doesDirectoryExist directory
     unless repoExists
         $ cmd "git clone" url directory
-    cmd_ "git -C" directory "fetch --all"
-    Stdout hash <- cmd "git -C" directory "show-ref -s origin/HEAD"
+    cmd_ "git -C" [directory] "fetch --all"
+    Stdout hash <- cmd "git -C" [directory] "show-ref -s origin/HEAD"
     pure hash
 
 type instance RuleResult (GitRepo "github.com/trskop/command-wrapper") = String
@@ -116,7 +116,7 @@ data Directories = Directories
 main :: IO ()
 main = do
     srcDir <- getScriptPath >>= \case
-        Executable exe -> pure $ takeDirectory exe
+        Executable executable -> pure $ takeDirectory executable
         RunGHC script -> pure $ takeDirectory script
         Interactive -> getXdgDirectory XdgConfig ""
 
@@ -187,9 +187,9 @@ install Directories{..} opts = shakeArgs opts $ do
         when targetExists $ do
             targetIsSymlink <- liftIO (pathIsSymbolicLink dst)
             unless targetIsSymlink
-                $ cmd "mv" dst (takeDirectory dst </> ".ghc-bac")
+                $ cmd "mv" [dst, takeDirectory dst </> ".ghc-bac"]
         cmd_ "chmod 700" src
-        cmd_ "ln -sf" (src `dropPrefixDir` home) (takeDirectory out)
+        cmd_ "ln -sf" [src `dropPrefixDir` home, takeDirectory out]
 
     (home </> ".haskeline") %> \out ->
         let src = (srcDir </> "haskeline" </> "prefs") `dropPrefixDir` home
@@ -240,7 +240,7 @@ install Directories{..} opts = shakeArgs opts $ do
     (commandWrapperLibDir </> "command-wrapper") %> \_ -> do
         _ <- commandWrapperUpToDate (GitRepo ())
         let GitRepoConfig{directory} = commandWrapperRepoConfig
-        cmd_ "git -C" directory "pull"
+        cmd_ "git -C" [directory] "pull"
         cmd_ (Cwd directory) "./install"
 
     (commandWrapperDir </> "*.dhall") %> \out -> do
@@ -268,9 +268,9 @@ install Directories{..} opts = shakeArgs opts $ do
 
     (binDir </> "fzf") %> \out -> do
         _ <- fzfRepoUpToDate (GitRepo ())
-        let GitRepoConfig{directory = srcDir} = fzfRepoConfig
-        cmd_ (srcDir </> "install") "--all" "--xdg" "--no-update-rc"
-        symlink (srcDir </> "bin" </> takeFileName out) out
+        let GitRepoConfig{directory} = fzfRepoConfig
+        cmd_ (directory </> "install") "--all" "--xdg" "--no-update-rc"
+        symlink (directory </> "bin" </> takeFileName out) out
 
 data StackRulesParams = StackRulesParams
     { home :: FilePath
@@ -298,9 +298,9 @@ symlink src dst = do
     when targetExists $ do
         targetIsSymlink <- liftIO (pathIsSymbolicLink dst)
         unless targetIsSymlink
-            $ cmd "mv" dst (dst <.> "bac")
+            $ cmd "mv" [dst, dst <.> "bac"]
 
-    cmd_ "ln -sf" src dst
+    cmd_ "ln -sf" [src, dst]
 
 data YxRulesParams = YxRulesParams
     { configDir :: FilePath
@@ -353,8 +353,8 @@ habitRules HabitRulesParamams{..} = do
                 writeFile' out "# Empty\n"
             else do
                 need srcs
-                cmd_ (FileStdout out) "sed" "/^#/d" srcs
-                cmd_ "chmod" "u=rw,go=" out
+                cmd_ (FileStdout out) "sed" ["/^#/d"] srcs
+                cmd_ "chmod" "u=rw,go=" [out]
 
 dropPrefixDir :: FilePath -> FilePath -> FilePath
 dropPrefixDir path prefix = dropPrefix' path' prefix'
