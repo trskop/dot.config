@@ -13,5 +13,6 @@ URxvt.borderLess: True
 ! URxvt.font: xft:DejaVu Sans Mono:size=14
 URxvt.font: xft:DejaVu Sans Mono for Powerline:size=16:style=Book
 URxvt.visualBell: True
+URxvt.saveLines: 100000
 
 ! }}} URxvt settings !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
