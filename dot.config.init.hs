@@ -250,17 +250,23 @@ install Directories{..} opts = shakeArgs opts $ do
             src = dir </> "constructor.dhall"
 
         getDirectoryFiles dir ["*"] >>= need . map (dir </>)
-        cmd_ (Stdin src) (FileStdout out) "dhall"
+
+        -- We need to make sure that correct version of dhall command is used.
+        -- Stack may give access to a different version based on resolver in
+        -- this script, that is the reason for absolute path to the executable.
+        cmd_ (Stdin src) (FileStdout out) [dotLocalDir </> "bin" </> "dhall"]
 
     yxRules YxRulesParams
         { configDir = yxDir
         , libDir = yxLibDir
         , binDir
         , commandWrapperLibDir
+        , dotLocalDir
         }
 
     habitRules HabitRulesParamams
         { configDir = habitDir
+        , dotLocalDir
         }
 
     -- }}} CommandWrapper -----------------------------------------------------
@@ -308,6 +314,7 @@ data YxRulesParams = YxRulesParams
     , libDir :: FilePath
     , binDir :: FilePath
     , commandWrapperLibDir :: FilePath
+    , dotLocalDir :: FilePath
     }
 
 -- | CommandWrapper toolset `yx` is used for personal tools.
@@ -319,7 +326,11 @@ yxRules YxRulesParams{..} = do
             src = dir </> "constructor.dhall"
 
         getDirectoryFiles dir ["*"] >>= need . map (dir </>)
-        cmd_ (Stdin src) (FileStdout out) "dhall"
+
+        -- We need to make sure that correct version of dhall command is used.
+        -- Stack may give access to a different version based on resolver in
+        -- this script, that is the reason for absolute path to the executable.
+        cmd_ (Stdin src) (FileStdout out) [dotLocalDir </> "bin" </> "dhall"]
 
     (libDir </> "yx-jmp") %> \out ->
         let src = configDir </> "toolset" </> "bash" </> "yx-jmp"
@@ -329,8 +340,9 @@ yxRules YxRulesParams{..} = do
         let src = commandWrapperLibDir </> "command-wrapper"
         in symlink src out
 
-newtype HabitRulesParamams = HabitRulesParamams
+data HabitRulesParamams = HabitRulesParamams
     { configDir :: FilePath
+    , dotLocalDir :: FilePath
     }
 
 -- | CommandWrapper toolset `habit` is used at work. Most of the configuration
@@ -343,7 +355,11 @@ habitRules HabitRulesParamams{..} = do
             src = dir </> "constructor.dhall"
 
         getDirectoryFiles dir ["*"] >>= need . map (dir </>)
-        cmd_ (Stdin src) (FileStdout out) "dhall"
+
+        -- We need to make sure that correct version of dhall command is used.
+        -- Stack may give access to a different version based on resolver in
+        -- this script, that is the reason for absolute path to the executable.
+        cmd_ (Stdin src) (FileStdout out) [dotLocalDir </> "bin" </> "dhall"]
 
     -- See `psql(1)` for more details about `pgpass` file.
     (configDir </> "pgpass.conf") %> \out -> do
