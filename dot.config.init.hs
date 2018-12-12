@@ -172,6 +172,7 @@ install Directories{..} opts = shakeArgs opts $ do
 
         , binDir </> "yx"
         , yxDir </> "default" <.> "dhall"
+        , yxDir </> "yx-jmp" <.> "dhall"
         , yxLibDir </> "yx-jmp"
 
         , habitDir </> "default.dhall"

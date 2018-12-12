@@ -10,6 +10,22 @@ ${COMMAND_WRAPPER_NAME} jmp [-h|--help]
 EOF
 }
 
+function declareCfg() {
+    local -r configFile="$1"; shift
+
+    dhall-to-bash --declare 'menuCommand' <<EOF
+let i = ${configFile}
+in  [i.menu.command] # i.menu.arguments
+EOF
+    echo
+
+    dhall-to-bash --declare 'editorCommand' <<EOF
+let i = ${configFile}
+in  [i.editor.command] # i.editor.arguments
+EOF
+    echo
+}
+
 function main() {
     dieIfExecutedOutsideOfCommandWrapperEnvironment
 
@@ -35,10 +51,13 @@ function main() {
         exit 1
     fi
 
+    eval "$(declareCfg "${COMMAND_WRAPPER_CONFIG}")"
+
     tmux capture-pane -S - -b scroll-buffer \; show-buffer -b scroll-buffer \; delete-buffer -b scroll-buffer \
     | sed -rn 's/^ *(.*):([0-9]+):[0-9]+: error:$/\1 +\2/;T;p' \
-    | ~/.config/nvim/dein.vim/repos/github.com/junegunn/fzf/bin/fzf \
-    | xargs -r nvim
+    | uniq \
+    | "${menuCommand[@]}" \
+    | xargs -r "${editorCommand[@]}"
 }
 
 main "$@"
