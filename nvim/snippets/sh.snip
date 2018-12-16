@@ -1,0 +1,50 @@
+snippet main
+abbr    #!/bin/bash
+options head
+	#!/bin/bash
+
+	# Copyright (c) 2018 Peter Trško
+	#
+	# TODO: License
+
+	set -e
+
+	function printHelp() {
+	    local -r progName="\${0##*/}"
+	
+	    cat <<__EOF__
+	This is a skeleton of a bash script.
+	
+	Usage:
+	
+	  \${progName} [-h|--help]
+	
+	Note, here, any prerequisites of this script for it to work.
+	__EOF__
+	}
+
+	function main() {
+	    local arg=''
+
+	    while (( \$# )); do
+	        arg="\$1"; shift
+	        case "\${arg}" in
+	          -h|--help)
+	            printHelp
+	            exit 0
+	            ;;
+	          -*)
+	            error - "\`%s': %s\n" "\${arg}" 'Unknown option.'
+	            printHelp 1>&2
+	            exit 1
+	            ;;
+	          *)
+	            error - "\`%s': %s\n" "\${arg}" 'Unexpected argument.'
+	            printHelp 1>&2
+	            exit 1
+	            ;;
+	        esac
+	    done
+
+	    ${0}
+	}

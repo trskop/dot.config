@@ -1,0 +1,119 @@
+*rituals.txt*	Personal rituals, i.e. custom configuration
+
+Version: 1.0
+Author: Peter Trško <peter.trsko at gmail.com>
+License: BSD3 license
+
+CONTENTS							     *rituals*
+
+Introduction		|rituals-introduction|
+Bindings		|rituals-bindings|
+  Leader sequence	  |rituals-bindings-leader|
+  NERDTree                |rituals-nerdtree|
+  Indent Guides           |rituals-indent-guides|
+  Terminal                |rituals-terminal|
+  LanguageClient          |rituals-language-client|
+  FZF                     |rituals-fzf|
+
+==============================================================================
+INTRODUCTION						*rituals-introduction*
+
+TODO
+
+==============================================================================
+BINDINGS						    *rituals-bindings*
+
+Key bindings specific for this Neovim configuration.
+
+------------------------------------------------------------------------------
+LEADER SEQUENCE					     *rituals-bindings-leader*
+
+Leader sequence is set as:
+>
+	<leader> = ","
+<
+------------------------------------------------------------------------------
+NERDTREE						    *rituals-nerdtree*
+
+Either open NERDTree window, in a directory relevant to file open in current
+buffer, or close existing NERDTree window:
+>
+	<Leader>f
+<
+Open or close NERDTree window (see `:help NERDTreeToggle` for more details):
+>
+	<Leader>F
+<
+------------------------------------------------------------------------------
+INDENT GUIDES					       *rituals-indent-guides*
+
+Toggle Indent Guides on/off:
+>
+	<Leader>ig
+<
+------------------------------------------------------------------------------
+TERMINAL						    *rituals-terminal*
+
+Make a horizontal split and open terminal in the new window:
+>
+	<Leader>t
+<
+Make a vertical split and open terminal in the new window:
+>
+	<Leader>T
+<
+------------------------------------------------------------------------------
+LANGUAGE CLIENT 				     *rituals-language-client*
+
+Show context menu, i.e. list of possible LanguageClient actions allowing user
+to select one:
+>
+	<leader>c
+>
+
+Goto definition:
+>
+	<Leader>d
+<
+
+Show type info (and short doc) of identifier under cursor:
+>
+	<Leader>D
+<
+------------------------------------------------------------------------------
+FZF 								 *rituals-fzf*
+
+Search for file (preview included):
+>
+	<Leader><Leader>
+<
+
+List buffers:
+>
+	<Leader><Enter>
+<
+
+List marks:
+>
+	<Leader>`
+<
+
+List mappings:
+>
+	<Leader><Tab>
+<
+
+Find a line in current file:
+>
+	<Leader>l
+<
+
+Completions:
+>
+	<c-x><c-k> -- Word
+	<c-x><c-f> -- File path
+	<c-x><c-d> -- Directory path
+	<c-x><c-l> -- Line
+<
+==============================================================================
+vim:tw=78:ts=8:ft=help:norl:noet:fen:noet:
