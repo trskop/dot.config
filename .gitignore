@@ -22,6 +22,9 @@
 # Contains private information.
 /ghc/ghci_history
 
+!/nvim/
+/nvim/dein.vim
+
 # {{{ Command Wrapper #########################################################
 
 !/command-wrapper/
