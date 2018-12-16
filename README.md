@@ -55,3 +55,5 @@ Other Resources
 
 * [XDG Base Directory Specification
   ](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html)
+* [ArchWiki: XDG Base Directory
+  ](https://wiki.archlinux.org/index.php/XDG_Base_Directory)
