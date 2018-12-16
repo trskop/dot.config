@@ -111,6 +111,7 @@ data Directories = Directories
     { home :: FilePath
     , srcDir :: FilePath
     , configDir :: FilePath
+    , cacheDir :: FilePath
     }
 
 main :: IO ()
@@ -120,13 +121,15 @@ main = do
         RunGHC script -> pure $ takeDirectory script
         Interactive -> getXdgDirectory XdgConfig ""
 
-    cacheDir <- getXdgDirectory XdgCache "dot.config"
-    home <- getHomeDirectory
+    stateDir <- getXdgDirectory XdgCache "dot.config"
+
+    cacheDir <- getXdgDirectory XdgCache ""
     configDir <- getXdgDirectory XdgConfig ""
+    home <- getHomeDirectory
 
     setCurrentDirectory home
     install Directories{..} $ shakeOptions
-        { shakeFiles = cacheDir
+        { shakeFiles = stateDir
         }
 
 install :: Directories -> ShakeOptions -> IO ()
@@ -147,6 +150,7 @@ install Directories{..} opts = shakeArgs opts $ do
             dotLocalDir </> "share" </> "fonts"
             </> "DejaVu Sans Mono for Powerline.ttf"
 
+        deinInstallDir = cacheDir </> "dein.vim"
     want
         [ home </> ".ghc/ghci.conf"
         , home </> ".haskeline"
@@ -179,6 +183,9 @@ install Directories{..} opts = shakeArgs opts $ do
         , habitDir </> "pgpass.conf"
 
         , binDir </> "fzf"
+
+        -- Dein is a Vim/Neovim plugin manager.
+        , deinInstallDir </> "installed.lock"
         ]
 
     (home </> ".ghc/ghci.conf") %> \out -> do
@@ -279,6 +286,19 @@ install Directories{..} opts = shakeArgs opts $ do
         let GitRepoConfig{directory} = fzfRepoConfig
         cmd_ (directory </> "install") "--all" "--xdg" "--no-update-rc"
         symlink (directory </> "bin" </> takeFileName out) out
+
+    (deinInstallDir </> "installed.lock") %> \out -> do
+        let installerUrl = "https://raw.githubusercontent.com/Shougo/dein.vim/master/bin/installer.sh"
+            installerHash = "943163d3660423febad96fe91371807763679a683947b44b63254dc2d555094c"
+
+            installerSh = deinInstallDir </> "installer.sh"
+            installerChecksum = installerHash <> "  " <> installerSh
+
+        Stdout installer <- cmd "curl" [installerUrl]
+        writeFile' installerSh installer
+        cmd_ (Stdin installerChecksum) "sha256sum -c -"
+        cmd_ "bash" [installerSh, deinInstallDir]
+        writeFile' out ""
 
 data StackRulesParams = StackRulesParams
     { home :: FilePath

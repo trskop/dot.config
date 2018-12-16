@@ -8,11 +8,12 @@
 !/ghc/
 !/git/
 !/haskeline/
+!/nvim/
 !/psql/
+!/readline/
 !/sensible-editor/
 !/stack/
 !/tmux/
-!/readline/
 !README.md
 !Xresources
 !dot.config.init.hs
@@ -21,9 +22,6 @@
 
 # Contains private information.
 /ghc/ghci_history
-
-!/nvim/
-/nvim/dein.vim
 
 # {{{ Command Wrapper #########################################################
 

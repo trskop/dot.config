@@ -87,18 +87,18 @@ endif
 
 " {{{ Plugin -- Dein.vim ------------------------------------------------------
 "
-" Dein.vm is a plugin manager.
+" Dein.vim is a plugin manager.
 
 " Required:
-set runtimepath+=~/.config/nvim/dein.vim/repos/github.com/Shougo/dein.vim
+set runtimepath+=~/.cache/dein.vim/repos/github.com/Shougo/dein.vim
 
 " Required:
-if dein#load_state('~/.config/nvim/dein.vim')
-  call dein#begin('~/.config/nvim/dein.vim')
+if dein#load_state('~/.cache/dein.vim')
+  call dein#begin('~/.cache/dein.vim')
 
   " Let dein manage dein
   " Required:
-  call dein#add('~/.config/nvim/dein.vim/repos/github.com/Shougo/dein.vim')
+  call dein#add('~/.cache/dein.vim/repos/github.com/Shougo/dein.vim')
 
   " {{{ Plugin -- Dein.vim -- Plugins to Install ------------------------------
   "
@@ -137,11 +137,11 @@ if dein#load_state('~/.config/nvim/dein.vim')
   " provides basic Vim/Neovim integration (:FZF command). Full Vim/Neovim
   " integration is provided by 'junegunn/fzf.vim'.
   "
-  " Install command `./install --all` is there so the interactive script
+  " Install command `./install --bin` is there so the interactive script
   " doesn't block.
   "
   " Instructions taken from <https://github.com/Shougo/dein.vim/issues/74>
-  call dein#add('junegunn/fzf', { 'build': './install --all', 'merged': 0 })
+  call dein#add('junegunn/fzf', { 'build': './install --bin', 'merged': 0 })
   call dein#add('junegunn/fzf.vim', { 'depends': 'fzf' })
 
   " This is a fast, extensible, async completion framework for Neovim.
