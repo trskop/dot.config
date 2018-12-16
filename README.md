@@ -24,14 +24,21 @@ User configuration files (dot–files)
 * Tmux configuration, see [tmux/README.md](tmux/README.md) for more
   information.
 
+* Neovim configuration, see [nvim/README.md](nvim/README.md) for more
+  information.
+
 TODO:
 
-* Merge <https://github.com/trskop/dot.config.nvim> into this repository.
 * Merge <https://github.com/trskop/dot.xmonad> into this repository.
 
 
 Installation
 ------------
+
+We are expecting that there are some files already present in your `~/.config/`
+directory.  This installation process will leave them untached, but you may
+need to resolve issues with files that exist both locally and in the
+repository.
 
 ```Bash
 cd ~/.config/

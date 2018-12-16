@@ -17,7 +17,8 @@ pip2 install neovim
 pip3 install neovim
 ```
 
-Install Powerline fonts:
+Install Powerline fonts, this is now done by
+[`dot.config.init.hs`](../dot.config.init.hs):
 
 ```Bash
 git clone https://github.com/powerline/fonts.git ~/.local/src/powerline/fonts
@@ -38,6 +39,12 @@ Install *Haskell IDE Engine* using instructions in section [Haskell IDE Engine
 
 
 #### Debian
+
+Install *Neovim* and *Python 2 & 3* language servers:
+
+```Bash
+apt install python-neovim python3-neovim
+```
 
 Dependencies required by installation of Haskell IDE Engine:
 
@@ -207,12 +214,6 @@ through [*LanguageClient-neovim*
 ](#lsp-language-server-protocol-client-for-neovim-plugin) plugin. See its
 documentation (`:help LanguageClient`) and [`init.vim`](init.vim) for more
 information.
-
-Build script and *Haskell IDE Eengine* wrapper for GHC 8.0.2, 8.2.2, and 8.4.2:
-[gist.github.com/trskop/1c8f78a62f92906763437bc3ead56539
-](https://gist.github.com/trskop/1c8f78a62f92906763437bc3ead56539). The way
-*HIE* is installed, along with the wrapper script, allows using it for all
-three GHC versions without any additional configuration or manual intervention.
 
 
 ### PlantUML (command line tool, plugin)
