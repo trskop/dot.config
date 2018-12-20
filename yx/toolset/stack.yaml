@@ -21,6 +21,10 @@ packages:
       git: https://github.com/trskop/command-wrapper.git
       commit: ea25cb246df33ec514f8a2f4c73c3e390b658f6d
     extra-dep: True
+  - location:
+      git: https://github.com/trskop/genbashrc.git
+      commit: 41d75f88cd0c947d22b64f2eeee67732b33a86f3
+    extra-dep: True
 
 extra-deps:
   - endo-0.3.0.1

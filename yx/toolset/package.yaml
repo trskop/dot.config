@@ -44,10 +44,11 @@ dependencies:
 ghc-options: -Wall
 
 executables:
-  yx-this:
-    source-dirs: app-yx-this
+  yx-env:
+    source-dirs: app-yx-env
     main: Main.hs
-    dependencies: []
+    dependencies:
+      - genbashrc
 
   yx-path:
     source-dirs: app-yx-path
@@ -56,3 +57,8 @@ executables:
       - prettyprinter
       - process
       - lens
+
+  yx-this:
+    source-dirs: app-yx-this
+    main: Main.hs
+    dependencies: []
