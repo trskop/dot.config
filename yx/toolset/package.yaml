@@ -14,6 +14,24 @@ extra-source-files:
   - README.md
   - dhall/*.dhall
 
+default-extensions:
+  - DeriveAnyClass
+  - DeriveGeneric
+  - DerivingStrategies
+  - DuplicateRecordFields
+  - FlexibleContexts
+  - FlexibleInstances
+  - LambdaCase
+  - MultiWayIf
+  - NamedFieldPuns
+  - OverloadedStrings
+  - RankNTypes
+  - RecordWildCards
+  - ScopedTypeVariables
+  - StandaloneDeriving
+  - TupleSections
+  - TypeApplications
+
 dependencies:
   - base
 
@@ -48,6 +66,8 @@ executables:
     source-dirs: app-yx-env
     main: Main.hs
     dependencies:
+      - ansi-terminal
+      - prettyprinter
       - genbashrc
 
   yx-path:
