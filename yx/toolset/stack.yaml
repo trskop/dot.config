@@ -11,7 +11,7 @@ packages:
     extra-dep: True
   - location:
       git: https://github.com/trskop/mainplate.git
-      commit: f7de7866004e7ec9d1e6b20cd75b50f8e5bed628
+      commit: 68cd6f825d951144a0055a63a72b19f60cdac8ee
     extra-dep: True
   - location:
       git: https://github.com/trskop/verbosity.git
@@ -19,7 +19,7 @@ packages:
     extra-dep: True
   - location:
       git: https://github.com/trskop/command-wrapper.git
-      commit: ea25cb246df33ec514f8a2f4c73c3e390b658f6d
+      commit: 91496a645c50e0d466b8da4ff34e72ca4cbae3b1
     extra-dep: True
   - location:
       git: https://github.com/trskop/genbashrc.git

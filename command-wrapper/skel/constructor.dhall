@@ -2,8 +2,9 @@ let CommandWrapper = ../lib/Types.dhall
 
 let commandWrapper = ../lib/lib.dhall
 
-let context =
-      { home = "${env:HOME as Text}"
-      }
-
-in  commandWrapper.mkSkelConfig context ./templates.dhall
+in    λ(wrapper : Text)
+    → λ(subcommand : Text)
+    → λ(command : Text)
+    → { template = ./templates.dhall wrapper subcommand command
+      , editAfterwards = True
+      } : CommandWrapper.SkelConfig
