@@ -1,6 +1,6 @@
 let home = "${env:HOME as Text}"
 
-let config = "${home}/.config"
+let config = env:XDG_CONFIG_HOME as Text ? "${home}/.config"
 
 let local = "${home}/.local"
 

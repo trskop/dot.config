@@ -1,5 +1,4 @@
-let CommandWrapper =
-      ~/.local/src/trskop/command-wrapper/dhall/CommandWrapper/Type/package.dhall
+let CommandWrapper = ../lib/Types.dhall
 
 let home = env:HOME as Text
 
