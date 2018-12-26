@@ -2,5 +2,6 @@ let CommandWrapper = ../lib/Types.dhall
 
 in
     { commands =
-        ./commands.dhall ? ([] : List CommandWrapper.ExecNamedCommand)
+          ./debug-commands.dhall
+        # (./commands.dhall ? ([] : List CommandWrapper.ExecNamedCommand))
     }
