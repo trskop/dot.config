@@ -99,3 +99,10 @@ parseOptions = Turtle.options "Paths"
             }
         , Text.strip (Text.unwords as)
         )
+
+-- TODO:
+--
+-- - Find a better name for this command.  Its scope is broader then just
+--   returning interesting paths
+-- - System information (OS, distribution, architecture, number of CPUs,
+--   RAM size, ...).  See also TODOs in `Main.Paths` module.

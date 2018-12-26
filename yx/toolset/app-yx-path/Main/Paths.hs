@@ -25,10 +25,12 @@ module Main.Paths
     )
   where
 
+import Control.Applicative (liftA2)
 import qualified Data.Char as Char (toUpper)
 import qualified Data.List as List (takeWhile)
 import Data.String (IsString, fromString)
 import GHC.Generics (Generic)
+import System.Environment (lookupEnv)
 
 import CommandWrapper.Environment (Params(Params, exePath, name))
 import Data.Text (Text)
@@ -42,10 +44,22 @@ import System.FilePath ((</>))
 import System.Process (readProcess)
 
 
+-- TODO:
+-- data System = System
+--     { os :: OperatingSystem
+--     , cpuInfo :: CpuInfo
+--     -- ^ Number of CPUs, physical cores, virtual cores, ...
+--     , ramSize :: Natural
+--     }
+
 data Paths = Paths
     { xdg :: Xdg
     , projectRoot :: Maybe Text
     , commandWrapper :: CommandWrapper
+    , editor :: Text
+
+-- TODO:
+--  , pager :: Text
     }
   deriving (Generic, Show)
 
@@ -133,6 +147,31 @@ mk Params{name, exePath} = do
 
     projectRoot <- fmap fromString <$> getProjectRootCurrent
 
+    let -- This default is used in all cases, however, in case of dumb terminal
+        -- it should probably be 'ex'.
+        defaultEditor = "vi"
+
+    editor <- maybe defaultEditor fromString <$> do
+        let lookupEditor = lookupEnv "EDITOR"
+
+            lookupVisualThenEditor =
+                lookupEnv "VISUAL" >>= maybe lookupEditor (pure . Just)
+
+            checkIfDumbTerminal = liftA2 (||) null (== "dumb")
+
+        -- https://unix.stackexchange.com/questions/4859/visual-vs-editor-what-s-the-difference
+        isDumbTerminal <- maybe True checkIfDumbTerminal <$> lookupEnv "TERM"
+        if isDumbTerminal
+            then lookupEditor
+            else lookupVisualThenEditor
+
+        -- TODO:
+        --
+        -- - Support Debian/Ubuntu select-editor and sensible-editor
+        --   functionality.
+        -- - It may be useful to check that the command exists on the system
+        --   and resolve it to a full path.
+
     pure Paths
         { xdg = Xdg
             { configDir
@@ -151,6 +190,7 @@ mk Params{name, exePath} = do
             }
         , projectRoot
         , commandWrapper
+        , editor
         }
 
 execXdgUserDir :: IsString s => XdgUserDir -> IO s
