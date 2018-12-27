@@ -13,12 +13,14 @@ module Main (main)
   where
 
 import Control.Exception (bracket)
-import Control.Monad ((>=>), when, unless)
-import Data.Foldable (asum, for_)
+import Control.Monad ((>=>), join, when, unless)
+import Data.Foldable (asum, fold, for_)
 import Data.Functor ((<&>))
+import qualified Data.List as List (find)
 import Data.Maybe (fromMaybe)
-import Data.String (fromString)
-import System.Exit (die, exitFailure)
+import Data.String (IsString, fromString)
+import Data.Traversable (for)
+import System.Exit (die, exitFailure, exitSuccess)
 import System.IO
     ( Handle
     , IOMode(WriteMode)
@@ -64,6 +66,14 @@ import Main.Config
     , readConfig
     , readEnvConfig
     )
+import Main.Config.Preferences (Preferences(Preferences))
+import qualified Main.Config.Preferences as Preferences
+    ( KnownFile(..)
+    , Preferences(..)
+    , Status(..)
+    , modify
+    , read
+    )
 import qualified Main.Bash as Bash
     ( applyEnv
     , reverseOperations
@@ -85,18 +95,20 @@ main = do
 dieMissingConfig :: Params -> FilePath -> IO a
 dieMissingConfig params fp = do
     printMsg params Error
-        $ "Missing configuration file " <> fromString (show fp)
+        $ "Missing configuration file " <> gshow fp
     exitFailure
 
 getEnvironment :: IO Params
 getEnvironment = parseEnvIO (die . show) askParams
 
 data Mode a
+    -- TODO: Command to show preferences.
     = RunHook Text a
     | Script a
     | DryRun FilePath a
     | Init FilePath a
     | Cleanup a
+    | SetEnvConfigStatus Preferences.Status FilePath a
     | Default a
   deriving stock (Show)
 
@@ -107,6 +119,7 @@ switchMode f = \case
     DryRun _ cfg -> f cfg
     Init _ cfg -> f cfg
     Cleanup cfg -> f cfg
+    SetEnvConfigStatus _ _ cfg -> f cfg
     Default cfg -> f cfg
 
 switchMode1 :: (forall b. a -> b -> Mode b) -> a -> Mode cfg -> Mode cfg
@@ -129,8 +142,13 @@ parseOptions config = Turtle.options "env" options <&> ($ Default config)
         , cleanupMode <$> Turtle.switch "cleanup" 'c' "Perform cleanup"
 
         , dryRunMode <$> Turtle.optText "dry-run" 'u'
-                "Print out what would happen if we cded into specified\
-                \ directory."
+            "Print out what would happen if we cded into specified directory."
+
+        , setStatusMode Preferences.Allowed <$> Turtle.optText "allow" 'a'
+            "Allow specified env config to be used to modify environment."
+
+        , setStatusMode Preferences.Ignored <$> Turtle.optText "ignore" 'g'
+            "Ignore specified env config to be used to modify environment."
 
         , pure id
         ]
@@ -156,6 +174,9 @@ parseOptions config = Turtle.options "env" options <&> ($ Default config)
       | p = switchMode Cleanup
       | otherwise = id
 
+    setStatusMode :: Preferences.Status -> Text -> Mode Config -> Mode Config
+    setStatusMode s = switchMode1 (SetEnvConfigStatus s) . Text.unpack
+
 env :: Params -> Mode Config -> IO ()
 env params@Params{name, subcommand} = \case
     Default _ ->
@@ -172,7 +193,7 @@ env params@Params{name, subcommand} = \case
         die "TODO"
 
     DryRun dir config -> do
-        possiblyEnvFile <- findEnvFile (mkEnvFileName config params)
+        possiblyEnvFile <- findEnvFile (mkEnvFileName params config)
             (Turtle.decodeString dir)
 
         for_ possiblyEnvFile $ \envFile ->
@@ -195,17 +216,51 @@ env params@Params{name, subcommand} = \case
         in  Text.putStr bash
 
     RunHook shellPid config -> do
-        let envFileName = mkEnvFileName config params
+        let envFileName = mkEnvFileName params config
+        envFile' <- Turtle.pwd >>= findEnvFile envFileName
+
+        -- TODO: We may want to move most of this logic into 'findEnvFile'.
+        envFile <- fmap join . for envFile' $ \file -> do
+            Preferences{knownFiles} <-
+                mkPreferencesFilePath params >>= Preferences.read
+
+            let lookupFile fp =
+                    List.find ((== fp) . Preferences.file) knownFiles
+            case Preferences.status <$> lookupFile (fromString file) of
+                Just Preferences.Allowed ->
+                    pure envFile'
+
+                -- We need to skip ignored file to not change existing
+                -- environment.  Otherwise we would enter a directory with a
+                -- disallowed env config and unload current environment, if one
+                -- is loaded.
+                Just Preferences.Ignored ->
+                    findEnvFile envFileName
+                        -- TODO: Should we make sure that
+                        -- 'takeDirectory . takeDirectory /= takeDirectory'?
+                        . fromString . takeDirectory $ takeDirectory file
+
+                Nothing -> do
+                    let baseCmd =
+                            fromString name <> " " <> fromString subcommand
+
+                    printMsg params Warning $ fold
+                        [ "Ignoring ", gshow file, ".\n\n"
+                        , "To allow it run:\n\n"
+                        , "    ", baseCmd, " --allow .\n\n"
+                        , "To ignore it run:\n\n"
+                        , "    ", baseCmd, " --ignore ."
+                        ]
+                    exitSuccess
 
         envVars <- HashMap.fromList <$> Turtle.env
-        envFile <- Turtle.pwd >>= findEnvFile envFileName
-
         let stateFile = HashMap.lookup stateEnvVar envVars
         -- TODO: Handle parse, type, and other read state errors correctly.
         state <- maybe (pure emptyState) (readState . Text.unpack) stateFile
 
         possiblyParsedConfig <-
-            maybe (pure Nothing) (\fp -> fmap (fp, ) <$> readEnvConfig fp) envFile
+            maybe (pure Nothing) (\fp -> fmap (fp, ) <$> readEnvConfig fp)
+                envFile
 
         let possiblyEnvFile = do
                 possiblyParsedConfig <&> \(file, (hash, _)) -> File
@@ -227,9 +282,8 @@ env params@Params{name, subcommand} = \case
 
             | otherwise -> pure ()
 
-    Init dir config@Config{initEnv} -> do
-        let envFile = dir </> mkEnvFileName config params
-        Text.writeFile envFile initEnv
+    Init dir config@Config{initEnv} ->
+        Text.writeFile (dir </> mkEnvFileName params config) initEnv
 
     -- This command is used in following cases:
     --
@@ -241,6 +295,25 @@ env params@Params{name, subcommand} = \case
             -- TODO: Restore the previous environment.
             Lazy.Text.putStr (Bash.unsetState stateEnvVar)
             Turtle.rm (Turtle.fromText stateFile)
+
+    SetEnvConfigStatus status dir config -> do
+        envFile <- findEnvFile (mkEnvFileName params config) (fromString dir)
+        case envFile of
+            Nothing ->
+                printMsg params Warning
+                    $ "No env config found in " <> gshow dir
+
+            Just file' -> do
+                printMsg params Notice
+                    $ "Setting " <> gshow file' <> " as " <> gshow status
+
+                prefsFile <- mkPreferencesFilePath params
+                Preferences.modify prefsFile $ \Preferences{knownFiles} ->
+                    Preferences
+                        { knownFiles =
+                            let file = fromString file'
+                            in Preferences.KnownFile{file, status} : knownFiles
+                        }
   where
     stateEnvVar = "YX_ENV_STATE" :: Text
 
@@ -284,14 +357,20 @@ mkDefaultEnvFileName Params{name, subcommand} =
 
 -- | Construct env config file name based on user preferences, and if those
 -- aren't present then use 'mkDefaultEnvFileName' to construct it.
-mkEnvFileName :: Config -> Params -> String
-mkEnvFileName Config{envFileName = mkConfigEnvFileName'} params =
+mkEnvFileName :: Params -> Config -> String
+mkEnvFileName params Config{envFileName = mkConfigEnvFileName'} =
     fromMaybe (mkDefaultEnvFileName params) (mkConfigEnvFileName params)
   where
     mkConfigEnvFileName :: Params -> Maybe String
     mkConfigEnvFileName Params{name, subcommand} =
         mkConfigEnvFileName' <&> \f ->
             Text.unpack $ f (fromString name) (fromString subcommand)
+
+mkPreferencesFilePath :: Params -> IO FilePath
+mkPreferencesFilePath Params{name, subcommand}  =
+    getXdgDirectory XdgCache (cmdDir </> "preferences.dhall")
+  where
+    cmdDir = name <> "-" <> subcommand
 
 enterEnv
     :: Text
@@ -401,7 +480,7 @@ printMsg params@Params{verbosity} messageType
 
     formatMsg msg
       | messageType == Warning || messageType == Error
-      = fromString (show messageType) <> ": " <> msg
+      = gshow messageType <> ": " <> msg
 
       | otherwise
       = msg
@@ -432,3 +511,6 @@ useColours Params{colour} =
     -- TODO: This is very naive. We need to make sure that the handle that we
     -- are writting into is attached to a terminal.
     useColoursWhen (terminalSupportsColours <$> setupTermFromEnv) colour
+
+gshow :: (IsString s, Show a) => a -> s
+gshow = fromString . show
