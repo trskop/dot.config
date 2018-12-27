@@ -16,7 +16,7 @@ import Control.Exception (bracket)
 import Control.Monad ((>=>), join, when, unless)
 import Data.Foldable (asum, fold, for_)
 import Data.Functor ((<&>))
-import qualified Data.List as List (find)
+import qualified Data.List as List (filter, find, notElem)
 import Data.Maybe (fromMaybe)
 import Data.String (IsString, fromString)
 import Data.Traversable (for)
@@ -28,6 +28,7 @@ import System.IO
     , hPutStr
     , hPutStrLn
     , openTempFile
+    , stdout
     , withFile
     )
 
@@ -80,8 +81,9 @@ import qualified Main.Bash as Bash
     , setState
     , unsetState
     )
+import qualified Main.Dhall as Dhall (hPut)
 import Main.Env (SetOrUnsetEnvVar)
-import qualified Main.Env as Env (apply)
+import qualified Main.Env as Env (apply, diff)
 import Main.State (File(..), State(..), emptyState, readState, writeState)
 
 
@@ -109,6 +111,8 @@ data Mode a
     | Init FilePath a
     | Cleanup a
     | SetEnvConfigStatus Preferences.Status FilePath a
+    | Dump FilePath a
+    | Diff FilePath a
     | Default a
   deriving stock (Show)
 
@@ -120,6 +124,8 @@ switchMode f = \case
     Init _ cfg -> f cfg
     Cleanup cfg -> f cfg
     SetEnvConfigStatus _ _ cfg -> f cfg
+    Dump _ cfg -> f cfg
+    Diff _ cfg -> f cfg
     Default cfg -> f cfg
 
 switchMode1 :: (forall b. a -> b -> Mode b) -> a -> Mode cfg -> Mode cfg
@@ -153,6 +159,12 @@ parseOptions config = Turtle.options "env" options <&> ($ Default config)
             "Ignore specified env config instead of using it to modify\
             \ environment."
 
+        , dumpMode <$> Turtle.optText "dump" 'p'
+            "Dump current environment into a specified file."
+
+        , diffMode <$> Turtle.optText "diff" 'd'
+            "Dump current environment into a specified file."
+
         , pure id
         ]
 
@@ -179,6 +191,12 @@ parseOptions config = Turtle.options "env" options <&> ($ Default config)
 
     setStatusMode :: Preferences.Status -> Text -> Mode Config -> Mode Config
     setStatusMode s = switchMode1 (SetEnvConfigStatus s) . Text.unpack
+
+    dumpMode :: Text -> Mode Config -> Mode Config
+    dumpMode = switchMode1 Dump . Text.unpack
+
+    diffMode :: Text -> Mode Config -> Mode Config
+    diffMode = switchMode1 Diff . Text.unpack
 
 env :: Params -> Mode Config -> IO ()
 env params@Params{name, subcommand} = \case
@@ -317,8 +335,29 @@ env params@Params{name, subcommand} = \case
                             let file = fromString file'
                             in Preferences.KnownFile{file, status} : knownFiles
                         }
+
+    Dump file _config ->
+        dumpEnv >>= writeFile file . show
+
+    Diff file _config -> do
+        oldEnv <- readFile file >>= readIO
+        newEnv <- dumpEnv
+        Dhall.hPut stdout (Env.diff oldEnv newEnv)
   where
     stateEnvVar = "YX_ENV_STATE" :: Text
+
+    dumpEnv =
+        let isNotIgnoredVar (n, _) = n `List.notElem`
+                [ "YX_ENV_STATE"
+                , "YX_ENV_DIR"      -- TODO: Will be used in the future
+
+                -- Taken from `direnv` source code, they say that it avoids
+                -- segfaults in Bash.
+                , "COMP_WORDBREAKS"
+                , "PS1"
+                , "OLDPWD", "PWD", "SHELL", "SHELLOPTS", "SHLVL", "_"
+                ]
+        in  List.filter isNotIgnoredVar <$> Turtle.env
 
 isStateStale :: State -> Maybe File -> Bool
 isStateStale State{config} currentConfig = config /= currentConfig

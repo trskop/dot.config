@@ -24,13 +24,11 @@ import Control.Exception (throwIO)
 import Control.Monad ((>=>))
 import Data.Functor ((<$))
 import GHC.Generics (Generic)
-import System.IO (Handle, hPutStrLn)
+import System.IO (Handle)
 
 import Control.Monad.State.Strict (evalStateT)
 import Data.Text (Text)
 import qualified Data.Text.IO as Text (readFile)
-import Data.Text.Prettyprint.Doc (pretty)
-import Data.Text.Prettyprint.Doc.Render.Text (hPutDoc)
 import qualified Dhall
     ( Inject
     , Interpret
@@ -63,6 +61,7 @@ import qualified Dhall.TypeCheck as Dhall (TypeError, X, typeOf)
 import System.FilePath (takeDirectory)
 import qualified Turtle
 
+import qualified Main.Dhall as Dhall (hPut)
 import Main.Env (SetOrUnsetEnvVar(..))
 
 
@@ -191,6 +190,4 @@ mkFullExpressionAndTypeCheck configExpression = do
     emptyStateExpr = Dhall.embed Dhall.inject emptyState
 
 writeState :: Handle -> State -> IO ()
-writeState h state = do
-    hPutDoc h . pretty $ Dhall.embed Dhall.inject state
-    hPutStrLn h ""
+writeState = Dhall.hPut
