@@ -73,8 +73,8 @@ parseOptions = Turtle.options "Paths"
 
     plainOption =
         plainOutput <$> Turtle.switch "plain" 'p'
-            "Plain output, Dhall expression must result in one of: Text,\
-            \ Natural, or Integer."
+            "Plain output, final Dhall expression must result in one of: Text,\
+            \ Natural, or Integer"
 
     plainOutput p
       | p = const Dhall.Plain
@@ -82,7 +82,7 @@ parseOptions = Turtle.options "Paths"
 
     typeOption =
         typeOutput <$> Turtle.switch "type" 't'
-            "Print Dhall type instead of a value"
+            "Print type of final Dhall expression instead of its value"
 
     typeOutput p
       | p = const Dhall.DhallType

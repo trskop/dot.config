@@ -12,11 +12,17 @@
 
 yx \[GLOBAL\_OPTIONS] env
 
-yx \[GLOBAL\_OPTIONS] env {-i|\--init}
+yx \[GLOBAL\_OPTIONS] env {\--init|-i}
 
-yx \[GLOBAL\_OPTIONS] env {-u DIR|\--dry-run DIR}
+yx \[GLOBAL\_OPTIONS] env {\--dry-run DIR|-u DIR}
 
-yx \[GLOBAL\_OPTIONS] env {-s|\--script}
+yx \[GLOBAL\_OPTIONS] env {\--allow|-a} DIR
+
+yx \[GLOBAL\_OPTIONS] env {\--ignore|-a} DIR
+
+yx \[GLOBAL\_OPTIONS] env {\--help|-h}
+
+yx \[GLOBAL\_OPTIONS] help env
 
 
 # DESCRIPTION
@@ -37,6 +43,15 @@ For documentation of *GLOBAL_OPTIONS* see `command-wrapper(1)` manual page.
 
 -u *DIR*, \--dry-run *DIR*
 :   Print out what would happen if we cded into *DIR*.
+
+-a *DIR*, \--allow *DIR*
+:   Allow specified env config to be used to modify environment.
+
+-g *DIR*, \--ignore *DIR*
+:   Ignore specified env config instead of using it to modify environment.
+
+-h, \--help
+:   Print short help message and exit.  Same as `yx help this`.
 
 
 # EXIT STATUS
@@ -101,10 +116,12 @@ mentioned there applies to this subcommand as well.
 
 # SEE ALSO
 
-command-wrapper(1)
+yx-path(1), yx-this(1), command-wrapper(1)
 
 * [XDG Base Directory Specification
   ](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html)
+* Similar projects:
+    - [`direnv`] (https://direnv.net)
 
 
 # BUGS

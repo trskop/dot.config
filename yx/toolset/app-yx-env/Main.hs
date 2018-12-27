@@ -125,6 +125,8 @@ switchMode f = \case
 switchMode1 :: (forall b. a -> b -> Mode b) -> a -> Mode cfg -> Mode cfg
 switchMode1 f a = switchMode (f a)
 
+-- TODO: Switch to pure @optparse-applicative@ to gain full control over the
+-- TUI.
 parseOptions :: Config -> IO (Mode Config)
 parseOptions config = Turtle.options "env" options <&> ($ Default config)
   where
@@ -148,7 +150,8 @@ parseOptions config = Turtle.options "env" options <&> ($ Default config)
             "Allow specified env config to be used to modify environment."
 
         , setStatusMode Preferences.Ignored <$> Turtle.optText "ignore" 'g'
-            "Ignore specified env config to be used to modify environment."
+            "Ignore specified env config instead of using it to modify\
+            \ environment."
 
         , pure id
         ]

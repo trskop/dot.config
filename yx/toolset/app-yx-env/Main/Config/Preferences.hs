@@ -54,6 +54,7 @@ data Status
 data KnownFile = KnownFile
     { file :: Text
     , status :: Status
+--  , timetamp :: Timestamp -- TODO: Consider adding this.
     }
   deriving stock (Eq, Generic, Show)
   deriving anyclass (Dhall.Inject, Dhall.Interpret)
