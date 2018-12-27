@@ -78,8 +78,8 @@ import System.Environment.Variable
     , EnvVarName
     , EnvVarValue
     )
-import qualified Turtle
 import System.FilePath (takeDirectory)
+import qualified Turtle
 
 
 -- {{{ Env Config -------------------------------------------------------------

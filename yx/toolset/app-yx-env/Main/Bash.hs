@@ -20,7 +20,7 @@ module Main.Bash
     )
   where
 
-import Data.Foldable (fold)
+import Data.Maybe (fromMaybe)
 import Data.String (fromString)
 
 import Data.HashMap.Strict (HashMap)
@@ -59,20 +59,20 @@ operations = mapM_ operation
 operation :: SetOrUnsetEnvVar -> Bash ()
 operation = \case
     SetEnv{name, value, originalValue} ->
-        Bash.line $ fold
-            [ "export ", name, "=", value
-            , maybe previouslyNotDefined (previouslyDefined name) originalValue
+        mapM_ Bash.line
+            [ previouslyDefined name originalValue
+            , "export " <> name <> "=" <> value
             ]
 
     UnsetEnv{name, value} ->
-        Bash.line $ "unset " <> name <> previouslyDefined name value
+        mapM_ Bash.line
+            [ previouslyDefined name (Just value)
+            , "unset " <> name
+            ]
 
   where
     previouslyDefined name value =
-        " # Previously defined as " <> name <> "=" <> value
-
-    previouslyNotDefined =
-        " # Previously wasn't defined."
+        "# " <> name <> "=" <> fromMaybe "" value
 
 setState :: Text -> FilePath -> Lazy.Text
 setState name file =
