@@ -66,9 +66,10 @@ executables:
     source-dirs: app-yx-env
     main: Main.hs
     dependencies:
+      - Diff
       - ansi-terminal
-      - prettyprinter
       - genbashrc
+      - prettyprinter
 
   yx-path:
     source-dirs: app-yx-path

@@ -15,14 +15,18 @@ module Main.Env
     , simplifyOperations
     , reverseOperation
     , apply
+    , diff
     )
   where
 
+import Data.Function (on)
 import Data.Functor ((<&>))
+import qualified Data.List as List (sort)
 import Data.Maybe (mapMaybe)
 import Data.Monoid (Endo(..))
 import GHC.Generics (Generic)
 
+import Data.Algorithm.Diff (Diff(..), getDiffBy)
 import Data.HashMap.Strict (HashMap)
 import qualified Data.HashMap.Strict as HashMap (delete, insert, lookup)
 import qualified Dhall (Inject, Interpret)
@@ -125,3 +129,27 @@ applyOperation = \case
 
     UnsetEnv{name} ->
         HashMap.delete name
+
+diff
+    :: [(EnvVarName, EnvVarValue)]
+    -- ^ Old environment.
+    -> [(EnvVarName, EnvVarValue)]
+    -- ^ New environment.
+    -> [SetOrUnsetEnvVar]
+    -- ^ Operations that will transform old environment into the new one.
+diff old new =
+    mapMaybe toOp $ getDiffBy ((==) `on` fst) (List.sort old) (List.sort new)
+  where
+    toOp = \case
+        First (name, value) ->
+            Just UnsetEnv{name, value}
+
+        Second (name, value) ->
+            Just SetEnv{name, value, originalValue = Nothing}
+
+        Both (name, originalValue) (_, value)
+          | originalValue == value ->
+                Nothing
+
+          | otherwise ->
+                Just SetEnv{name, value, originalValue = Just originalValue}
