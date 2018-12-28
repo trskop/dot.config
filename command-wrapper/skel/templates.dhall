@@ -1,6 +1,6 @@
 let home = "${env:HOME as Text}"
 
-let bashLib = "${home}/.local/trskop/command-wrapper/bash/lib.sh"
+let bashLib = "${home}/.local/src/trskop/command-wrapper/bash/lib.sh"
 
 let config = env:XDG_CONFIG_HOME as Text ? "${home}/.config"
 
