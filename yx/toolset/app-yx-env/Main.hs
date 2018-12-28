@@ -289,19 +289,36 @@ env params@Params{name, subcommand} = \case
                     , hash
                     }
 
-        if  | isStateStale state possiblyEnvFile -> do
-                leaveEnv params state envVars
-                    >>= enterEnv stateEnvVar params possiblyParsedConfig shellPid
+            shellChanged = hasShellChanged state shellPid
+            stateStale = isStateStale state possiblyEnvFile
 
-                -- Function `enterEnv` created a new state file. It is safe to
-                -- delete the old one.
-                for_ stateFile $ Turtle.rm . Turtle.fromText
+        -- We need to detect 'shellChanged' before we try to leave and enter a
+        -- state if the current one is stale.  This is due to the fact that
+        -- both of these (entered a subshell and chaned directory that got us
+        -- in/out of a scope of an env file) may have happened at the same
+        -- time.
+        --
+        -- Reason for not duplicating state when the state is stale is that it
+        -- will be done for us by the 'enterEnv' function.  If we duplicated it
+        -- and then entered a new state, then we would just end up creating a
+        -- file that was completely unused, and we would have to provide quite
+        -- complicated logic to make sure that it gets deleted at some point.
+        when (shellChanged && not stateStale)
+            -- Clone state file so that the state of the subshell can evolve
+            -- independently without affecting its parent state.
+            $ writeStateFile stateEnvVar params state{shellPid}
 
-            | shellChanged state shellPid -> do
-                -- Clone state file so that the two can evolve independently.
-                writeStateFile stateEnvVar params state{shellPid}
+        -- Stale state is when we got in or out of scope of an env config.
+        when stateStale $ do
+            leaveEnv params state envVars
+                >>= enterEnv stateEnvVar params possiblyParsedConfig shellPid
 
-            | otherwise -> pure ()
+            -- Function `enterEnv` created a new state file.  It is safe to
+            -- delete the old one, unless we have entered a subshell.  In such
+            -- case the old state is owned by the parent shell.
+            unless shellChanged
+                $ for_ stateFile
+                    $ Turtle.rm . Turtle.fromText
 
     Init dir config@Config{initEnv} ->
         Text.writeFile (dir </> mkEnvFileName params config) initEnv
@@ -362,8 +379,8 @@ env params@Params{name, subcommand} = \case
 isStateStale :: State -> Maybe File -> Bool
 isStateStale State{config} currentConfig = config /= currentConfig
 
-shellChanged :: State -> Text -> Bool
-shellChanged State{shellPid} currentShellPid = shellPid /= currentShellPid
+hasShellChanged :: State -> Text -> Bool
+hasShellChanged State{shellPid} currentShellPid = shellPid /= currentShellPid
 
 -- | Search from specified directory upwards until env config is found.
 findEnvFile
