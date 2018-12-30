@@ -112,6 +112,7 @@ data Directories = Directories
     , srcDir :: FilePath
     , configDir :: FilePath
     , cacheDir :: FilePath
+    , stateDir :: FilePath
     }
 
 main :: IO ()
@@ -151,6 +152,13 @@ install Directories{..} opts = shakeArgs opts $ do
             </> "DejaVu Sans Mono for Powerline.ttf"
 
         deinInstallDir = cacheDir </> "dein.vim"
+
+        nixParams = NixParams
+            { home
+            , cacheDir = stateDir </> "nix"
+            }
+        nixTarget = mkNixTarget nixParams
+
     want
         [ home </> ".ghc/ghci.conf"
         , home </> ".haskeline"
@@ -186,6 +194,8 @@ install Directories{..} opts = shakeArgs opts $ do
 
         -- Dein is a Vim/Neovim plugin manager.
         , deinInstallDir </> "installed.lock"
+
+        , nixTarget
         ]
 
     (home </> ".ghc/ghci.conf") %> \out -> do
@@ -300,6 +310,8 @@ install Directories{..} opts = shakeArgs opts $ do
         cmd_ "bash" [installerSh, deinInstallDir]
         writeFile' out ""
 
+    nixRules nixParams
+
 data StackRulesParams = StackRulesParams
     { home :: FilePath
     , srcDir :: FilePath
@@ -393,6 +405,40 @@ habitRules HabitRulesParamams{..} = do
                 need srcs
                 cmd_ (FileStdout out) "sed" ["/^#/d"] srcs
                 cmd_ "chmod" "u=rw,go=" [out]
+
+data NixParams = NixParams
+    { home :: FilePath
+    , cacheDir :: FilePath
+    }
+
+mkNixTarget :: NixParams -> FilePath
+mkNixTarget NixParams{cacheDir} = cacheDir </> "nix-installed.lock"
+
+nixRules :: NixParams -> Rules ()
+nixRules params@NixParams{cacheDir} = do
+    installerSh %> \out -> do
+        Stdout installer <- cmd "curl" [installerUrl]
+        writeFile' out installer
+
+        Stdout installerSig <- cmd "curl" [installerSigUrl]
+        writeFile' (out <.> "sig") installerSig
+
+        cmd_ "gpg --recv-keys" [signingKeyFingerprint]
+        cmd_ "gpg --verify" [out <.> "sig"]
+
+    mkNixTarget params %> \out -> do
+        need [installerSh]
+
+        -- We don't want `.bashrc` file to be modified, instead we want this to
+        -- be handled by `genbashrc`.
+        cmd_ (AddEnv "NIX_INSTALLER_NO_MODIFY_PROFILE" "1") "sh" [installerSh]
+            "--no-daemon"
+        writeFile' out ""
+  where
+    installerSh = cacheDir </> "installer"
+    installerUrl = "https://nixos.org/nix/install"
+    installerSigUrl = "https://nixos.org/nix/install.sig"
+    signingKeyFingerprint = "B541D55301270E0BCF15CA5D8170B4726D7198DE"
 
 dropPrefixDir :: FilePath -> FilePath -> FilePath
 dropPrefixDir path prefix = dropPrefix' path' prefix'
