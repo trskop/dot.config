@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedLists #-}
 -- |
--- Module:      Main.Config
+-- Module:      Main.Config.App
 -- Description: TODO: Module synopsis
 -- Copyright:   (c) 2018 Peter Trško
 -- License:     BSD3
@@ -10,7 +10,7 @@
 -- Portability: GHC specific language extensions.
 --
 -- TODO: Module description.
-module Main.Config
+module Main.Config.App
     (
     -- * Application Config
       Config(..)
