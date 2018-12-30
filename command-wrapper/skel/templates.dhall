@@ -41,7 +41,7 @@ in    λ(wrapper : Text)
         , Dhall =
               λ(_ : {})
             → { targetFile = dhallConfigFileName wrapper command
-              , executable = True
+              , executable = False
               , template = ./dhall-skel.dhall wrapper subcommand
               }
         }
