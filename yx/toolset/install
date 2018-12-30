@@ -122,9 +122,11 @@ shakeMain Directories{..} opts = shakeArgs opts $ do
         [ yxEnvBin
         , yxPathBin
         , yxThisBin
+        , man1Dir </> "yx.1.gz"
         , man1Dir </> "yx-env.1.gz"
         , man1Dir </> "yx-path.1.gz"
         , man1Dir </> "yx-this.1.gz"
+        , man1Dir </> "yx-jmp.1.gz"
         ]
 
     hasThisRepoChanged <- addOracle (thisGitRepo projectRoot)

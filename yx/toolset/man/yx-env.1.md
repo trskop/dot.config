@@ -51,7 +51,7 @@ For documentation of *GLOBAL_OPTIONS* see `command-wrapper(1)` manual page.
 :   Ignore specified env config instead of using it to modify environment.
 
 -h, \--help
-:   Print short help message and exit.  Same as `yx help this`.
+:   Print short help message and exit.  Same as `yx help env`.
 
 
 # EXIT STATUS
@@ -116,7 +116,7 @@ mentioned there applies to this subcommand as well.
 
 # SEE ALSO
 
-yx-path(1), yx-this(1), command-wrapper(1)
+yx-jmp(1), yx-path(1), yx-this(1), command-wrapper(1)
 
 * [XDG Base Directory Specification
   ](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html)

@@ -35,7 +35,7 @@ For documentation of *GLOBAL_OPTIONS* see `command-wrapper(1)` manual page.
     functionality to be enabled.
 
 -h, \--help
-:   Print short help message and exit.  Same as `yx help this`.
+:   Print short help message and exit.  Same as `yx help path`.
 
 *EXPRESSION*
 :   Dhall expression that has access to `data` record, `Paths` and `Config`
@@ -51,7 +51,12 @@ TODO
 # FILES
 
 `${XDG_CONFIG_HOME:-$HOME/.config}/yx/yx-path.dhall`
-:   Configuration file.  **TODO**
+:   Configuration file defines additional fields of the `data` provided when
+    `path` command is executed.  In full it can be accessed using:
+
+    ```
+    yx path data.config
+    ```
 
     See also `XDG_CONFIG_HOME` in *ENVIRONMENT VARIABLES* section for more
     information on how Command Wrapper figures out where to look for this
@@ -125,7 +130,7 @@ peter@machine ~ $ yx path --plain data.paths.xdg.cacheDir
 
 # SEE ALSO
 
-yx-env(1), yx-this(1), command-wrapper(1)
+yx-env(1), yx-jmp(1), yx-this(1), command-wrapper(1)
 
 * [XDG Base Directory Specification
   ](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html)
