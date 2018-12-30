@@ -70,7 +70,7 @@ import qualified Main.Config.Preferences as Preferences
     , modify
     , read
     )
-import qualified Main.Bash as Bash
+import qualified Main.Shell.Bash as Bash
     ( applyEnv
     , reverseOperations
     , setEnvDir

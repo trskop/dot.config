@@ -1,5 +1,5 @@
 -- |
--- Module:      Main.Bash
+-- Module:      Main.Shell.Bash
 -- Description: TODO: Module synopsis
 -- Copyright:   (c) 2018 Peter Trško
 -- License:     BSD3
@@ -9,7 +9,7 @@
 -- Portability: GHC specific language extensions.
 --
 -- TODO: Module description.
-module Main.Bash
+module Main.Shell.Bash
     ( applyEnv
     , setState
     , unsetState
