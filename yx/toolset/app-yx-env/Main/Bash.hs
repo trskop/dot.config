@@ -13,6 +13,8 @@ module Main.Bash
     ( applyEnv
     , setState
     , unsetState
+    , setEnvDir
+    , unsetEnvDir
 
     --
     , operations
@@ -80,3 +82,10 @@ setState name file =
 
 unsetState :: Text -> Lazy.Text
 unsetState name = genBash $ Bash.line ("unset " <> name)
+
+setEnvDir :: Text -> FilePath -> Lazy.Text
+setEnvDir name dir =
+    genBash $ Bash.export (Bash.var name) (Just . Bash.str $ fromString dir)
+
+unsetEnvDir :: Text -> Lazy.Text
+unsetEnvDir name = genBash $ Bash.line ("unset " <> name)

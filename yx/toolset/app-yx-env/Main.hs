@@ -17,7 +17,7 @@ import Control.Monad ((>=>), join, when, unless)
 import Data.Foldable (asum, fold, for_)
 import Data.Functor ((<&>))
 import qualified Data.List as List (filter, find, notElem)
-import Data.Maybe (fromMaybe)
+import Data.Maybe (fromMaybe, isNothing)
 import Data.String (IsString, fromString)
 import Data.Traversable (for)
 import System.Exit (die, exitFailure, exitSuccess)
@@ -78,7 +78,9 @@ import qualified Main.Config.Preferences as Preferences
 import qualified Main.Bash as Bash
     ( applyEnv
     , reverseOperations
+    , setEnvDir
     , setState
+    , unsetEnvDir
     , unsetState
     )
 import qualified Main.Dhall as Dhall (hPut)
@@ -310,7 +312,7 @@ env params@Params{name, subcommand} = \case
 
         -- Stale state is when we got in or out of scope of an env config.
         when stateStale $ do
-            leaveEnv params state envVars
+            leaveEnv params state possiblyEnvFile envVars
                 >>= enterEnv stateEnvVar params possiblyParsedConfig shellPid
 
             -- Function `enterEnv` created a new state file.  It is safe to
@@ -366,7 +368,7 @@ env params@Params{name, subcommand} = \case
     dumpEnv =
         let isNotIgnoredVar (n, _) = n `List.notElem`
                 [ "YX_ENV_STATE"
-                , "YX_ENV_DIR"      -- TODO: Will be used in the future
+                , "YX_ENV_DIR"
 
                 -- Taken from `direnv` source code, they say that it avoids
                 -- segfaults in Bash.
@@ -448,6 +450,9 @@ enterEnv stateEnvVar params possiblyEnv shellPid envVars = do
         }
 
     Lazy.Text.putStr applyEnv
+    for_ (fst <$> possiblyEnv)
+        $ Lazy.Text.putStr . Bash.setEnvDir "YX_ENV_DIR" . takeDirectory
+
     unless (Lazy.Text.null applyEnv) $ do
         printMsg params Info "Updating environment:"
         printMsg params Notice (Lazy.Text.toStrict applyEnv)
@@ -498,14 +503,18 @@ withStateFile Params{name, subcommand} action = do
 leaveEnv
     :: Params
     -> State
+    -> Maybe File
     -> HashMap Text Text
     -> IO (HashMap Text Text)
-leaveEnv params State{changes} e = do
+leaveEnv params State{changes} possiblyEnvFile e = do
     let restore = Lazy.Text.toStrict . genBash $ Bash.reverseOperations changes
 
     unless (null changes) $ do
         printMsg params Info "Restoring environment:"
         printMsg params Notice restore
+
+    when (isNothing possiblyEnvFile)
+        $ Lazy.Text.putStr (Bash.unsetEnvDir "YX_ENV_DIR")
 
     Env.apply changes e <$ Text.putStr restore
 
