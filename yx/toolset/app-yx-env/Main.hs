@@ -60,13 +60,8 @@ import System.Directory (XdgDirectory(XdgCache), getXdgDirectory)
 import System.FilePath ((</>), takeDirectory)
 import qualified Turtle
 
-import Main.Config
-    ( Config(..)
-    , Env
-    , ShellScripts(..)
-    , readConfig
-    , readEnvConfig
-    )
+import Main.Config (Config(..), ShellScripts(..), readConfig)
+import Main.Config.Env (Env, readEnvConfig)
 import Main.Config.Preferences (Preferences(Preferences))
 import qualified Main.Config.Preferences as Preferences
     ( KnownFile(..)

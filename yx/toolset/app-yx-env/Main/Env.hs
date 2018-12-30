@@ -36,7 +36,7 @@ import System.Environment.Variable
     , EnvVarValue
     )
 
-import Main.Config (EnvironmentVariableOperation(..))
+import Main.Config.Env (EnvironmentVariableOperation(..))
 
 
 -- | Invertible operations over environment variables.

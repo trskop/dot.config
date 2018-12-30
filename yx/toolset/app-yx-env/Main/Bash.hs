@@ -31,7 +31,7 @@ import qualified Data.Text.Lazy as Lazy (Text)
 import GenBashrc.Bash (Bash, genBash)
 import qualified GenBashrc.Bash as Bash
 
-import Main.Config (Env(..))
+import Main.Config.Env (Env(..))
 import Main.Env
     ( SetOrUnsetEnvVar(..)
     , reverseOperation
