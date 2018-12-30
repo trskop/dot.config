@@ -38,7 +38,53 @@
 
 , initEnv =
     ''
+    -- Following definitions are automatically in scope:
+    --
+    -- let Variable : Type = {name : Text, value : Text}
+    --
+    -- Following data type is just a placeholder for future implementation:
+    -- let Action : Type =
+    --       { name : Text
+    --       , action : Text
+    --       }
+    --
+    -- let Actions : Type = List Action
+    --
+    -- let VariableOperation : Type =
+    --       < Set : {_1 : Variable}
+    --       , UnSet : {_1 : Text}
+    --       , Modify : {_1 : Text, _2 : Optional Text → Optional Text}
+    --       >
+    --
+    -- let VariableOperations : Type = List VariableOperation
+    --
+    -- let Env : Type =
+    --       { variables : Text → VariableOperations
+    --       , actions : Actions
+    --       }
+    --
+    -- let empty : Env =
+    --       { variables = λ(_ : Text) → [] : VariableOperations
+    --       , actions = List Actions
+    --       }
+    --
     empty : Env
+
+    -- Example:
+    --
+    -- { variables =
+    --       λ(dir : Text)
+    --     → [ VariableOperation.Modify
+    --           { _1 = "PATH"
+    --           , _2 =
+    --                 λ(value : Optional Text)
+    --               → Optional/fold Text value (Optional Text)
+    --                   (λ(path : Text) → Some "''${dir}/bin:''${path}") (Some "''${dir}")
+    --           }
+    --       ] : VariableOperations
+    --
+    -- , actions = empty.actions
+    -- }
 
     -- vim:ft=dhall
     ''
