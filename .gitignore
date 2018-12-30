@@ -32,6 +32,7 @@
 /command-wrapper/*.dhall
 /habit/*.dhall
 /yx/*.dhall
+/yx/toolset/.shake
 /yx/toolset/.stack-work/
 /yx/toolset/*.cabal
 # This is machine specific, and it exposes too much information:
