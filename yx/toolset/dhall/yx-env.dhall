@@ -33,7 +33,7 @@
       }
 
 , envFileName =
-    -- When 'None' we default to ".${toolset}-${subcommand}".
+    -- When 'None Text' we default to ".${toolset}-${subcommand}".
     None (∀(toolset : Text) → ∀(subcommand : Text) → Text)
 
 , initEnv = ''
@@ -50,9 +50,9 @@
 -- let Actions : Type = List Action
 --
 -- let VariableOperation : Type =
---       < Set : {_1 : Variable}
---       , UnSet : {_1 : Text}
---       , Modify : {_1 : Text, _2 : Optional Text → Optional Text}
+--       < Set : {name : Text, value : Text}  -- Same as 'Variable'.
+--       , Unset : {name : Text}
+--       , Modify : {name : Text, modify : Optional Text → Optional Text}
 --       >
 --
 -- let VariableOperations : Type = List VariableOperation
@@ -74,11 +74,12 @@ empty : Env
 -- { variables =
 --       λ(dir : Text)
 --     → [ VariableOperation.Modify
---           { _1 = "PATH"
---           , _2 =
+--           { name = "PATH"
+--           , modify =
 --                 λ(value : Optional Text)
 --               → Optional/fold Text value (Optional Text)
---                   (λ(path : Text) → Some "''${dir}/bin:''${path}") (Some "''${dir}")
+--                   (λ(path : Text) → Some "''${dir}/bin:''${path}")
+--                   (Some "''${dir}")
 --           }
 --       ] : VariableOperations
 --

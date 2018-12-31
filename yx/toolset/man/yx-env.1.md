@@ -1,6 +1,6 @@
 % YX-ENV(1) YX Toolset 0.1.0 | YX Toolset
 % Peter Trsko
-% 23nd December 2018
+% 31st December 2018
 
 
 # NAME
@@ -14,11 +14,15 @@ yx \[GLOBAL\_OPTIONS] env
 
 yx \[GLOBAL\_OPTIONS] env {\--init|-i}
 
-yx \[GLOBAL\_OPTIONS] env {\--dry-run DIR|-u DIR}
+yx \[GLOBAL\_OPTIONS] env {\--dry-run *DIR*|-u *DIR*}
 
-yx \[GLOBAL\_OPTIONS] env {\--allow|-a} DIR
+yx \[GLOBAL\_OPTIONS] env {\--allow|-a} *DIR*
 
-yx \[GLOBAL\_OPTIONS] env {\--ignore|-a} DIR
+yx \[GLOBAL\_OPTIONS] env {\--ignore|-a} *DIR*
+
+yx \[GLOBAL\_OPTIONS] env {\--dump|-p|\--diff|-d} *FILE*
+
+yx \[GLOBAL\_OPTIONS] env {\--script|\-s|\--run-hook=*PID*|\-r *PID*}
 
 yx \[GLOBAL\_OPTIONS] env {\--help|-h}
 
@@ -37,18 +41,33 @@ For documentation of *GLOBAL_OPTIONS* see `command-wrapper(1)` manual page.
 -i, \--init
 :   Create env config (`.yx-env` by default) in the current directory.
 
+-u *DIR*, \--dry-run *DIR*, \--dry-run=*DIR*
+:   Print out what would happen if we descended into *DIR*.
+
+-a *DIR*, \--allow *DIR*, \--allow=*DIR*
+:   Allow specified env config to be used to modify environment.
+
+-g *DIR*, \--ignore *DIR*, \--ignore=*DIR*
+:   Ignore specified env config instead of using it to modify environment.
+
+-p *FILE*, \--dump *FILE*, \--dump=*FILE*
+:   Dump current environment in the form of Haskell associative list.
+    **TODO: Plan is to change the output format to Dhall.**
+
+-d *FILE*, \--diff *FILE*, \--diff=*FILE*
+:   Diff current environment against existing dump.  Output is a Dhall
+    description of changes that would be performed to transition from the
+    environment described in *FILE* in to the current one.
+
 -s, \--script
 :   Generate a script that needs to be included in `.bashrc` for `yx env`
     functionality to be enabled.
 
--u *DIR*, \--dry-run *DIR*
-:   Print out what would happen if we cded into *DIR*.
-
--a *DIR*, \--allow *DIR*
-:   Allow specified env config to be used to modify environment.
-
--g *DIR*, \--ignore *DIR*
-:   Ignore specified env config instead of using it to modify environment.
+-r, \--run-hook *PID*, \--run-hook=*PID*
+:   Run shell hook, i.e. generate shell script that will modify environment
+    if evaluated.  *PID* is the process ID of the shell that is executing it.
+    This way we can track nested shells, and properly handle state in those
+    cases.
 
 -h, \--help
 :   Print short help message and exit.  Same as `yx help env`.
@@ -64,9 +83,63 @@ TODO
 `${XDG_CONFIG_HOME:-$HOME/.config}/yx/yx-env.dhall`
 :   Configuration file.  **TODO**
 
+    Type signature of configuration expression:
+
+    ```
+
+    -- Command 'yx env' will look for these env config files
+    -- in directories.  If 'None Text' then '.yx-env' is used.
+    { envFileName
+        : Optional
+            ( ∀(toolset : Text)     -- "yx"
+            → ∀(subcommand : Text)  -- "env"
+            → Text
+            )
+
+    -- Template of env config (name depends on 'envFileName',
+    -- by default its '.yx-env'.  See documentation for
+    -- '--init' option for more details.
+    , initEnv : Text
+
+    , installScript
+        -- "yx_env" ("${toolsetName}_${subcommandName}")
+        -- Usually used as a base name for functions.
+        : ∀(name : Text)
+
+        -- Toolset command ("yx"), hopefully full path
+        -- in the future.
+        → ∀(toolset : Text)
+
+        -- Scripts used to hook into individual shells.
+        → { bash : Text
+          , fish : Text
+          , tcsh : Text
+          , zsh : Text
+          }
+    }
+    ```
+
     See also `XDG_CONFIG_HOME` in *ENVIRONMENT VARIABLES* section for more
     information on how Command Wrapper figures out where to look for this
     configuration file.
+
+`.yx-env`
+:   Env(ironment) config that is loaded when a directory with it present is
+    entered.  For the file to be loaded it has to be allowed first, see
+    `--allow` option for more details.  File can also be explicitly ignored.
+    In such case it is skipped when searching for a suitable `.yx-env` file,
+    see `--ignore` option for that.
+
+    Name of this file can be overriden in configuration by specifying
+    `envFileName`.
+
+    To create initial env config just run:
+
+    ```
+    yx env --init
+    ```
+
+    Which will create `.yx-env` file in the current directory.
 
 
 # ENVIRONMENT VARIABLES
@@ -108,6 +181,13 @@ mentioned there applies to this subcommand as well.
     variable is that there is a size limit to environment variable size as well
     as an environment block.
 
+`YX_ENV_DIR`
+:   Directory path of where currently loaded env config lies.  If there is no
+    environment loaded then this variable is not present.
+
+    Scripts can use this variable to detect that they are in a specific
+    environment.
+
 
 # EXAMPLES
 
@@ -116,7 +196,7 @@ mentioned there applies to this subcommand as well.
 
 # SEE ALSO
 
-yx-jmp(1), yx-path(1), yx-this(1), command-wrapper(1)
+yx-jmp(1), yx-path(1), yx-this(1), yx(1), command-wrapper(1)
 
 * [XDG Base Directory Specification
   ](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html)

@@ -149,6 +149,8 @@ parseOptions config = Turtle.options "env" options <&> ($ Default config)
         , dryRunMode <$> Turtle.optText "dry-run" 'u'
             "Print out what would happen if we cded into specified directory."
 
+        -- TODO: Support '--pin' option that would allow only env file if its
+        -- hash matches.
         , setStatusMode Preferences.Allowed <$> Turtle.optText "allow" 'a'
             "Allow specified env config to be used to modify environment."
 
@@ -160,7 +162,7 @@ parseOptions config = Turtle.options "env" options <&> ($ Default config)
             "Dump current environment into a specified file."
 
         , diffMode <$> Turtle.optText "diff" 'd'
-            "Dump current environment into a specified file."
+            "Diff current environment against existing dump."
 
         , pure id
         ]

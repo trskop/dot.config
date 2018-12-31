@@ -30,11 +30,7 @@ import Data.Algorithm.Diff (Diff(..), getDiffBy)
 import Data.HashMap.Strict (HashMap)
 import qualified Data.HashMap.Strict as HashMap (delete, insert, lookup)
 import qualified Dhall (Inject, Interpret)
-import System.Environment.Variable
-    ( EnvironmentVariable(..)
-    , EnvVarName
-    , EnvVarValue
-    )
+import System.Environment.Variable (EnvVarName, EnvVarValue)
 
 import Main.Config.Env (EnvironmentVariableOperation(..))
 
@@ -63,20 +59,20 @@ simplifyOperation
     -> Maybe SetOrUnsetEnvVar
     -- ^ 'Nothing' means no changes to be performed.
 simplifyOperation env = \case
-    Set EnvironmentVariable{name, value} ->
+    Set{name, value} ->
         let originalValue = HashMap.lookup name env
         in if originalValue == Just value
             then Nothing
             else Just SetEnv{name, value, originalValue}
 
-    Unset name ->
+    Unset{name} ->
         HashMap.lookup name env <&> \value ->
             UnsetEnv{name, value}
 
-    Modify name f ->
-        modify name (HashMap.lookup name env) f
+    Modify{name, modify} ->
+        modifyValue name (HashMap.lookup name env) modify
   where
-    modify name originalValue f =
+    modifyValue name originalValue f =
         case (originalValue, f originalValue) of
             (Nothing, Nothing) ->
                 Nothing

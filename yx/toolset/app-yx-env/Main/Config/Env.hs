@@ -76,11 +76,18 @@ import qualified Turtle
 
 
 data EnvironmentVariableOperation
-    = Set EnvironmentVariable
-    | Unset EnvVarName
-    | Modify EnvVarName (Maybe EnvVarValue -> Maybe EnvVarValue)
+    = Set
+        { name :: EnvVarName
+        , value :: EnvVarValue
+        }
+    | Unset
+        { name :: EnvVarName
+        }
+    | Modify
+        { name :: EnvVarName
+        , modify :: Maybe EnvVarValue -> Maybe EnvVarValue
+        }
   deriving stock (Generic)
-  -- TODO: Custom instance to get better Dhall representation.
   deriving anyclass (Dhall.Interpret)
 
 data ReversibleAction = ReversibleAction
