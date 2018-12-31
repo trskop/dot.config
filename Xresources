@@ -1,6 +1,8 @@
 ! xrdb -merge ~/.Xresources
 
 ! {{{ URxvt settings !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!
+! https://wiki.archlinux.org/index.php/Rxvt-unicode
 
 ! Same result as using: rxvt -depth 32 -bg '[80]black' -fg gray +sb -bl
 URxvt.depth: 32
@@ -14,5 +16,8 @@ URxvt.borderLess: True
 URxvt.font: xft:DejaVu Sans Mono for Powerline:size=16:style=Book
 URxvt.visualBell: True
 URxvt.saveLines: 100000
+
+! Disable printing the terminal contents when pressing PrintScreen.
+URxvt.print-pipe: "cat > /dev/null"
 
 ! }}} URxvt settings !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
