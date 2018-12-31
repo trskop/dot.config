@@ -35,7 +35,7 @@ For documentation of *GLOBAL_OPTIONS* see `command-wrapper(1)` manual page.
     functionality to be enabled.
 
 -h, \--help
-:   Print short help message and exit.  Same as `yx help path`.
+:   Print short help message and exit.  Same as: `yx help path`.
 
 *EXPRESSION*
 :   Dhall expression that has access to `data` record, `Paths` and `Config`
@@ -130,7 +130,7 @@ peter@machine ~ $ yx path --plain data.paths.xdg.cacheDir
 
 # SEE ALSO
 
-yx-env(1), yx-jmp(1), yx-this(1), command-wrapper(1)
+yx-env(1), yx-jmp(1), yx-this(1), yx(1), command-wrapper(1)
 
 * [XDG Base Directory Specification
   ](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html)

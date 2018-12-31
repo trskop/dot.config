@@ -27,7 +27,7 @@ yx \[GLOBAL\_OPTIONS] help this
 For documentation of *GLOBAL_OPTIONS* see `command-wrapper(1)` manual page.
 
 -h, \--help
-:   Print short help message and exit.  Same as `yx help this`.
+:   Print short help message and exit.  Same as: `yx help this`.
 
 
 # EXIT STATUS
@@ -80,7 +80,7 @@ mentioned there applies to this subcommand as well.
 
 # SEE ALSO
 
-yx-env(1), yx-jmp(1), yx-path(1), command-wrapper(1)
+yx-env(1), yx-jmp(1), yx-path(1), yx(1), command-wrapper(1)
 
 * [XDG Base Directory Specification
   ](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html)
