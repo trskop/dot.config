@@ -5,25 +5,58 @@ set -e
 source ~/.local/src/trskop/command-wrapper/bash/lib.sh
 
 function printHelp() {
+    local -r command="${COMMAND_WRAPPER_NAME} ${COMMAND_WRAPPER_SUBCOMMAND}"
+    local -r commandHelp="${COMMAND_WRAPPER_NAME} help ${COMMAND_WRAPPER_SUBCOMMAND}"
+
     cat <<EOF
-${COMMAND_WRAPPER_NAME} jmp [-h|--help]
+Find GHC error messages in Tmux scrollback buffer and edit selected one in an
+editor.
+
+Usage:
+
+  ${command} [--help|-h]
+  ${commandHelp}
+
+Options:
+
+  -h, --help
+    Print short help message and exit.  Same as: ${commandHelp}
+
+See yx-jmp(1) manual page for documentation.
 EOF
 }
 
 function declareCfg() {
-    local -r configFile="$1"; shift
-
     dhall-to-bash --declare 'menuCommand' <<EOF
-let i = ${configFile}
+let i = ${COMMAND_WRAPPER_CONFIG}
 in  [i.menu.command] # i.menu.arguments
 EOF
+    # Command 'dhall-to-bash' doesn't produce new lines.  It can get important
+    # when chaining multiple declarations.
     echo
+}
 
-    dhall-to-bash --declare 'editorCommand' <<EOF
-let i = ${configFile}
-in  [i.editor.command] # i.editor.arguments
+function startEditor() {
+    local params=''
+    read params
+
+    if [[ -z "${params}" ]]; then
+        notice "Nothing selected, exiting."
+        exit 0
+    fi
+
+    # Line is in the form "FILE +LINE".  This should work even if FILE contains
+    # spaces.
+    local -r file="${params% +[0-9]*}"
+    local -r line="${params##* +}"
+
+    eval $(dhall-to-bash --declare 'editorCommand' <<EOF
+let editor = (${COMMAND_WRAPPER_CONFIG}).editor "${file}" ${line}
+in  [editor.command] # editor.arguments
 EOF
-    echo
+        )
+
+    exec "${editorCommand[@]}"
 }
 
 function main() {
@@ -38,26 +71,30 @@ function main() {
                 exit 0
                 ;;
             -*)
-                die 1 "'%s': %s" "${arg}" 'Unknown option.'
+                die 1 "'%s': Unknown option." "${arg}"
                 ;;
             *)
-                die 1 "'%s': %s" "${arg}" 'Too many arguments.'
+                die 1 "'%s': Too many arguments." "${arg}"
                 ;;
         esac
     done
 
     if [[ -z "${TMUX}" || -z "${TMUX_PANE}" ]]; then
-        die 1 "Not running in a Tmux pane."
-        exit 1
+        die 1 "Not running in a Tmux pane, see yx-jmp(1)."
     fi
 
-    eval "$(declareCfg "${COMMAND_WRAPPER_CONFIG}")"
+    if [[ ! -e "${COMMAND_WRAPPER_CONFIG}" ]]; then
+        die 1 "'%s': Configuration file doesn't exist, see yx-jmp(1)." \
+            "${COMMAND_WRAPPER_CONFIG}"
+    fi
+
+    eval "$(declareCfg)"
 
     tmux capture-pane -S - -b scroll-buffer \; show-buffer -b scroll-buffer \; delete-buffer -b scroll-buffer \
-    | sed -rn 's/^ *(.*):([0-9]+):[0-9]+: error:$/\1 +\2/;T;p' \
+    | sed -rn 's/^ *(.*):([0-9]+):[0-9]+: error:.*$/\1 +\2/;T;p' \
     | uniq \
     | "${menuCommand[@]}" \
-    | xargs -r "${editorCommand[@]}"
+    | startEditor
 }
 
 main "$@"
