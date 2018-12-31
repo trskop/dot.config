@@ -20,8 +20,9 @@ module Main.Paths
   where
 
 import Control.Applicative (liftA2)
+import Control.Monad (guard)
 import qualified Data.Char as Char (toUpper)
-import qualified Data.List as List (takeWhile)
+import qualified Data.List as List (filter, takeWhile)
 import Data.String (IsString, fromString)
 import GHC.Generics (Generic)
 import System.Environment (lookupEnv)
@@ -31,10 +32,14 @@ import Data.Text (Text)
 import qualified Dhall (Inject)
 import System.Directory
     ( XdgDirectory(XdgCache, XdgConfig, XdgData)
+    , doesDirectoryExist
+    , doesFileExist
+    , getHomeDirectory
     , getXdgDirectory
+    , listDirectory
     )
 import System.Directory.ProjectRoot (getProjectRootCurrent)
-import System.FilePath ((</>))
+import System.FilePath ((</>), takeExtension)
 import System.Process (readProcess)
 
 
@@ -51,13 +56,13 @@ data Paths = Paths
     , projectRoot :: Maybe Text
     , commandWrapper :: CommandWrapper
     , editor :: Text
+    , ssh :: Ssh
 
 -- TODO:
 --  , pager :: Text
     }
-  deriving (Generic, Show)
-
-instance Dhall.Inject Paths
+  deriving stock (Generic, Show)
+  deriving anyclass (Dhall.Inject)
 
 data Xdg = Xdg
     { userDirs :: XdgUserDirs
@@ -65,9 +70,8 @@ data Xdg = Xdg
     , cacheDir :: Text
     , dataDir :: Text
     }
-  deriving (Generic, Show)
-
-instance Dhall.Inject Xdg
+  deriving stock (Generic, Show)
+  deriving anyclass (Dhall.Inject)
 
 data XdgUserDirs = XdgUserDirs
     { desktop :: Text
@@ -79,9 +83,8 @@ data XdgUserDirs = XdgUserDirs
     , pictures :: Text
     , videos :: Text
     }
-  deriving (Generic, Show)
-
-instance Dhall.Inject XdgUserDirs
+  deriving stock (Generic, Show)
+  deriving anyclass (Dhall.Inject)
 
 data XdgUserDir
     = Desktop
@@ -100,9 +103,8 @@ data Toolset = Toolset
 --  , exeFile :: Text
 --  , libDir :: Text
     }
-  deriving (Generic, Show)
-
-instance Dhall.Inject Toolset
+  deriving stock (Generic, Show)
+  deriving anyclass (Dhall.Inject)
 
 data CommandWrapper = CommandWrapper
     { configDir :: Text
@@ -111,9 +113,16 @@ data CommandWrapper = CommandWrapper
 --  , libDir :: Text
     , toolset :: Toolset
     }
-  deriving (Generic, Show)
+  deriving stock (Generic, Show)
+  deriving anyclass (Dhall.Inject)
 
-instance Dhall.Inject CommandWrapper
+data Ssh = Ssh
+    { configDir :: Maybe Text
+    , configFile :: Maybe Text
+    , identities :: [Text]
+    }
+  deriving stock (Generic, Show)
+  deriving anyclass (Dhall.Inject)
 
 mk :: Params -> IO Paths
 mk Params{name, exePath} = do
@@ -166,6 +175,30 @@ mk Params{name, exePath} = do
         -- - It may be useful to check that the command exists on the system
         --   and resolve it to a full path.
 
+    ssh <- do
+        home <- getHomeDirectory
+        let sshConfigDir = home </> ".ssh"
+            configFile = sshConfigDir </> "config"
+        configDirExists <- doesDirectoryExist sshConfigDir
+        configFileExists <- doesFileExist configFile
+
+        let algorithms = ["dsa", "ecdsa", "ed25519", "rsa"]
+            isIdentity file =
+                file `elem` map ("id_" <>) algorithms
+                || takeExtension file `elem` map (".id_" <>) algorithms
+        identities <- List.filter isIdentity <$> listDirectory sshConfigDir
+
+        pure Ssh
+            { configDir =
+                guard configDirExists *> Just (fromString sshConfigDir)
+
+            , configFile =
+                guard configFileExists *> Just (fromString configFile)
+
+            , identities =
+                fromString . (sshConfigDir </>) <$> identities
+            }
+
     pure Paths
         { xdg = Xdg
             { configDir
@@ -185,6 +218,7 @@ mk Params{name, exePath} = do
         , projectRoot
         , commandWrapper
         , editor
+        , ssh
         }
 
 execXdgUserDir :: IsString s => XdgUserDir -> IO s

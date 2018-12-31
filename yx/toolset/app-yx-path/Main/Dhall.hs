@@ -17,7 +17,7 @@ module Main.Dhall
   where
 
 import Control.Exception (Exception, throwIO)
-import Data.Foldable (asum)
+import Data.Foldable (asum, traverse_)
 import Data.Functor ((<&>))
 import Data.String (fromString)
 import Data.Maybe (fromMaybe)
@@ -46,6 +46,7 @@ import qualified Dhall.Core as Dhall
         , Let
         , List
         , Natural
+        , Optional
         , Record
         , RecordLit
         , Text
@@ -112,6 +113,7 @@ printPlain paths expression possiblyConfigExpression =
     result :: Either [Dhall.TypeError Dhall.Src Dhall.X] (IO ())
     result = runExcept $ asum
         [ printText <$> mkExpression Dhall.Text
+        , printOptionalText <$> mkExpression (optional Dhall.Text)
         , printNatural <$> mkExpression Dhall.Natural
         , printInteger <$> mkExpression Dhall.Integer
         , printTextList <$> mkExpression (listOf Dhall.Text)
@@ -120,6 +122,7 @@ printPlain paths expression possiblyConfigExpression =
         ]
 
     listOf = (Dhall.List `Dhall.App`)
+    optional = (Dhall.Optional `Dhall.App`)
 
     configExpression = fromMaybe emptyRecord possiblyConfigExpression
 
@@ -127,24 +130,30 @@ printPlain paths expression possiblyConfigExpression =
         $ fst <$> mkExpressionAndTypeCheck (Just t) expression configExpression paths
 
     dieWithNotPlainType _ = die
-        "Error: Expected Text, Natural, Integer, or List of them as result."
+        "Error: Expected Text, Optional Text, Natural, Integer, or List of\
+        \ them as result."
 
     dieWithUnexpectedType t =
         die ("Error: Expected " <> t <> " as result.")
 
     Dhall.Type{extract = extractText} = Dhall.auto @Text
+    Dhall.Type{extract = extractMaybeText} = Dhall.auto @(Maybe Text)
     Dhall.Type{extract = extractNatural} = Dhall.auto @Natural
     Dhall.Type{extract = extractInteger} = Dhall.auto @Integer
     Dhall.Type{extract = extractTextList} = Dhall.auto @[Text]
     Dhall.Type{extract = extractNaturalList} = Dhall.auto @[Natural]
     Dhall.Type{extract = extractIntegerList} = Dhall.auto @[Integer]
 
-    printText, printNatural, printInteger
+    printText, printOptionalText, printNatural, printInteger
         :: Dhall.Expr Dhall.Src Dhall.X
         -> IO ()
 
     printText =
         maybe (dieWithUnexpectedType "Text") Text.putStrLn . extractText
+
+    printOptionalText =
+        maybe (dieWithUnexpectedType "Optional Text") (traverse_ Text.putStrLn)
+        . extractMaybeText
 
     printNatural =
         maybe (dieWithUnexpectedType "Natural") (Text.putStrLn . showing)
