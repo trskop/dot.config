@@ -20,6 +20,7 @@ import qualified Data.List as List (filter, find, notElem)
 import Data.Maybe (fromMaybe, isNothing)
 import Data.String (IsString, fromString)
 import Data.Traversable (for)
+import System.Environment (lookupEnv)
 import System.Exit (die, exitFailure, exitSuccess)
 import System.IO
     ( Handle
@@ -93,6 +94,13 @@ dieMissingConfig :: Params -> FilePath -> IO a
 dieMissingConfig params fp = do
     printMsg params Error
         $ "Missing configuration file " <> gshow fp
+    exitFailure
+
+dieMissingRuntimeDir :: Params -> IO a
+dieMissingRuntimeDir params = do
+    printMsg params Error
+        "Neither 'YX_ENV_STATE_DIR' nor 'XDG_RUNTIME_DIR' is set, please\
+        \ set either of them to a sensible value."
     exitFailure
 
 data Mode a
@@ -474,22 +482,33 @@ writeStateFile stateEnvVar params state =
 
 -- | State file is created with the following path:
 --
--- > ${XDG_CACHE_HOME:-${HOME}/.cache}/${name}-${subcommand}/state${RANDOM}.dhall
+-- > ${YX_ENV_STATE_DIR:-$XDG_RUNTIME_DIR}/${name}-${subcommand}/state${RANDOM}.dhall
 --
 -- Where @name@ and @subcommand@ are taken from 'Params', and @${RANDOM}@ is a
 -- random string regenerated each time this function is called.
 withStateFile :: Params -> (FilePath -> Handle -> IO a) -> IO a
-withStateFile Params{name, subcommand} action = do
-    -- TODO: We should store this in "$XDG_RUNTIME_DIR" instead.
-    -- <https://serverfault.com/questions/388840/good-default-for-xdg-runtime-dir>
-    cacheDir <- getXdgDirectory XdgCache (name <> "-" <> subcommand)
+withStateFile params@Params{name, subcommand} action = do
 
-    -- There is no requirement for the cache directory to already exist.
-    -- Function `getXdgDirectory` just constructs the path by following XDG
-    -- Base Directory rules, nothing else.
-    Turtle.mktree (Turtle.fromString cacheDir)
+    -- TODO: Refactor this to avoid hardcoded values.
+    stateDir <- lookupEnv "YX_ENV_STATE_DIR" >>= \case
+        Nothing ->
+            lookupEnv "XDG_RUNTIME_DIR" >>= \case
+                Nothing ->
+                    dieMissingRuntimeDir params
 
-    openTempFile cacheDir "state.dhall" `bracket` (hClose . snd)
+                Just xdgRuntimeDir -> do
+                    let dir = xdgRuntimeDir </> (name <> "-" <> subcommand)
+                    dir <$ Lazy.Text.putStr (Bash.setEnvDir "YX_ENV_STATE_DIR" dir)
+
+        Just dir ->
+            pure dir
+
+    -- There is no requirement for the state directory to already exist.
+    -- TODO: IMPORTANT: Set permissions to the directory to avoid unauthorised
+    -- access.
+    Turtle.mktree (Turtle.fromString stateDir)
+
+    openTempFile stateDir "state.dhall" `bracket` (hClose . snd)
         $ uncurry action
 
 -- | Print shell commands to standard output and inform user about those

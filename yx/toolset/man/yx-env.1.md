@@ -75,7 +75,9 @@ For documentation of *GLOBAL_OPTIONS* see `command-wrapper(1)` manual page.
 
 # EXIT STATUS
 
-TODO
+For documentation of generic *EXIT STATUS* codes see `command-wrapper(1)`
+manual page section *EXIT STATUS*.  Any *EXIT STATUS* codes specific to this
+subcommand, if any, will be listed below.
 
 
 # FILES
@@ -169,6 +171,31 @@ mentioned there applies to this subcommand as well.
     ](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html)
     for more information on rationale behind this.
 
+`YX_ENV_STATE_DIR`
+:   Full path to a directory where state files are stored.  If it's not set
+    then it will be populated using the value of `XDG_RUNTIME_DIR`:
+
+    ```
+    ${XDG_RUNTIME_DIR}/yx-env
+    ```
+
+    To override this default value users can define `YX_ENV_STATE_DIR` them
+    selves.  In such case the resolution will be as following:
+
+    ```
+    ${YX_ENV_STATE_DIR:-${XDG_RUNTIME_DIR}}/yx-env
+    ```
+
+    If `yx env` is hooked into current shell then this variable will always be
+    present.  Setting it to a different value won't have immediate effect.  It
+    will be used only when new env state file (see `YX_ENV_STATE` vairiable) is
+    created.  To force `yx env` to use a different value of `YX_ENV_STATE` it
+    has to be set before `yx env` is hooked into current shell.
+
+    See [XDG Base Directory Specification
+    ](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html)
+    for more information on `XDG_RUNTIME_DIR`.
+
 `YX_ENV_STATE`
 :   File path to a state file.  Usually it is in the form
     `${XDG_CONFIG_HOME:-${HOME}/.cache}/yx-env/state${RANDOM}.dhall`.
@@ -179,7 +206,22 @@ mentioned there applies to this subcommand as well.
 
     Reason for using state file instead of holding everything in an environment
     variable is that there is a size limit to environment variable size as well
-    as an environment block.
+    as an environment block.  There are other restrictions comming to play as
+    well, like maximum command line length, or that we like to pass a lot of
+    environment variables to Docker containers.  All of this can cause
+    environment variables or the whole environment to be truncated.
+    Interestingly Linux allows huge environment variable blocks, see
+    `execve(2)` manual page for details, however, some applications and
+    commands aren't handling it properly.
+
+    The downside of using state files is that they may pile up, if we don't do
+    a proper cleanup, and we have to create a new file every time we change
+    something to provide sense of atomicity.  Some of the negative aspects
+    can be avoided by using directories like `XDG_RUNTIME_DIR` to store these
+    files.
+
+    At the moment state files are in Dhall format.  This may change in the
+    future.
 
 `YX_ENV_DIR`
 :   Directory path of where currently loaded env config lies.  If there is no
