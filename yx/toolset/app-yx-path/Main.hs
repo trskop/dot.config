@@ -100,5 +100,10 @@ parseOptions = Turtle.options "Paths"
 --
 -- - Find a better name for this command.  Its scope is broader then just
 --   returning interesting paths
+--
 -- - System information (OS, distribution, architecture, number of CPUs,
 --   RAM size, ...).  See also TODOs in `Main.Paths` module.
+--
+-- - Having 'projectRoot' entry is nice, but there are other information that
+--   would be useful to have.  Like what VCS is used, what build system it
+--   uses, etc.

@@ -25,6 +25,47 @@ import qualified Main.Config.App as Config (read, writeDef)
 import Main.Message (dieWith)
 
 
+-- TODO:
+--
+-- Features provided by the original `this` script that would be nice to
+-- preserve:
+--
+-- - `--edit` [--fzf] [CONFIG_SELECTOR] -- Fast way to open a configuration
+--   file in editor.  For some of them it understood that there is a need to
+--   run an action.  Woid it make sense to make this into a separate
+--   subcommand?  However, if those action hooks should be working then it will
+--   need to call this one as well.
+--
+-- - Management of `apt/sources.list` and extra package repositories.
+--
+-- - Generate SSH key, store it in a password DB allong with randomly generated
+--   password that was used to encrypt it.  Would it make sense to make this a
+--   separate subcommand?
+--
+-- Features that weren't finished but would be nice to have them:
+--
+-- - Integration with etckeeper.  If there were changes made to package
+--   configuration it made sense to create a commit message for `/etc` changes.
+--   Similar thing for when pinning packages to a specific version due to
+--   outstanding issues.
+--
+-- - `--bootstrap-script` option to generate a bootstraping script that
+--   prepares newly installed system into a state where:
+--
+--     * Necessary packages are installed.
+--     * `~/.config` is initialised.
+--     * `~/.bashrc` modified appropriately.
+--     * Command `yx this` is able to run.
+--
+--     This was partially implemented during first attempt at a rewrite into
+--     Haskell.
+--
+-- Things that would be interesting to consider:
+--
+-- - Allowing user to select actions from `--update --user` subset by not only
+--   listing executed scripts but also querying Shake scripts for their
+--   targets.
+
 main :: IO ()
 main = do
     params <- getEnvironment
