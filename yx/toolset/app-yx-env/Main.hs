@@ -13,24 +13,21 @@ module Main (main)
   where
 
 import Control.Exception (bracket)
-import Control.Monad ((>=>), join, when, unless)
+import Control.Monad (join, when, unless)
 import Data.Foldable (asum, fold, for_)
 import Data.Functor ((<&>))
-import qualified Data.List as List (filter, find, notElem)
-import Data.Maybe (fromMaybe, isNothing)
-import Data.String (IsString, fromString)
+import qualified Data.List as List (find)
+import Data.Maybe (isNothing)
+import Data.String (fromString)
 import Data.Traversable (for)
 import System.Environment (lookupEnv)
-import System.Exit (die, exitFailure, exitSuccess)
+import System.Exit (exitFailure, exitSuccess)
 import System.IO
     ( Handle
-    , IOMode(WriteMode)
     , hClose
     , hPutStr
     , hPutStrLn
     , openTempFile
-    , stdout
-    , withFile
     )
 
 import CommandWrapper.Prelude
@@ -42,7 +39,7 @@ import Data.HashMap.Strict (HashMap)
 import qualified Data.HashMap.Strict as HashMap (fromList, lookup)
 import Data.Text (Text)
 import qualified Data.Text as Text (unpack)
-import qualified Data.Text.IO as Text (hPutStr, putStr, writeFile)
+import qualified Data.Text.IO as Text (hPutStr, putStr)
 import qualified Data.Text.Lazy as Lazy (Text)
 import qualified Data.Text.Lazy as Lazy.Text (null, toStrict)
 import qualified Data.Text.Lazy.IO as Lazy.Text (putStr)
@@ -55,18 +52,32 @@ import qualified System.Console.ANSI as AnsiTerminal
     , SGR(Reset, SetColor)
     , setSGRCode
     )
-import System.Directory (XdgDirectory(XdgCache), getXdgDirectory)
 import System.FilePath ((</>), takeDirectory)
 import qualified Turtle
 
-import Main.Config.App (Config(..), ShellScripts(..), readConfig)
+import Main.Action
+    ( defaultAction
+    , diffAction
+    , dumpAction
+    , initAction
+    , scriptAction
+    , setEnvConfigStatusAction
+
+    -- Utilities
+    -- TODO: Refactor so that they don't need to be imported.
+    , findEnvFile
+    , gshow
+    , mkEnvFileName
+    , mkPreferencesFilePath
+    , withTerminal
+    )
+import Main.Config.App (Config(..), readConfig)
 import Main.Config.Env (Env, readEnvConfig)
 import Main.Config.Preferences (Preferences(Preferences))
 import qualified Main.Config.Preferences as Preferences
     ( KnownFile(..)
     , Preferences(..)
     , Status(..)
-    , modify
     , read
     )
 import qualified Main.Shell.Bash as Bash
@@ -77,9 +88,8 @@ import qualified Main.Shell.Bash as Bash
     , unsetEnvDir
     , unsetState
     )
-import qualified Main.Dhall as Dhall (hPut)
 import Main.Env (SetOrUnsetEnvVar)
-import qualified Main.Env as Env (apply, diff)
+import qualified Main.Env as Env (apply)
 import Main.State (File(..), State(..), emptyState, readState, writeState)
 
 
@@ -202,18 +212,8 @@ parseOptions config = Turtle.options "env" options <&> ($ Default config)
 
 env :: Params -> Mode Config -> IO ()
 env params@Params{name, subcommand} = \case
-    Default _ ->
-        -- When implemented:
-        --
-        --   Start a new shell process with local environment settings in a
-        --   specified directory (current directory by default).
-        --
-        -- TODO:
-        --
-        --   * Genereate temporary `bashrc` file for that specific shell with
-        --     this application hooked in.
-        --   * Terminate with error if we are already in "hooked in".
-        die "TODO"
+    Default config ->
+        defaultAction params config
 
     DryRun dir config -> do
         possiblyEnvFile <- findEnvFile (mkEnvFileName params config)
@@ -231,12 +231,8 @@ env params@Params{name, subcommand} = \case
                     Lazy.Text.putStr "===\n"
                     Lazy.Text.putStr (genBash $ Bash.reverseOperations envOps)
 
-    Script Config{installScript} ->
-        let toolset = fromString name -- Full path would be better
-            fnName = fromString name <> "_" <> fromString subcommand
-            ShellScripts{bash} = installScript fnName toolset
-
-        in  Text.putStr bash
+    Script config ->
+        scriptAction params config
 
     RunHook shellPid config -> do
         let envFileName = mkEnvFileName params config
@@ -322,8 +318,8 @@ env params@Params{name, subcommand} = \case
                 $ for_ stateFile
                     $ Turtle.rm . Turtle.fromText
 
-    Init dir config@Config{initEnv} ->
-        Text.writeFile (dir </> mkEnvFileName params config) initEnv
+    Init dir config ->
+        initAction params config dir
 
     -- This command is used in following cases:
     --
@@ -337,101 +333,21 @@ env params@Params{name, subcommand} = \case
             Turtle.rm (Turtle.fromText stateFile)
 
     SetEnvConfigStatus status dir config -> do
-        envFile <- findEnvFile (mkEnvFileName params config) (fromString dir)
-        case envFile of
-            Nothing ->
-                printMsg params Warning
-                    $ "No env config found in " <> gshow dir
+        setEnvConfigStatusAction params config status dir
 
-            Just file' -> do
-                printMsg params Notice
-                    $ "Setting " <> gshow file' <> " as " <> gshow status
+    Dump file config ->
+        dumpAction params config file
 
-                prefsFile <- mkPreferencesFilePath params
-                Preferences.modify prefsFile $ \Preferences{knownFiles} ->
-                    Preferences
-                        { knownFiles =
-                            let file = fromString file'
-                            in Preferences.KnownFile{file, status} : knownFiles
-                        }
-
-    Dump file _config ->
-        dumpEnv >>= writeFile file . show
-
-    Diff file _config -> do
-        oldEnv <- readFile file >>= readIO
-        newEnv <- dumpEnv
-        Dhall.hPut stdout (Env.diff oldEnv newEnv)
+    Diff file config ->
+        diffAction params config file
   where
     stateEnvVar = "YX_ENV_STATE" :: Text
-
-    dumpEnv =
-        let isNotIgnoredVar (n, _) = n `List.notElem`
-                [ "YX_ENV_STATE"
-                , "YX_ENV_DIR"
-
-                -- Taken from `direnv` source code, they say that it avoids
-                -- segfaults in Bash.
-                , "COMP_WORDBREAKS"
-                , "PS1"
-                , "OLDPWD", "PWD", "SHELL", "SHELLOPTS", "SHLVL", "_"
-                ]
-        in  List.filter isNotIgnoredVar <$> Turtle.env
 
 isStateStale :: State -> Maybe File -> Bool
 isStateStale State{config} currentConfig = config /= currentConfig
 
 hasShellChanged :: State -> Text -> Bool
 hasShellChanged State{shellPid} currentShellPid = shellPid /= currentShellPid
-
--- | Search from specified directory upwards until env config is found.
-findEnvFile
-    :: String
-    -- ^ Env config file name, see 'mkEnvFileName'.
-    -> Turtle.FilePath
-    -- ^ Directory where to start the search.  Usually current working
-    -- directory.
-    -> IO (Maybe FilePath)
-    -- ^ Returns 'Nothing' if no such file was found.
-findEnvFile envFileName' = Turtle.realpath >=> findEnvFile'
-  where
-    findEnvFile' dir
-      | dir == Turtle.root dir = pure Nothing
-      | otherwise = do
-            let envFile = dir Turtle.</> envFileName
-            fileExists <- Turtle.testfile envFile
-            if fileExists
-                then pure . Just $ Turtle.encodeString envFile
-                else findEnvFile' (Turtle.parent dir)
-
-    envFileName = Turtle.decodeString envFileName'
-
--- | By default env config file is constructed as:
---
--- > .${toolset}-${subcommand}
---
--- This can be overwritten by setting 'envFileName' in configuration file. See
--- 'mkEnvFileName' for more details.
-mkDefaultEnvFileName :: Params -> String
-mkDefaultEnvFileName Params{name, subcommand} =
-    "." <> name <> "-" <> subcommand
-
--- | Construct env config file name based on user preferences, and if those
--- aren't present then use 'mkDefaultEnvFileName' to construct it.
-mkEnvFileName :: Params -> Config -> String
-mkEnvFileName params Config{envFileName = mkConfigEnvFileName'} =
-    fromMaybe (mkDefaultEnvFileName params) (mkConfigEnvFileName params)
-  where
-    mkConfigEnvFileName :: Params -> Maybe String
-    mkConfigEnvFileName Params{name, subcommand} =
-        mkConfigEnvFileName' <&> \f ->
-            Text.unpack $ f (fromString name) (fromString subcommand)
-
-mkPreferencesFilePath :: Params -> IO FilePath
-mkPreferencesFilePath Params{name, subcommand}  =
-    getXdgDirectory XdgCache (cmdDir </> "preferences.dhall")
-  where
-    cmdDir = name <> "-" <> subcommand
 
 enterEnv
     :: Text
@@ -553,7 +469,7 @@ printMsg Params{colour, verbosity} messageType
   | otherwise           = const (pure ())
   where
     printMsg' msg =
-        withFile "/dev/tty" WriteMode $ \h -> do
+        withTerminal $ \h -> do
             withColours h $ Text.hPutStr h (formatMsg msg)
             hPutStrLn h ""
 
@@ -586,6 +502,3 @@ messageColour = \case
   where
     vividColor c =
         [AnsiTerminal.SetColor AnsiTerminal.Foreground AnsiTerminal.Vivid c]
-
-gshow :: (IsString s, Show a) => a -> s
-gshow = fromString . show
