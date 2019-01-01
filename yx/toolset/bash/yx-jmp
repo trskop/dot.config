@@ -9,15 +9,25 @@ function printHelp() {
     local -r commandHelp="${COMMAND_WRAPPER_NAME} help ${COMMAND_WRAPPER_SUBCOMMAND}"
 
     cat <<EOF
-Find GHC error messages in Tmux scrollback buffer and edit selected one in an
-editor.
+Let user select a relevant file to edit based on various sorces.  By default it
+looks for GHC error messages in Tmux scrollback buffer and lists files where
+they were encountered.
 
 Usage:
 
-  ${command} [--help|-h]
+  ${command} [--tmux|-t]
+  ${command} {--git-status|-g}
+  ${command} {--help|-h}
   ${commandHelp}
 
 Options:
+
+  -t, --tmux (DEFAULT)
+    Look for GHC error messages in Tmux scrollback buffer.  This is the default
+    mode, when no options are specified.
+
+  -g, --git-status
+    Use 'git status' command as a source instead of scrollback buffer.
 
   -h, --help
     Print short help message and exit.  Same as: ${commandHelp}
@@ -62,13 +72,25 @@ EOF
 function main() {
     dieIfExecutedOutsideOfCommandWrapperEnvironment
 
+    # Should we switch operation mode to using 'git status' as a source?
+    #
+    # 0 -- No, use Tmux scrollback buffer.
+    # 1 -- Yes, use 'git status'.
+    local doGitStatus=0
+
     local arg
     while (( $# )); do
         arg="$1"; shift
         case "${arg}" in
-            -h|--help)
+            --help|-h)
                 printHelp
                 exit 0
+                ;;
+            --tmux|-t)
+                doGitStatus=0
+                ;;
+            --git-status|-g)
+                doGitStatus=1
                 ;;
             -*)
                 die 1 "'%s': Unknown option." "${arg}"
@@ -79,13 +101,38 @@ function main() {
         esac
     done
 
-    if [[ -z "${TMUX}" || -z "${TMUX_PANE}" ]]; then
-        die 1 "Not running in a Tmux pane, see yx-jmp(1)."
-    fi
-
     if [[ ! -e "${COMMAND_WRAPPER_CONFIG}" ]]; then
         die 1 "'%s': Configuration file doesn't exist, see yx-jmp(1)." \
             "${COMMAND_WRAPPER_CONFIG}"
+    fi
+
+    if (( doGitStatus )); then
+        gitStatus
+    else
+        tmuxScrollback
+    fi
+}
+
+function gitStatus() {
+    if ! type git >/dev/null; then
+        # Status code choosen based on command-wrapper-subcommand-protocol(1)
+        # manual page section EXIT STATUS.
+        die 127 "'git': Command not found."
+    fi
+
+    eval "$(declareCfg)"
+
+    # TODO: Line number is mostly irrelevant here.  Figure a sensible default,
+    # or allow users to handle it in the configuration file.
+    git status -s \
+    | sed 's/^.. \(.*\)$/\1 +1/' \
+    | "${menuCommand[@]}" \
+    | startEditor
+}
+
+function tmuxScrollback() {
+    if [[ -z "${TMUX}" || -z "${TMUX_PANE}" ]]; then
+        die 3 "Not running in a Tmux pane, see yx-jmp(1)."
     fi
 
     eval "$(declareCfg)"

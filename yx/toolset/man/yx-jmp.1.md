@@ -5,13 +5,14 @@
 
 # NAME
 
-`yx-jmp` -- Search Tmux history for GHC error messages, and allow user to open
-it in an editor.
+`yx-jmp` -- Let user select a relevant file to edit based on various sorces.
 
 
 # USAGE
 
-yx \[GLOBAL\_OPTIONS] jmp
+yx \[GLOBAL\_OPTIONS] jmp \[\--tmux|-t]
+
+yx \[GLOBAL\_OPTIONS] jmp {\--git-status|-g}
 
 yx \[GLOBAL\_OPTIONS] jmp {\--help|-h}
 
@@ -20,18 +21,30 @@ yx \[GLOBAL\_OPTIONS] help jmp
 
 # DESCRIPTION
 
-Find GHC error messages in Tmux scrollback buffer and edit selected one in an
-editor.  At the moment it supports only GHC error format, however it shouldn't
+By default it looks for GHC error messages in Tmux scrollback buffer, and
+allows user to select one of the files where those errors were encountered for
+editing.  At the moment it supports only GHC error format, however it shouldn't
 be hard to add other formats as well.
+
+With `--git-status` option it uses `git status` command as a source instead.
 
 Reason for supporting Tmux only is that it was really easy to access its
 scrollback buffer as text.  If a terminal emulator provides similar
-functionality then this script can be adapted to support it.
+functionality then this script can be adapted to support it.  Some terminals
+support things like URL matching.  In some cases it should be possible to use
+that as well.
 
 
 # OPTIONS
 
 For documentation of *GLOBAL_OPTIONS* see `command-wrapper(1)` manual page.
+
+-t, \--tmux (DEFAULT)
+:   Look for GHC error messages in Tmux scrollback buffer.  This is the default
+    mode, when no options are specified.
+
+-g, \--git-status
+:   Use `git status` command as a source instead of scrollback buffer.
 
 -h, \--help
 :   Print short help message and exit.  Same as: `yx help jmp`.
