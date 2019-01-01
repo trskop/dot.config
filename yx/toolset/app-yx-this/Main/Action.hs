@@ -17,11 +17,14 @@ module Main.Action
 --import Control.Applicative (empty)
 import Control.Monad (when)
 import GHC.Generics (Generic)
-import qualified System.IO as IO (stdout)
+import qualified System.IO as IO (stderr, stdout)
 import System.Process (callProcess)
 
-import CommandWrapper.Environment (Params(Params, colour, verbosity))
-import CommandWrapper.Options.ColourOutput (shouldUseColours)
+import CommandWrapper.Prelude
+    ( Params(Params, colour, verbosity)
+    , shouldUseColours
+    , dieWith
+    )
 import Data.Set (Set)
 import qualified Data.Set as Set (fromList, member, null)
 import Data.Text (Text)
@@ -31,7 +34,6 @@ import Turtle hiding (die)
 import System.Directory (XdgDirectory(XdgConfig), getXdgDirectory)
 
 import Main.Config.App (Config(..), Defaults(..), UpdateWhat(..))
-import Main.Message (dieWith)
 
 
 -- {{{ Update Action ----------------------------------------------------------
@@ -132,7 +134,7 @@ data EditWhat
 
 editAction :: Params -> Config -> EditWhat -> IO ()
 editAction params _ _ =
-    dieWith params 126 "'--edit': TODO: Implement me!"
+    dieWith params IO.stderr 126 "'--edit': TODO: Implement me!"
 
 -- }}} Edit Action ------------------------------------------------------------
 
@@ -140,6 +142,6 @@ editAction params _ _ =
 
 defaultAction :: Params -> Config -> IO ()
 defaultAction params _ =
-    dieWith params 126 "TODO: Implement me!"
+    dieWith params IO.stderr 126 "TODO: Implement me!"
 
 -- }}} Default Action ---------------------------------------------------------

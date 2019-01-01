@@ -50,7 +50,6 @@ dependencies:
   - optparse-applicative
   - prettyprinter
   - projectroot
-  - terminfo
   - text
   - turtle
   - unix

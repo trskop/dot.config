@@ -5,12 +5,12 @@ import Control.Applicative ((<|>), many)
 import Data.Foldable (asum, for_)
 import Data.Monoid (Endo(..), mempty)
 import Data.String (fromString)
-import System.Exit (die)
 
-import CommandWrapper.Environment
+import CommandWrapper.Prelude
     ( Params(Params, config)
-    , askParams
-    , parseEnvIO
+    , dieWith
+    , stderr
+    , subcommandParams
     )
 import Data.Monoid.Endo.Fold (dualFoldEndo)
 import Data.Set (Set)
@@ -22,7 +22,6 @@ import qualified Turtle
 import Main.Action (EditWhat(..), updateAction, editAction, defaultAction)
 import Main.Config.App (Config, UpdateWhat(..))
 import qualified Main.Config.App as Config (read, writeDef)
-import Main.Message (dieWith)
 
 
 -- TODO:
@@ -68,7 +67,7 @@ import Main.Message (dieWith)
 
 main :: IO ()
 main = do
-    params <- getEnvironment
+    params <- subcommandParams
     runAppWith parseOptions (readConfig params) applyDefaults $ \case
         Update what (Just config) ->
             updateAction params config what
@@ -79,7 +78,7 @@ main = do
         CreateDefaultConfig possiblyConfig -> do
             for_ possiblyConfig $ \_ ->
                 let Params{config} = params
-                in dieWith params 1
+                in dieWith params stderr 1
                     ( fromString (show config) <> ": Configuration file\
                     \ already exists, refusing to overwrite it."
                     )
@@ -91,14 +90,11 @@ main = do
 
         _ ->
             let Params{config} = params
-            in dieWith params 1
+            in dieWith params stderr 1
                 ( fromString (show config) <> ": Configuration file is missing\
                 \, you can use '--default-config' to generate initial value."
                 )
   where
-
-getEnvironment :: IO Params
-getEnvironment = parseEnvIO (die . show) askParams
 
 readConfig :: Params -> mode a -> IO (Either String (Endo (Maybe Config)))
 readConfig params _ = Right . Endo . const <$> Config.read params

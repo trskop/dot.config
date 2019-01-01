@@ -32,14 +32,13 @@ import System.IO
     , withFile
     )
 
-import CommandWrapper.Environment
+import CommandWrapper.Prelude
     ( Params(Params, colour, config, name, subcommand, verbosity)
-    , askParams
-    , parseEnvIO
+    , subcommandParams
+    , shouldUseColours
     )
 import Data.HashMap.Strict (HashMap)
 import qualified Data.HashMap.Strict as HashMap (fromList, lookup)
-import Data.Output.Colour (useColoursWhen, terminalSupportsColours)
 import Data.Text (Text)
 import qualified Data.Text as Text (unpack)
 import qualified Data.Text.IO as Text (hPutStr, putStr, writeFile)
@@ -55,7 +54,6 @@ import qualified System.Console.ANSI as AnsiTerminal
     , SGR(Reset, SetColor)
     , setSGRCode
     )
-import System.Console.Terminfo (setupTermFromEnv)
 import System.Directory (XdgDirectory(XdgCache), getXdgDirectory)
 import System.FilePath ((</>), takeDirectory)
 import qualified Turtle
@@ -86,7 +84,7 @@ import Main.State (File(..), State(..), emptyState, readState, writeState)
 
 main :: IO ()
 main = do
-    params@Params{config = configFile} <- getEnvironment
+    params@Params{config = configFile} <- subcommandParams
     config <- readConfig (dieMissingConfig params) configFile
     mode <- parseOptions config
     env params mode
@@ -96,9 +94,6 @@ dieMissingConfig params fp = do
     printMsg params Error
         $ "Missing configuration file " <> gshow fp
     exitFailure
-
-getEnvironment :: IO Params
-getEnvironment = parseEnvIO (die . show) askParams
 
 data Mode a
     -- TODO: Command to show preferences.
@@ -534,7 +529,7 @@ shouldPrintMessage verbosity = (verbosity >=) . \case
     Error -> Normal
 
 printMsg :: Params -> MessageType -> Text -> IO ()
-printMsg params@Params{verbosity} messageType
+printMsg Params{colour, verbosity} messageType
   | shouldPrintMessage' = printMsg'
   | otherwise           = const (pure ())
   where
@@ -553,14 +548,14 @@ printMsg params@Params{verbosity} messageType
       = msg
 
     withColours h m = do
-        useColours' <- useColours params
+        useColours <- shouldUseColours h colour
 
-        when useColours'
+        when useColours
             . hPutStr h $ AnsiTerminal.setSGRCode (messageColour messageType)
 
         () <- m
 
-        when useColours'
+        when useColours
             . hPutStr h $ AnsiTerminal.setSGRCode [AnsiTerminal.Reset]
 
 messageColour :: MessageType -> [AnsiTerminal.SGR]
@@ -572,12 +567,6 @@ messageColour = \case
   where
     vividColor c =
         [AnsiTerminal.SetColor AnsiTerminal.Foreground AnsiTerminal.Vivid c]
-
-useColours :: Params -> IO Bool
-useColours Params{colour} =
-    -- TODO: This is very naive. We need to make sure that the handle that we
-    -- are writting into is attached to a terminal.
-    useColoursWhen (terminalSupportsColours <$> setupTermFromEnv) colour
 
 gshow :: (IsString s, Show a) => a -> s
 gshow = fromString . show
