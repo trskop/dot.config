@@ -70,7 +70,7 @@ thisGitRepo directory ThisGitRepo{} = do
 
     if null @[] @Char status
         then do
-            Stdout hash <- cmd "git -C" [directory] "show-ref -s origin/HEAD"
+            Stdout hash <- cmd "git -C" [directory] "show-ref -s heads/master"
             pure hash
         else
             ("Workspace dirty " <>) . show <$> liftIO getCurrentTime
