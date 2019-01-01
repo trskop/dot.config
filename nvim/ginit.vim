@@ -1,1 +1,1 @@
-Guifont DejaVu Sans Mono for Powerline:h14
+:set guifont=DejaVu\ Sans\ Mono\ for\ Powerline:h14
