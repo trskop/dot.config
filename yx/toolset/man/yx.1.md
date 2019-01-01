@@ -68,8 +68,8 @@ Yx toolset comes with number of its own external subcommands:
 
 # EXIT STATUS
 
-For documentation of *EXIT STATUS* see `command-wrapper(1)` manual page section
-*EXIT STATUS*.
+For documentation of *EXIT STATUS* codes see `command-wrapper(1)` manual page
+section *EXIT STATUS*.
 
 
 # FILES AND DIRECTORIES

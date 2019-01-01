@@ -485,6 +485,8 @@ writeStateFile stateEnvVar params state =
 -- random string regenerated each time this function is called.
 withStateFile :: Params -> (FilePath -> Handle -> IO a) -> IO a
 withStateFile Params{name, subcommand} action = do
+    -- TODO: We should store this in "$XDG_RUNTIME_DIR" instead.
+    -- <https://serverfault.com/questions/388840/good-default-for-xdg-runtime-dir>
     cacheDir <- getXdgDirectory XdgCache (name <> "-" <> subcommand)
 
     -- There is no requirement for the cache directory to already exist.
