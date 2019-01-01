@@ -58,21 +58,33 @@ data Paths = Paths
     , editor :: Text
     , ssh :: Ssh
 
+    , tmpDir :: Maybe Text
+    -- ^ Environment variable set by e.g.
+    -- [pam_mktemp](https://www.openwall.com/pam/) it has similar capabilities
+    -- as are requred from @$XDG_RUNTIME_DIR@.
+
 -- TODO:
 --  , pager :: Text
     }
   deriving stock (Generic, Show)
   deriving anyclass (Dhall.Inject)
 
+-- | [XDG Base Directory Specification](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html)
 data Xdg = Xdg
     { userDirs :: XdgUserDirs
     , configDir :: Text
     , cacheDir :: Text
     , dataDir :: Text
+    , runtimeDir :: Maybe Text
+    -- ^ Value of @$XDG_RUNTIME_DIR@, if present, otherwise 'Nothing'.  There
+    -- is no fallback defined by the specification.
     }
   deriving stock (Generic, Show)
   deriving anyclass (Dhall.Inject)
 
+-- | XDG User Directories as reported by
+-- [`xdg-user-dir`](https://www.freedesktop.org/wiki/Software/xdg-user-dirs/)
+-- tool.
 data XdgUserDirs = XdgUserDirs
     { desktop :: Text
     , download :: Text
@@ -129,13 +141,14 @@ mk Params{name, exePath} = do
     cacheDir <- fromString <$> getXdgDirectory XdgCache ""
     configDir <- fromString <$> getXdgDirectory XdgConfig ""
     dataDir <- fromString <$> getXdgDirectory XdgData ""
+    runtimeDir <- fmap fromString <$> lookupEnv "XDG_RUNTIME_DIR"
 
     toolset <- Toolset
         <$> (fromString <$> getXdgDirectory XdgConfig name)
         <*> (fromString <$> getXdgDirectory XdgConfig (name </> "default.dhall"))
     commandWrapper <- CommandWrapper
         <$> (fromString <$> getXdgDirectory XdgConfig "command-wrapper")
-        <*>  (fromString <$> getXdgDirectory XdgConfig ("command-wrapper" </> "default.dhall"))
+        <*> (fromString <$> getXdgDirectory XdgConfig ("command-wrapper" </> "default.dhall"))
         <*> pure (fromString exePath)
         <*> pure toolset
 
@@ -199,11 +212,14 @@ mk Params{name, exePath} = do
                 fromString . (sshConfigDir </>) <$> identities
             }
 
+    tmpDir <- fmap fromString <$> lookupEnv "TMPDIR"
+
     pure Paths
         { xdg = Xdg
             { configDir
             , cacheDir
             , dataDir
+            , runtimeDir
             , userDirs = XdgUserDirs
                 { desktop
                 , download
@@ -219,6 +235,7 @@ mk Params{name, exePath} = do
         , commandWrapper
         , editor
         , ssh
+        , tmpDir
         }
 
 execXdgUserDir :: IsString s => XdgUserDir -> IO s

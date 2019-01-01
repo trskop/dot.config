@@ -103,6 +103,8 @@ peter@machine ~ $ yx path --type data.paths.xdg
     Text
 , dataDir :
     Text
+, runtimeDir :
+    Optional Text
 , userDirs :
     { desktop :
         Text
