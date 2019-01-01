@@ -7,7 +7,7 @@ license: BSD3
 license-file: LICENSE
 author: Peter Trško
 maintainer: peter.trsko@gmail.com
-copyright: (c) 2018 Peter Trško
+copyright: (c) 2018, 2019 Peter Trško
 category: Tools
 
 extra-source-files:
@@ -15,6 +15,7 @@ extra-source-files:
   - dhall/*.dhall
 
 default-extensions:
+  - DeriveFunctor
   - DeriveAnyClass
   - DeriveGeneric
   - DerivingStrategies
@@ -45,10 +46,9 @@ dependencies:
   - executable-path
   - filepath
   - generic-lens
-  - host-and-port
-  - mainplate
   - mtl
   - optparse-applicative
+  - prettyprinter
   - projectroot
   - terminfo
   - text
@@ -58,6 +58,8 @@ dependencies:
   - verbosity >=0.3
 
   - command-wrapper
+  - host-and-port
+  - mainplate
 
 ghc-options: -Wall
 
@@ -68,18 +70,19 @@ executables:
     dependencies:
       - Diff
       - ansi-terminal
+
       - genbashrc
-      - prettyprinter
 
   yx-path:
     source-dirs: app-yx-path
     main: Main.hs
     dependencies:
-      - prettyprinter
-      - process
       - lens
+      - process
 
   yx-this:
     source-dirs: app-yx-this
     main: Main.hs
-    dependencies: []
+    dependencies:
+      - containers
+      - process

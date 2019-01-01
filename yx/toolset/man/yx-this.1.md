@@ -1,16 +1,22 @@
 % YX-THIS(1) YX Toolset 0.1.0 | YX Toolset
 % Peter Trsko
-% 27th December 2018
+% 1st January 2019
 
 
 # NAME
 
-`yx-this` -- **TODO**
+`yx-this` -- Simplify system management and common system operations.
 
 
 # USAGE
 
-yx \[GLOBAL\_OPTIONS] this \[OPTIONS]
+yx \[GLOBAL\_OPTIONS] this
+
+yx \[GLOBAL\_OPTIONS] this {\--update|-U} \[\--system|-s] \[\--install|-i] \[\--user|-u]
+
+yx \[GLOBAL\_OPTIONS] this {\--edit|-e}
+
+yx \[GLOBAL\_OPTIONS] this {\--default-config}
 
 yx \[GLOBAL\_OPTIONS] this {\--help|-h}
 
@@ -19,12 +25,45 @@ yx \[GLOBAL\_OPTIONS] help this
 
 # DESCRIPTION
 
-**TODO**
+This subcommand started as a huge set of Bash scripts that simplified system
+management.  Most important feature was a configuration that contained a list
+of packages that were installed.  These packages were annotated with a lot of
+information, and especially reason why they were installed.
+
+**TODO: At the moment only bare minimum of functionality was translated into this
+subcommand.**
 
 
 # OPTIONS
 
 For documentation of *GLOBAL_OPTIONS* see `command-wrapper(1)` manual page.
+
+-U, \--update
+:   Update system and user's tools.  What is updated can be restricted by
+    specifying additional options:
+
+    -s, --system
+    :   Update/upgrade system.
+
+    -u, --user
+    :   Update only user tools, environment and configuration.
+
+    -i, --install
+    :   Install packages based on what is present in configuration file.
+
+    We can consisder the default value to be as if we specified all options
+    `--system --user --install`, however, that can be overriden in the
+    configuration file.  See *FILES AND DIRECTORIES* section for more
+    information on configuration file.
+
+-e, \--edit
+:   Edit configuration file using user's preferred editor.
+    **TODO: Currently not implemented**
+
+\--default-config
+:   Generate default configuration file, if it doesn't exist, otherwise it
+    refuses to do so.  See *FIlES AND DIRECTORIES* section for more details
+    about configuration file.
 
 -h, \--help
 :   Print short help message and exit.  Same as: `yx help this`.
@@ -32,7 +71,9 @@ For documentation of *GLOBAL_OPTIONS* see `command-wrapper(1)` manual page.
 
 # EXIT STATUS
 
-TODO
+For documentation of generic *EXIT STATUS* codes see `command-wrapper(1)`
+manual page section *EXIT STATUS*.  Any *EXIT STATUS* codes specific to this
+subcommand will be listed below.
 
 
 # FILES

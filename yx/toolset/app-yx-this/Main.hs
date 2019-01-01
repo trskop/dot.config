@@ -1,41 +1,148 @@
 module Main (main)
   where
 
-import Control.Applicative ((<|>))
-import Data.Functor (void)
-import GHC.Generics (Generic)
+import Control.Applicative ((<|>), many)
+import Data.Foldable (asum, for_)
+import Data.Monoid (Endo(..), mempty)
+import Data.String (fromString)
 import System.Exit (die)
 
-import qualified Dhall
-import qualified Turtle
 import CommandWrapper.Environment
     ( Params(Params, config)
     , askParams
     , parseEnvIO
     )
+import Data.Monoid.Endo.Fold (dualFoldEndo)
+import Data.Set (Set)
+import qualified Data.Set as Set (empty, insert)
+import Mainplate (applySimpleDefaults, runAppWith)
+import qualified Options.Applicative as Options
+import qualified Turtle
 
+import Main.Action (EditWhat(..), updateAction, editAction, defaultAction)
+import Main.Config.App (Config, UpdateWhat(..))
+import qualified Main.Config.App as Config (read, writeDef)
+import Main.Message (dieWith)
 
-data Config = Config
-  deriving (Generic, Show)
-
-instance Dhall.Interpret Config
-
-data Mode = Mode
-  deriving (Generic, Show)
 
 main :: IO ()
 main = do
-    params@Params{config = configFile} <- getEnvironment
-    mode <- Turtle.options "TODO: Describe me!" parseOptions
-    config <- Dhall.inputFile Dhall.auto configFile
-    realMain params config mode
+    params <- getEnvironment
+    runAppWith parseOptions (readConfig params) applyDefaults $ \case
+        Update what (Just config) ->
+            updateAction params config what
+
+        Edit what (Just config) ->
+            editAction params config what
+
+        CreateDefaultConfig possiblyConfig -> do
+            for_ possiblyConfig $ \_ ->
+                let Params{config} = params
+                in dieWith params 1
+                    ( fromString (show config) <> ": Configuration file\
+                    \ already exists, refusing to overwrite it."
+                    )
+
+            Config.writeDef params
+
+        Default (Just config) ->
+            defaultAction params config
+
+        _ ->
+            let Params{config} = params
+            in dieWith params 1
+                ( fromString (show config) <> ": Configuration file is missing\
+                \, you can use '--default-config' to generate initial value."
+                )
+  where
 
 getEnvironment :: IO Params
 getEnvironment = parseEnvIO (die . show) askParams
 
-parseOptions :: Turtle.Parser Mode
-parseOptions = pure Mode
+readConfig :: Params -> mode a -> IO (Either String (Endo (Maybe Config)))
+readConfig params _ = Right . Endo . const <$> Config.read params
 
-realMain :: Params -> Config -> Mode -> IO ()
-realMain _params _config = \case
-    Mode -> die "Error: TODO: Implement me!"
+data Mode config
+    = Update (Set UpdateWhat) config
+    | Edit EditWhat config
+    | CreateDefaultConfig config
+    | Default config
+  deriving stock (Functor, Show)
+
+switchMode :: (forall x. x -> Mode x) -> Endo (Mode config)
+switchMode f = Endo $ \case
+    Update _ config -> f config
+    Edit _ config -> f config
+    CreateDefaultConfig config -> f config
+    Default config -> f config
+
+switchMode1 :: (forall x. a -> x -> Mode x) -> a -> Endo (Mode config)
+switchMode1 f a = switchMode (f a)
+
+applyDefaults :: Endo (Mode (Maybe Config)) -> IO (Mode (Maybe Config))
+applyDefaults = applySimpleDefaults (Default Nothing)
+
+parseOptions :: IO (Endo (Mode config))
+parseOptions = Turtle.options "TODO: Describe me!" options
+
+options :: Options.Parser (Endo (Mode config))
+options = asum
+    [ dualFoldEndo
+        <$> updateFlag
+        <*> many
+            ( systemFlag
+            <|> installFlag
+            <|> userFlag
+            )
+
+    , editFlag
+    , defaultConfigFlag
+
+    , pure mempty
+    ]
+
+updateFlag :: Options.Parser (Endo (Mode config))
+updateFlag = Options.flag' (switchMode1 Update Set.empty) $ mconcat
+    [ Options.short 'U'
+    , Options.long "update"
+    , Options.help "Update"
+    ]
+
+systemFlag :: Options.Parser (Endo (Mode config))
+systemFlag = Options.flag' (addUpdateWhat UpdateSystem) $ mconcat
+    [ Options.short 's'
+    , Options.long "system"
+    , Options.help "Update system"
+    ]
+
+installFlag :: Options.Parser (Endo (Mode config))
+installFlag = Options.flag' (addUpdateWhat InstallPackages) $ mconcat
+    [ Options.short 'i'
+    , Options.long "install"
+    , Options.help "Install packages"
+    ]
+
+userFlag :: Options.Parser (Endo (Mode config))
+userFlag = Options.flag' (addUpdateWhat UpdateUserEnvironment) $ mconcat
+    [ Options.short 'u'
+    , Options.long "user"
+    , Options.help "Update user environment"
+    ]
+
+addUpdateWhat :: UpdateWhat -> Endo (Mode config)
+addUpdateWhat w = Endo $ \case
+    Update what config -> Update (Set.insert w what) config
+    mode -> mode
+
+editFlag :: Options.Parser (Endo (Mode config))
+editFlag = Options.flag' (switchMode1 Edit ThisConfigFile) $ mconcat
+    [ Options.short 'e'
+    , Options.long "edit"
+    , Options.help "Edit"
+    ]
+
+defaultConfigFlag :: Options.Parser (Endo (Mode config))
+defaultConfigFlag = Options.flag' (switchMode CreateDefaultConfig) $ mconcat
+    [ Options.long "default-config"
+    , Options.help "Create initial configuration file if it doesn't exist"
+    ]
