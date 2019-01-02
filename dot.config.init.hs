@@ -423,8 +423,18 @@ nixRules params@NixParams{cacheDir} = do
         Stdout installerSig <- cmd "curl" [installerSigUrl]
         writeFile' (out <.> "sig") installerSig
 
-        cmd_ "gpg --recv-keys" [signingKeyFingerprint]
-        cmd_ "gpg --verify" [out <.> "sig"]
+        Stdout distro <- cmd "lsb_release --short --id"
+        case distro of
+            "Ubuntu" -> do
+                cmd_ "gpg2 --recv-keys --keyserver hkp://keyserver.ubuntu.com" [signingKeyFingerprint]
+                cmd_ "gpg2 --verify" [out <.> "sig"]
+
+            "Debian" -> do
+                cmd_ "gpg --recv-keys" [signingKeyFingerprint]
+                cmd_ "gpg --verify" [out <.> "sig"]
+
+            _ ->
+                error (show distro <> ": Distribution not supported!")
 
     mkNixTarget params %> \out -> do
         need [installerSh]
