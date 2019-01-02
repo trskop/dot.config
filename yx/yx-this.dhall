@@ -32,7 +32,10 @@ in  { bootstrapPackages =
     , packages =
         -- Be aware of possible issues on Debian, especially useful when
         -- running on testing/unstable.
-        [ "apt-listbugs", "apt-listchanges"
+        --
+        -- Package "apt-listbugs" had to be moved into included packages, since
+        -- it's not available on Ubuntu.
+        [ "apt-listchanges"
 
         -- Use more advanced fallback editor.
         , "vim-nox", "vim-doc"
