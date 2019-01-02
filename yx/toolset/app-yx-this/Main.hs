@@ -32,14 +32,17 @@ import qualified Main.Config.App as Config (read, writeDef)
 -- - `--edit` [--fzf] [CONFIG_SELECTOR] -- Fast way to open a configuration
 --   file in editor.  For some of them it understood that there is a need to
 --   run an action.  Woid it make sense to make this into a separate
---   subcommand?  However, if those action hooks should be working then it will
---   need to call this one as well.
+--   subcommand?  Maybe merge with with `yx jmp`?  However, if those action
+--   hooks should be working then it will need to call this one as well.  BTW,
+--   CTRL+e is not binded in current Bash setup.
 --
 -- - Management of `apt/sources.list` and extra package repositories.
 --
 -- - Generate SSH key, store it in a password DB allong with randomly generated
 --   password that was used to encrypt it.  Would it make sense to make this a
 --   separate subcommand?
+--
+-- - Set alternatives (`update-alternatives`) on Debian/Ubuntu.
 --
 -- Features that weren't finished but would be nice to have them:
 --
@@ -58,6 +61,14 @@ import qualified Main.Config.App as Config (read, writeDef)
 --
 --     This was partially implemented during first attempt at a rewrite into
 --     Haskell.
+--
+-- - Hint system.  If there is a file/directory/command missing that it is not
+--   able to create/install then it will produce a "hint message" where it
+--   describes how to create/install it.  E.g. missing identity file for a
+--   specific purpose.
+--
+-- - Allow Debian and Ubuntu coexist in top-level configuration file.  Instead
+--   of package list we could use a function that produces it based on OS info.
 --
 -- Things that would be interesting to consider:
 --
@@ -94,7 +105,6 @@ main = do
                 ( fromString (show config) <> ": Configuration file is missing\
                 \, you can use '--default-config' to generate initial value."
                 )
-  where
 
 readConfig :: Params -> mode a -> IO (Either String (Endo (Maybe Config)))
 readConfig params _ = Right . Endo . const <$> Config.read params
