@@ -1,6 +1,6 @@
 #!/usr/bin/env stack
 {- stack script
-    --resolver lts-12.20
+    --resolver lts-13.1
     --package directory
     --package executable-path
     --package shake
@@ -198,6 +198,16 @@ install Directories{..} opts = shakeArgs opts $ do
         , nixTarget
         ]
 
+    -- TODO: Refactor so that "~/.ghc" is actually a symbolic link to:
+    --
+    --     ${XDG_CACHE_HOME:-${HOME}/.cache}/ghc
+    --
+    -- Path `~/.ghc/ghci.conf` should still be symbolic link to:
+    --
+    --     ${XDG_CONFIG_HOME:-${HOME}/.config}/ghc/ghci.conf
+    --
+    -- This way we will separate configuration from `ghci_history` and package
+    -- databases.
     (home </> ".ghc/ghci.conf") %> \out -> do
         let src = srcDir </> "ghc"
             dst = (takeDirectory out)
@@ -423,7 +433,8 @@ nixRules params@NixParams{cacheDir} = do
         Stdout installerSig <- cmd "curl" [installerSigUrl]
         writeFile' (out <.> "sig") installerSig
 
-        Stdout distro <- cmd "lsb_release --short --id"
+        Stdout distro' <- cmd "lsb_release --short --id"
+        let distro = takeWhile (/= '\n') distro'
         case distro of
             "Ubuntu" -> do
                 cmd_ "gpg2 --recv-keys --keyserver hkp://keyserver.ubuntu.com" [signingKeyFingerprint]
