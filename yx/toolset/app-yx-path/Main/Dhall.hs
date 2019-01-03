@@ -66,7 +66,7 @@ import Main.Paths (Paths)
 
 data Output = Plain | DhallExpression | DhallType
 
-data Options = Options
+newtype Options = Options
     { output :: Output
     }
 

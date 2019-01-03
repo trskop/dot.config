@@ -281,7 +281,7 @@ env params@Params{name, subcommand} = \case
             maybe (pure Nothing) (\fp -> fmap (fp, ) <$> readEnvConfig fp)
                 envFile
 
-        let possiblyEnvFile = do
+        let possiblyEnvFile =
                 possiblyParsedConfig <&> \(file, (hash, _)) -> File
                     { file = fromString file
                     , hash
@@ -332,7 +332,7 @@ env params@Params{name, subcommand} = \case
             Lazy.Text.putStr (Bash.unsetState stateEnvVar)
             Turtle.rm (Turtle.fromText stateFile)
 
-    SetEnvConfigStatus status dir config -> do
+    SetEnvConfigStatus status dir config ->
         setEnvConfigStatusAction params config status dir
 
     Dump file config ->
