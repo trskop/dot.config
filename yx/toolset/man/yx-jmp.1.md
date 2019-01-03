@@ -1,6 +1,6 @@
 % YX-JMP(1) YX Toolset 0.1.0 | YX Toolset
 % Peter Trsko
-% 31st December 2018
+% 3rd January 2019
 
 
 # NAME
@@ -14,6 +14,8 @@ yx \[GLOBAL\_OPTIONS] jmp \[\--tmux|-t]
 
 yx \[GLOBAL\_OPTIONS] jmp {\--git-status|-g}
 
+yx \[GLOBAL\_OPTIONS] jmp {\--git-commit|-G} \[COMMIT]
+
 yx \[GLOBAL\_OPTIONS] jmp {\--help|-h}
 
 yx \[GLOBAL\_OPTIONS] help jmp
@@ -26,7 +28,8 @@ allows user to select one of the files where those errors were encountered for
 editing.  At the moment it supports only GHC error format, however it shouldn't
 be hard to add other formats as well.
 
-With `--git-status` option it uses `git status` command as a source instead.
+With `--git-status` or `--git-commit` option it uses Git repository as a source
+instead.  See documentation of individual options for details.
 
 Reason for supporting Tmux only is that it was really easy to access its
 scrollback buffer as text.  If a terminal emulator provides similar
@@ -39,14 +42,21 @@ that as well.
 
 For documentation of *GLOBAL_OPTIONS* see `command-wrapper(1)` manual page.
 
--t, \--tmux (DEFAULT)
-:   Look for GHC error messages in Tmux scrollback buffer.  This is the default
-    mode, when no options are specified.
+\--tmux, -t
+:   (DEFAULT) Look for GHC error messages in Tmux scrollback buffer.  This is
+    the default mode, when no options are specified.
 
--g, \--git-status
-:   Use `git status` command as a source instead of scrollback buffer.
+\--git-status, -g
+:   Use `git status` command as a source instead of scrollback buffer.  This is
+    Useful if you are working on set of files that weren't yet commited.
 
--h, \--help
+\--git-commit [COMMIT], -G [COMMIT]
+:   Use list of files changed as part of a COMMIT as a source instead of Tmux
+    scrollback buffer.  Defaults to 'HEAD' if COMMIT is not specified.
+    Especially useful if you like to have a set of WIP (work in progres)
+    commits.
+
+\--help, -h
 :   Print short help message and exit.  Same as: `yx help jmp`.
 
 
