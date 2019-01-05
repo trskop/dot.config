@@ -99,3 +99,6 @@ parseOptions = Turtle.options "Paths"
 -- - Having 'projectRoot' entry is nice, but there are other information that
 --   would be useful to have.  Like what VCS is used, what build system it
 --   uses, etc.
+--
+-- - In case of `--plain` we may want to be able to provide delimiter.
+--   Especially for cases when we are returning lists.

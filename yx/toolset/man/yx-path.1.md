@@ -38,9 +38,15 @@ For documentation of *GLOBAL_OPTIONS* see `command-wrapper(1)` manual page.
 :   Print short help message and exit.  Same as: `yx help path`.
 
 *EXPRESSION*
-:   Dhall expression that has access to `data` record, `Paths` and `Config`
-    types.  If *EXPRESSION* is not supplied then identity function is assumed,
-    i.e. value of `data` is returned.
+:   Dhall expression that has access to `paths : Paths` and `config : Config`
+    records.  If *EXPRESSION* is not supplied then record of following type is
+    returned:
+
+    ```
+    { paths : Paths
+    , config : Config
+    }
+    ```
 
 
 # EXIT STATUS
@@ -96,7 +102,7 @@ mentioned there applies to this subcommand as well.
 # EXAMPLES
 
 ```
-peter@machine ~ $ yx path --type data.paths.xdg
+peter@machine ~ $ yx path --type paths.xdg
 { cacheDir :
     Text
 , configDir :
@@ -127,8 +133,21 @@ peter@machine ~ $ yx path --type data.paths.xdg
 ```
 
 ```
-peter@machine ~ $ yx path --plain data.paths.xdg.cacheDir
+peter@machine ~ $ yx path --plain paths.xdg.cacheDir
 /home/peter/.cache
+```
+
+Using in Bash scripts:
+
+```
+declare -r downloadDir="$(yx path --plain paths.xdg.userDirs.download)"
+```
+
+List can be declared using:
+
+```
+declare -a sshIdentities=()
+mapfile sshIdentities <(yx path --plain paths.ssh.identities)
 ```
 
 

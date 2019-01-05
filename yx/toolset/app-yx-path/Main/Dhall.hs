@@ -19,6 +19,7 @@ module Main.Dhall
 import Control.Exception (Exception, throwIO)
 import Data.Foldable (asum, traverse_)
 import Data.Functor ((<&>))
+import Data.List.NonEmpty (NonEmpty((:|)))
 import Data.String (fromString)
 import Data.Maybe (fromMaybe)
 import Data.Traversable (for)
@@ -42,7 +43,6 @@ import qualified Dhall.Core as Dhall
         ( Annot
         , App
         , Integer
-        , Lam
         , Let
         , List
         , Natural
@@ -239,32 +239,42 @@ mkExpressionAndTypeCheck possiblyResultType bodyExpression configExpression path
 
     mkExpression configExpressionType =
         Dhall.Let
-            ( pure Dhall.Binding
+            ( Dhall.Binding
                 { Dhall.variable = "Paths"
                 , Dhall.annotation = Nothing
                 , Dhall.value = declared
                 }
-            )
-            ( Dhall.Let
-                ( pure Dhall.Binding
+            :|  [ Dhall.Binding
                     { Dhall.variable = "Config"
                     , Dhall.annotation = Nothing
                     , Dhall.value = configExpressionType
                     }
-                )
-                ( Dhall.Lam "data"
-                    ( recordType
-                        [ ("paths", declared)
-                        , ("config", configExpressionType)
+                , Dhall.Binding
+                    { Dhall.variable = "config"
+                    , Dhall.annotation = Just configExpressionType
+                    , Dhall.value = configExpression
+                    }
+                , Dhall.Binding
+                    { Dhall.variable = "paths"
+                    , Dhall.annotation = Just declared
+                    , Dhall.value = embed paths
+                    }
+                , Dhall.Binding
+                    { Dhall.variable = "data"
+                    , Dhall.annotation = Just
+                        ( recordType
+                            [ ("paths", declared)
+                            , ("config", configExpressionType)
+                            ]
+                        )
+                    , Dhall.value = record
+                        [ ("paths", embed paths)
+                        , ("config", configExpression)
                         ]
-                    )
-                    bodyExpression'
-                )
+                    }
+                ]
             )
-        `Dhall.App` record
-            [ ("paths", embed paths)
-            , ("config", configExpression)
-            ]
+            bodyExpression'
 
 throwLeft :: Exception e => Either e r -> IO r
 throwLeft = either throwIO pure
