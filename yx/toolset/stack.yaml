@@ -1,7 +1,7 @@
 # For advanced use and comprehensive documentation of the format, please see:
 # https://docs.haskellstack.org/en/stable/yaml_configuration/
 
-resolver: lts-13.0
+resolver: lts-13.1
 
 packages:
   - '.'
@@ -19,7 +19,7 @@ packages:
     extra-dep: True
   - location:
       git: https://github.com/trskop/command-wrapper.git
-      commit: 86174d1fc7945b201615c8699c43e8caca340928
+      commit: 130d11a8760d34c0671ef35837fa710317b72ac0
     extra-dep: True
   - location:
       git: https://github.com/trskop/genbashrc.git
