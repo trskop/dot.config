@@ -209,4 +209,5 @@ mkPreferencesFilePath Params{name, subcommand}  =
 
 gshow :: (IsString s, Show a) => a -> s
 gshow = fromString . show
+
 -- }}} Utilities --------------------------------------------------------------

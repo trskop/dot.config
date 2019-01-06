@@ -37,7 +37,7 @@ import qualified Dhall
     , Type(expected, extract)
     , auto
     )
-import qualified Dhall.Binary as Dhall (StandardVersion(V_4_0_0))
+import qualified Dhall.Binary as Dhall (StandardVersion(V_5_0_0))
 import qualified Dhall.Core as Dhall
     ( Binding
         ( Binding
@@ -122,7 +122,7 @@ readEnvConfig configFile = do
 
         else pure Nothing
   where
-    mkHash = fromString . show . Dhall.hashExpression Dhall.V_4_0_0
+    mkHash = fromString . show . Dhall.hashExpression Dhall.V_5_0_0
 
 parseDhallExpression :: FilePath -> Text -> IO (Dhall.Expr Dhall.Src Dhall.X)
 parseDhallExpression sourcePath = parseConfig >=> typeCheckAndNormalize
