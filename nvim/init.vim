@@ -290,7 +290,7 @@ let g:LanguageClient_selectionUI = "fzf"
 "let g:LanguageClient_selectionUI = "location-list"
 
 let g:LanguageClient_serverCommands = {
-    \ 'haskell': ['hie', '--lsp'],
+    \ 'haskell': ['hie-wrapper', '--lsp'],
     \ }
 
 nmap <silent> <leader>c <ESC>:call LanguageClient_contextMenu()<CR>

@@ -80,6 +80,11 @@ Show type info (and short doc) of identifier under cursor:
 >
 	<Leader>D
 <
+
+Language client is populating quickfix list.  To jump to an error use:
+>
+	:cc
+<
 ------------------------------------------------------------------------------
 FZF 								 *rituals-fzf*
 
