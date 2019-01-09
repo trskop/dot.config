@@ -4,7 +4,7 @@ let commandWrapper = ../lib/lib.dhall
 
 let null =
       http://prelude.dhall-lang.org/List/null
-      sha256:0c3dcbe024ab37387dc2c24854921f586f4c83c3600fbe34ae5233ea2d924783
+      sha256:1db1ef93166a95794a9d1dc1aa8ecff4aba79a4e07d1713891e008afd7938526
 
 let DockerGlobalOptions : Type = ./DockerGlobalOptions.dhall
 
