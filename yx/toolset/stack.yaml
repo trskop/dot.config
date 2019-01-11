@@ -19,7 +19,7 @@ packages:
     extra-dep: True
   - location:
       git: https://github.com/trskop/command-wrapper.git
-      commit: fbdd32f26323e5f636e224ba30525d228763c2da
+      commit: d26d3f7919716e04d3aa7a8d873c5b9e2f84e3e1
     extra-dep: True
   - location:
       git: https://github.com/trskop/genbashrc.git
