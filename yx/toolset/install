@@ -36,6 +36,7 @@ module Main (main)
   where
 
 import Control.Monad (unless)
+import Data.Foldable (forM_)
 import System.Exit (die)
 
 import Data.Time.Clock.POSIX (getCurrentTime)
@@ -66,6 +67,7 @@ thisGitRepo directory ThisGitRepo{} = do
         , "app-yx-env/"
         , "app-yx-path/"
         , "app-yx-this/"
+        , "man/"
         ]
 
     if null @[] @Char status
@@ -111,6 +113,7 @@ shakeMain Directories{..} opts = shakeArgs opts $ do
         yxEnvBin = yxLibexecDir </> "yx-env"
         yxPathBin = yxLibexecDir </> "yx-path"
         yxThisBin = yxLibexecDir </> "yx-this"
+        yxJmpScript = yxLibexecDir </> "yx-jmp"
 
         -- Standard `man` command should be able to pick this up.  Try
         -- `manpath` after installation to be sure.
@@ -122,6 +125,7 @@ shakeMain Directories{..} opts = shakeArgs opts $ do
         [ yxEnvBin
         , yxPathBin
         , yxThisBin
+        , yxJmpScript
         , man1Dir </> "yx.1.gz"
         , man1Dir </> "yx-env.1.gz"
         , man1Dir </> "yx-path.1.gz"
@@ -153,5 +157,12 @@ shakeMain Directories{..} opts = shakeArgs opts $ do
 
         cmd_ "pandoc --standalone --to=man" ["--output=" <> tempOut, src]
         cmd_ "gzip --force -9" [tempOut]
+
+    [yxJmpScript] &%> \outs ->
+        forM_ outs $ \out ->
+            cmd_ "ln -sf"
+                [ projectRoot </> "bash" </> takeFileName out
+                , takeDirectory out
+                ]
 
 -- vim:ft=haskell
