@@ -144,9 +144,6 @@ if dein#load_state('~/.cache/dein.vim')
   call dein#add('junegunn/fzf', { 'build': './install --bin', 'merged': 0 })
   call dein#add('junegunn/fzf.vim', { 'depends': 'fzf' })
 
-  " This is a fast, extensible, async completion framework for Neovim.
-  call dein#add('roxma/nvim-completion-manager')
-
   " Molokai is a Vim port of the monokai theme for TextMate originally created
   " by Wimer Hazenberg.
   call dein#add('tomasr/molokai')
