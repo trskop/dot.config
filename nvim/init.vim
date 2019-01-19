@@ -1,28 +1,27 @@
 ", {{{ Table of Contents -------------------------------------------------------
 "
 " ~/.config/nvim/init.vim
-" |-- Basics
-" |-- |-- Leader
-" |   |-- Visuals
-" |   `-- Python Provider
-" |
-" |-- Plugin
-" |   |-- Dein.vim
-" |   |-- Shougo/deoplete.vim
-" |   |-- Shougo/echodoc.vim
-" |   |-- Shougo/neosnippet.vim
-" |   |-- autozimu/LanguageClient-neovim
-" |   |-- junegunn/fzf.vim
-" |   |-- tomasr/molokai
-" |   |-- neovimhaskell/haskell-vim
-" |   |-- vim-airline/vim-airline
-" |   |-- scrooloose/nerdtree
-" |   |-- scrooloose/nerdcommenter
-" |   |-- nathanaelkane/vim-indent-guides
-" |   |-- raichoo/purescript-vim
-" |   |-- aklt/plantuml-syntax
-" |
-" `-- Terminal
+" ├── Basics
+" │   ├── Leader
+" │   ├── Visuals
+" │   └── Python Provider
+" │
+" ├── Plugin
+" │   ├── Dein.vim
+" │   ├── Shougo/deoplete.vim
+" │   ├── Shougo/echodoc.vim
+" │   ├── Shougo/neosnippet.vim
+" │   ├── autozimu/LanguageClient-neovim
+" │   ├── junegunn/fzf.vim
+" │   ├── tomasr/molokai
+" │   ├── neovimhaskell/haskell-vim
+" │   ├── vim-airline/vim-airline
+" │   ├── scrooloose/nerdtree
+" │   ├── scrooloose/nerdcommenter
+" │   ├── nathanaelkane/vim-indent-guides
+" │   └── raichoo/purescript-vim
+" │
+" └── Terminal
 "
 " }}} Table of Contents -------------------------------------------------------
 
