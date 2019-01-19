@@ -1,47 +1,40 @@
 ''
+{-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE LambdaCase #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE ScopedTypeVariables #-}
 module Main (main)
   where
 
-import Control.Applicative ((<|>))
-import Data.Functor (void)
 import GHC.Generics (Generic)
-import System.Exit (die)
+import System.IO (stderr)
 
+import CommandWrapper.Prelude
+    ( Params(Params, config)
+    , dieWith
+    , subcommandParams
+    )
 import qualified Dhall
 import qualified Turtle
-import CommandWrapper.Environment
-    ( Params(Params, config)
-    , askParams
-    , parseEnvIO
-    )
 
 
 data Config = Config
-  deriving (Generic, Show)
-
-instance Dhall.Interpret Config
+  deriving stock (Generic, Show)
+  deriving anyclass (Dhall.Interpret)
 
 data Mode = Mode
-  deriving (Generic, Show)
+  deriving stock (Generic, Show)
 
 main :: IO ()
 main = do
-    params@Params{config = configFile} <- getEnvironment
+    params@Params{config = configFile} <- subcommandParams
     mode <- Turtle.options "TODO: Describe me!" parseOptions
     config <- Dhall.inputFile Dhall.auto configFile
     realMain params config mode
-
-getEnvironment :: IO Params
-getEnvironment = parseEnvIO (die . show) askParams
 
 parseOptions :: Turtle.Parser Mode
 parseOptions = pure Mode
 
 realMain :: Params -> Config -> Mode -> IO ()
-realMain _params _config = \case
-    Mode -> die "Error: TODO: Implement me!"
-''
+realMain params _config = \case
+    Mode -> dieWith params stderr 125 "Not yet implemented!"''
