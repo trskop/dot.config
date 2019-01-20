@@ -157,7 +157,7 @@ EOF
 
 # SEE ALSO
 
-yx-env(1), yx-path(1), yx-this(1), yx(1), command-wrapper(1)
+yx-env(1), yx-new(1), yx-path(1), yx-this(1), yx(1), command-wrapper(1)
 
 * [XDG Base Directory Specification
   ](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html)

@@ -113,7 +113,7 @@ page section *ENVIRONMENT VARIABLES*.
 
 # SEE ALSO
 
-command-wrapper(1), yx-env(1), yx-jmp(1), yx-path(1), yx-this(1)
+command-wrapper(1), yx-env(1), yx-jmp(1), yx-new(1), yx-path(1), yx-this(1)
 command-wrapper-cd(1), command-wrapper-exec(1), command-wrapper-skel(1),
 command-wrapper-subcommand-protocol(7)
 
