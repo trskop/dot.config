@@ -33,6 +33,7 @@
 /command-wrapper/*.dhall
 /habit/*.dhall
 /yx/*.dhall
+!/yx/yx-new.dhall
 !/yx/yx-this.dhall
 /yx/toolset/.shake
 /yx/toolset/.stack-work/
@@ -47,6 +48,7 @@
 !/habit/pgpass.d/.gitkeep
 /habit/toolset
 /yx/default/aliases.dhall
+/yx/new/templates.dhall
 /yx/this/packages.dhall
 /yx/this/purge-packages.dhall
 

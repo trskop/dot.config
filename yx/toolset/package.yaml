@@ -85,3 +85,7 @@ executables:
     dependencies:
       - containers
       - process
+
+  yx-new:
+    source-dirs: app-yx-new
+    main: Main.hs
