@@ -196,9 +196,18 @@ mk Params{name, exePath} = do
         configFileExists <- doesFileExist configFile
 
         let algorithms = ["dsa", "ecdsa", "ed25519", "rsa"]
+
+            -- Default identieties are named just `id_${algorithm}`.
+            defaultIdentities = map ("id_" <>) algorithms
+
+            -- OpenSSH client supports `.pem` files as well. It is commonly
+            -- used by AWS (EC2).
+            identityExtensions = ".pem" : map (".id_" <>) algorithms
+
             isIdentity file =
-                file `elem` map ("id_" <>) algorithms
-                || takeExtension file `elem` map (".id_" <>) algorithms
+                file `elem` defaultIdentities
+                || takeExtension file `elem` identityExtensions
+
         identities <- List.filter isIdentity <$> listDirectory sshConfigDir
 
         pure Ssh
