@@ -99,6 +99,16 @@ mkPowerlineFontsRepoConfig dotLocalDir = GitRepoConfig
     , url = "https://github.com/powerline/fonts.git"
     }
 
+type instance RuleResult (GitRepo "github.com/ryanoasis/nerd-fonts") = String
+
+mkNerdFontsRepoConfig
+    :: FilePath
+    -> GitRepoConfig "github.com/ryanoasis/nerd-fonts"
+mkNerdFontsRepoConfig dotLocalDir = GitRepoConfig
+    { directory = dotLocalDir </> "src" </> "ryanoasis" </> "nerd-fonts"
+    , url = "https://github.com/ryanoasis/nerd-fonts.git"
+    }
+
 type instance RuleResult (GitRepo "github.com/junegunn/fzf") = String
 
 mkFzfRepoConfig :: FilePath -> GitRepoConfig "github.com/junegunn/fzf"
@@ -145,11 +155,16 @@ install Directories{..} opts = shakeArgs opts $ do
         commandWrapperRepoConfig = mkCommandWrapperRepoConfig dotLocalDir
         genbashrcRepoConfig = mkGenbashrcRepoConfig dotLocalDir
         powerlineFontsRepoConfig = mkPowerlineFontsRepoConfig dotLocalDir
+        nerdFontsRepoConfig = mkNerdFontsRepoConfig dotLocalDir
         fzfRepoConfig = mkFzfRepoConfig dotLocalDir
 
         dejaVuSansMonoPowerlineTtf =
             dotLocalDir </> "share" </> "fonts"
             </> "DejaVu Sans Mono for Powerline.ttf"
+
+        dejaVuSansMonoNerdFontTtf =
+            dotLocalDir </> "share" </> "fonts" </> "NerdFonts"
+            </> "DejaVu Sans Mono Nerd Font Complete Mono.ttf"
 
         deinInstallDir = cacheDir </> "dein.vim"
 
@@ -173,6 +188,7 @@ install Directories{..} opts = shakeArgs opts $ do
         , binDir </> "stack-help"
 
         , dejaVuSansMonoPowerlineTtf
+        , dejaVuSansMonoNerdFontTtf
 
         , dotLocalDir </> "bin" </> "genbashrc"
 
@@ -260,6 +276,14 @@ install Directories{..} opts = shakeArgs opts $ do
     dejaVuSansMonoPowerlineTtf %> \_ -> do
         _ <- powerlineFontsUpToDate (GitRepo ())
         let GitRepoConfig{directory} = powerlineFontsRepoConfig
+        cmd_ "git -C" directory "pull"
+        cmd_ (Cwd directory) "./install.sh"
+
+    nerdFontsUpToDate <- addOracle (gitRepo nerdFontsRepoConfig)
+
+    dejaVuSansMonoNerdFontTtf %> \_ -> do
+        _ <- nerdFontsUpToDate (GitRepo ())
+        let GitRepoConfig{directory} = nerdFontsRepoConfig
         cmd_ "git -C" directory "pull"
         cmd_ (Cwd directory) "./install.sh"
 
