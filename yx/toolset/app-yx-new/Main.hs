@@ -1,3 +1,14 @@
+-- |
+-- Module:      Main
+-- Description: TODO: Module synopsis
+-- Copyright:   (c) 2019 Peter Trško
+-- License:     BSD3
+--
+-- Maintainer:  peter.trsko@gmail.com
+-- Stability:   experimental
+-- Portability: GHC specific language extensions.
+--
+-- TODO: Module description.
 module Main (main)
   where
 

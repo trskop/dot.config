@@ -1,7 +1,7 @@
 -- |
 -- Module:      Main
 -- Description: Generate Dhall configuration file with XDG Directories.
--- Copyright:   (c) 2018 Peter Trško
+-- Copyright:   (c) 2018-2019 Peter Trško
 -- License:     BSD3
 --
 -- Maintainer:  peter.trsko@gmail.com

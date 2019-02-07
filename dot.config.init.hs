@@ -23,7 +23,7 @@
 -- Module:      Main
 -- Description: Initialise configuration for applications that do not support
 --              XDG Base Directory Specification
--- Copyright:   (c) 2018 Peter Trško
+-- Copyright:   (c) 2018-2019 Peter Trško
 -- License:     BSD3
 --
 -- Maintainer:  peter.trsko@gmail.com
