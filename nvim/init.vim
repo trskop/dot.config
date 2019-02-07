@@ -212,6 +212,14 @@ if dein#load_state('~/.cache/dein.vim')
   " Syntax highlighting for Dhall (https://github.com/dhall-lang/dhall-lang)
   call dein#add('vmchale/dhall-vim')
 
+  " Extra icons for various Vim/Neovim plugins. It supports plugins such as
+  " NERDTree, vim-airline, CtrlP, powerline, denite, unite, lightline.vim,
+  " vim-startify, vimfiler, vim-workspace and flagship.
+  " (https://github.com/ryanoasis/vim-devicons)
+  "
+  " See also: https://github.com/ryanoasis/nerd-fonts
+  call dein#add('ryanoasis/vim-devicons')
+
   " }}} Plugin -- Dein.vim -- Plugins to Install ------------------------------
 
   " Required:
