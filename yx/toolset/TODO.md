@@ -17,3 +17,39 @@ Dump of other possible features that would be nice:
   - [app-yx-this/Main.hs](./app-yx-env/Main.hs)
   - [app-yx-this/Main.hs](./app-yx-this/Main.hs)
   - [app-yx-path/Main.hs](./app-yx-path/Main.hs)
+
+# Subcommand `new`
+
+Should be for creation of e.g. new Haskell packages.
+
+Usage:
+
+```
+yx new TEMPLATE_NAME [PARAMETERS]
+yx new [--list|--ls|-l]
+```
+
+Config:
+
+```
+let HaskellPackageParams =
+      { packageName : Text
+      , author : {name : Text, email : Text}
+      , license : < BSD3 : {} >
+      }
+
+let Template = {}
+
+let ParameterisedTemplate = \(Params : Type) -> forall (params : Params) -> Template
+
+let TemplateType =
+      < HaskellPackage : ParameterisedTemplate HaskellPackageParams >
+
+let WithDefaults =
+      forall (templateType : TemplateType) -> Template
+
+in  [ { name : Text
+      , template : TemplateType
+      }
+    ]
+```
