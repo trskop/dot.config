@@ -220,6 +220,12 @@ if dein#load_state('~/.cache/dein.vim')
   " See also: https://github.com/ryanoasis/nerd-fonts
   call dein#add('ryanoasis/vim-devicons')
 
+  " Syntax highlighting for Nix expressions and other functionality that makes
+  " Nix files editing better.  (https://github.com/LnL7/vim-nix)
+  "
+  " Interesting article: http://nicknovitski.com/vim-nix-syntax
+  call dein#add('LnL7/vim-nix')
+
   " }}} Plugin -- Dein.vim -- Plugins to Install ------------------------------
 
   " Required:
