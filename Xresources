@@ -51,6 +51,14 @@ URxvt.print-pipe: "cat > /dev/null"
 ! }}} URxvt settings !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 ! {{{ SSH Askpass settings !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!
+! Documentation for this fields can be find in `x11-ssh-askpass(1)`, or in
+! `ssh-askpass(1)`, depending on your system/installation.  Default values are
+! defined in:
+!
+! ```
+! /etc/X11/app-defaults/SshAskpass
+! ```
 
 ssh-askpass.Dialog.title: Authentication Passphrase
 
