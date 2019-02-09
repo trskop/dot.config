@@ -28,3 +28,24 @@ URxvt.font: xft:DejaVuSansMono Nerd Font Mono:style=Book:size=16
 URxvt.print-pipe: "cat > /dev/null"
 
 ! }}} URxvt settings !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! {{{ SSH Askpass settings !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+ssh-askpass.Dialog.title: Authentication Passphrase
+
+ssh-askpass.Dialog.font: xft:DejaVuSansMono Nerd Font Mono:style=Book
+ssh-askpass.Button*font: xft:DejaVu Serif:style=Bold
+
+ssh-askpass*background:           black
+ssh-askpass*foreground:           gray
+ssh-askpass.Button*background:    gray
+ssh-askpass.Button*foreground:    black
+ssh-askpass.Indicator*background: black
+ssh-askpass.Indicator*foreground: gray
+
+ssh-askpass*shadowThickness: 0
+ssh-askpass.*borderWidth:    0
+
+ssh-askpass*maximumCount: 5
+
+! }}} SSH Askpass settings !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
