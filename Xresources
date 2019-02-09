@@ -1,4 +1,25 @@
+! Xresources is a user-level configuration dotfile, typically located at
+! `~/.Xresources`. It can be used to set X resources, which are configuration
+! parameters for X client applications. 
+!
+! Load a resource file (such as the conventional .Xresources), replacing any
+! current settings: 
+!
+! ```
+! xrdb ~/.Xresources
+! ```
+!
+! Load a resource file, and merge with the current settings:
+!
+! ```
 ! xrdb -merge ~/.Xresources
+! ```
+!
+! Source: <https://wiki.archlinux.org/index.php/x_resources>
+!
+! Unfortunately there is no alternative to `~/.Xresources` that respects XDG
+! Base Directory specification.  For that reason `~/.Xresources` is a symbolic
+! link to this file.
 
 ! {{{ URxvt settings !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !

@@ -3,29 +3,31 @@ User configuration files (dot–files)
 
 * CommandWrapper configuration:
     * Default CommandWrapper configuration and configuration of stock
-      subcommands: [command-wrapper/README.md](command-wrapper/README.md)
+      subcommands: [`command-wrapper/README.md`](command-wrapper/README.md)
     * Toolset specialised for work environment:
-      [habit/README.md](habit/README.md)
-    * Toolset optimised for personal use: [yx/README.md](yx/README.md)
+      [`habit/README.md`](habit/README.md)
+    * Toolset optimised for personal use: [`yx/README.md`](yx/README.md)
 
-* GHCi configuration, see [ghc/README.md](ghc/README.md) for more information.
+* GHCi configuration, see [`ghc/README.md`](ghc/README.md) for more information.
 
-* Git configuration, see [git/README.md](git/README.md) for more information.
+* Git configuration, see [`git/README.md`](git/README.md) for more information.
 
-* Haskeline configuration, see [haskeline/README.md](haskeline/README.md) for
+* Haskeline configuration, see [`haskeline/README.md`](haskeline/README.md) for
   more information.
 
-* PostgreSQL interactive terminal (`psql`) configuration, see [psql/README.md
+* PostgreSQL interactive terminal (`psql`) configuration, see [`psql/README.md`
   ](psql/README.md) for more information.
 
-* Readline configuration, see [readline/README.md](readline/README.md) for more
+* Readline configuration, see [`readline/README.md`](readline/README.md) for more
   information.
 
-* Tmux configuration, see [tmux/README.md](tmux/README.md) for more
+* Tmux configuration, see [`tmux/README.md`](tmux/README.md) for more
   information.
 
-* Neovim configuration, see [nvim/README.md](nvim/README.md) for more
+* Neovim configuration, see [`nvim/README.md`](nvim/README.md) for more
   information.
+
+* `~/.Xresources`, see [`Xresources`](Xresources) for details.
 
 TODO:
 
