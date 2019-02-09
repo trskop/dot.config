@@ -298,7 +298,11 @@ install Directories{..} opts = shakeArgs opts $ do
         cmd_ (Cwd directory) "./install"
 
     (commandWrapperDir </> "*.dhall") %> \out -> do
-        need [commandWrapperLibDir </> "command-wrapper"]
+        need
+            [ commandWrapperLibDir </> "command-wrapper"
+            , commandWrapperDir </> "lib/lib.dhall"
+            , commandWrapperDir </> "lib/Types.dhall"
+            ]
         let subdir = takeBaseName out `dropPrefix` "command-wrapper-"
             dir = commandWrapperDir </> subdir
             src = dir </> "constructor.dhall"
@@ -312,6 +316,10 @@ install Directories{..} opts = shakeArgs opts $ do
 
     yxRules YxRulesParams
         { configDir = yxDir
+        , configLib =
+            [ commandWrapperDir </> "lib/lib.dhall"
+            , commandWrapperDir </> "lib/Types.dhall"
+            ]
         , libDir = yxLibDir
         , binDir
         , commandWrapperLibDir
@@ -383,6 +391,7 @@ symlink src dst = do
 
 data YxRulesParams = YxRulesParams
     { configDir :: FilePath
+    , configLib :: [FilePath]
     , libDir :: FilePath
     , binDir :: FilePath
     , commandWrapperLibDir :: FilePath
@@ -396,6 +405,10 @@ yxRules YxRulesParams{..} = do
         let subdir = takeBaseName out `dropPrefix` "yx-"
             dir = configDir </> subdir
             src = dir </> "constructor.dhall"
+
+        -- At the moment only "yx/default.dhall" depends on the config library.
+        when (takeBaseName out == "default")
+            $ need configLib
 
         getDirectoryFiles dir ["*"] >>= need . map (dir </>)
 
