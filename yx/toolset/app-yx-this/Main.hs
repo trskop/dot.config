@@ -42,7 +42,7 @@ import qualified Main.Config.App as Config (read, writeDef)
 --
 -- - `--edit` [--fzf] [CONFIG_SELECTOR] -- Fast way to open a configuration
 --   file in editor.  For some of them it understood that there is a need to
---   run an action.  Woid it make sense to make this into a separate
+--   run an action.  Would it make sense to make this into a separate
 --   subcommand?  Maybe merge with with `yx jmp`?  However, if those action
 --   hooks should be working then it will need to call this one as well.  BTW,
 --   CTRL+e is not binded in current Bash setup.
@@ -86,6 +86,27 @@ import qualified Main.Config.App as Config (read, writeDef)
 -- - Allowing user to select actions from `--update --user` subset by not only
 --   listing executed scripts but also querying Shake scripts for their
 --   targets.
+--
+-- - Integrate `apt search`, `apt show`, `dpkg-query -[LS]`, etc.  This would
+--   allow something like:
+--
+--     ```
+--     function _ditch_apt() {
+--         echo "Use 'this' or 'yx this' instead of calling 'apt' directly!" 1>&2
+--     }
+--     alias apt='_ditch_apt'
+--     ```
+--
+-- - Integrate with Nix.
+--
+-- - Change interface to something like:
+--
+--     ```
+--     yx this u[pdate] [WHAT_TO_UPDATE]
+--     yx this s[earch] [PACKAGE_PATTERN]
+--     yx this [sho]w {[--list-files] PACKAGE_NAME|--file=FILE}
+--     yx this e[dit] [WHAT_TO_EDIT]
+--     ```
 
 main :: IO ()
 main = do
