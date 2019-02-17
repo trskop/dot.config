@@ -25,10 +25,10 @@
           ""
 
   in  ''
-name: &this; ${package.name}
-version: &this; ${package.version}
-synopsis: ${package.synopsis}
-description: ${package.description}
+name: &this ${package.name}
+version: ${package.version}
+synopsis: "${package.synopsis}"
+description: "${package.description}"
 category: ${package.category}
 
 license: ${copyright.license}
