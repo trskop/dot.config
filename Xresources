@@ -44,6 +44,7 @@ URxvt.saveLines: 100000
 ! URxvt.font: xft:DejaVu Sans Mono:size=14
 ! URxvt.font: xft:DejaVu Sans Mono for Powerline:size=16:style=Book
 URxvt.font: xft:DejaVuSansMono Nerd Font Mono:style=Book:size=16
+URxvt.boldFont: xft:DejaVuSansMono Nerd Font Mono:style=Book:size=16:weight=Bold
 
 ! Disable printing the terminal contents when pressing PrintScreen.
 URxvt.print-pipe: "cat > /dev/null"
