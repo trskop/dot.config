@@ -39,6 +39,10 @@ Options:
     Use list of files changed as part of a COMMIT as a source instead of Tmux
     scrollback buffer.  Defaults to 'HEAD' if COMMIT is not specified.
 
+  --root-dir=DIR, --root-dir DIR
+    When executing editor use this directory as a parent dir for the file that
+    is being edited.
+
   --help, -h
     Print short help message and exit.  Same as: ${commandHelp}
 
@@ -57,6 +61,7 @@ EOF
 }
 
 function startEditor() {
+    local -r rootDir="$1"; shift
     local params=''
     read -r params
 
@@ -67,7 +72,7 @@ function startEditor() {
 
     # Line is in the form "FILE +LINE".  This should work even if FILE contains
     # spaces.
-    local -r file="${params% +[0-9]*}"
+    local -r file="${rootDir%/}${rootDir:+/}${params% +[0-9]*}"
     local -r line="${params##* +}"
 
     eval "$(dhall-to-bash --declare 'editorCommand' <<EOF
@@ -103,6 +108,8 @@ function main() {
     # Empty value is valid and defaults to `HEAD`.
     local gitCommit=''
 
+    local rootDir=''
+
     local arg
     while (( $# )); do
         arg="$1"; shift
@@ -121,6 +128,15 @@ function main() {
             --git-commit|-G)
                 doGitAction=1
                 gitAction='commit'
+                ;;
+            --root-dir)
+                if (( ! $# )); then
+                    die 1 "'%s': Missing argument DIR." "${arg}"
+                fi
+                rootDir="$1"; shift
+                ;;
+            --root-dir=*)
+                rootDir="${arg#*=}"
                 ;;
             -*)
                 die 1 "'%s': Unknown option." "${arg}"
@@ -145,13 +161,14 @@ function main() {
     fi
 
     if (( doGitAction )); then
-        gitAction "${gitAction}" "${gitCommit}"
+        runGitAction "${rootDir}" "${gitAction}" "${gitCommit}"
     else
-        tmuxScrollback
+        tmuxScrollback "${rootDir}"
     fi
 }
 
-function gitAction() {
+function runGitAction() {
+    local -r rootDir="$1"; shift
     local -r action="$1"; shift
     local -r commit="$1"; shift
 
@@ -163,10 +180,10 @@ function gitAction() {
 
     case "${action}" in
         'status')
-            gitStatus
+            gitStatus "${rootDir}"
             ;;
         'commit')
-            gitCommit "${commit}"
+            gitCommit "${rootDir}" "${commit}"
             ;;
         *)
             die 4 "'%s': Unknown internal Git action; probably a bug." \
@@ -176,6 +193,7 @@ function gitAction() {
 }
 
 function gitStatus() {
+    local -r rootDir="$1"; shift
     eval "$(declareCfg)"
 
     # TODO:
@@ -190,10 +208,11 @@ function gitStatus() {
     git status -s \
     | sed 's/^.. \(.*\)$/\1 +1/' \
     | "${menuCommand[@]}" \
-    | startEditor
+    | startEditor "${rootDir}"
 }
 
 function gitCommit() {
+    local -r rootDir="$1"; shift
     local -r commit="$1"; shift
 
     eval "$(declareCfg)"
@@ -210,10 +229,12 @@ function gitCommit() {
     git diff-tree --no-commit-id --name-only -r "${commit:-HEAD}" \
     | sed -r "s|^(.*)\$|$(git rev-parse --show-toplevel)/\\1 +1|" \
     | "${menuCommand[@]}" \
-    | startEditor
+    | startEditor "${rootDir}"
 }
 
 function tmuxScrollback() {
+    local -r rootDir="$1"; shift
+
     if [[ -z "${TMUX}" || -z "${TMUX_PANE}" ]]; then
         die 3 "Not running in a Tmux pane, see yx-jmp(1)."
     fi
@@ -228,7 +249,7 @@ function tmuxScrollback() {
     | sed -rn 's/^ *(.*):([0-9]+):[0-9]+: error:.*$/\1 +\2/;T;p' \
     | uniq \
     | "${menuCommand[@]}" \
-    | startEditor
+    | startEditor "${rootDir}"
 }
 
 main "$@"
