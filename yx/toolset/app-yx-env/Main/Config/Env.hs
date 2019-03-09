@@ -33,7 +33,6 @@ import qualified Data.Text.IO as Text (readFile)
 import qualified Dhall
     ( Inject
     , Interpret
-    , InvalidType(InvalidType)
     , Type(expected, extract)
     , auto
     )
@@ -118,7 +117,8 @@ readEnvConfig configFile = do
                     pure $ (mkHash expression, ) <$> v
 
                 Nothing ->
-                    throwIO Dhall.InvalidType
+                    -- TODO: Use custom exception here.
+                    error "Failed to convert Dhall value into Haskell value."
 
         else pure Nothing
   where

@@ -32,7 +32,6 @@ import qualified Data.Text.IO as Text (readFile)
 import qualified Dhall
     ( Inject
     , Interpret
-    , InvalidType(InvalidType)
     , InputType(embed)
     , Type(expected, extract)
     , auto
@@ -124,8 +123,11 @@ readState stateFile = do
             stateContent <- Text.readFile stateFile
             expression <- parseDhallExpression stateFile stateContent
             case Dhall.extract Dhall.auto expression of
-                Just v -> pure v
-                Nothing -> throwIO Dhall.InvalidType
+                Just v ->
+                    pure v
+                Nothing ->
+                    -- TODO: Use custom exception here.
+                    error "Failed to convert Dhall value into Haskell value."
 
         else
             pure emptyState
