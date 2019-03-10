@@ -104,14 +104,7 @@ Install *Haskell IDE Engine*:
 
 Don't forget that `~/.local/bin` has to be in your `PATH`.
 
-Configure Neovim:
-
 ```Bash
-git clone git@github.com:trskop/dot.config.nvim.git ~/.config/nvim
-cd ~/.config/nvim
-wget https://raw.githubusercontent.com/Shougo/dein.vim/master/bin/installer.sh
-# Review installer.sh before executing it.
-sh installer.sh dein.vim
 nvim -c ':helptags ~/.config/nvim/doc/ | :UpdateRemotePlugins'
 ```
 

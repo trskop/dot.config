@@ -1,6 +1,6 @@
 % YX(1) YX Toolset 0.1.0 | YX Toolset
 % Peter Trsko
-% 30th December 2018
+% 10th March 2019
 
 # NAME
 
@@ -60,6 +60,8 @@ Yx toolset comes with number of its own external subcommands:
 * *env* -- `yx-env(1)`
 
 * *jmp* -- `yx-jmp(1)`
+
+* *new* -- `yx-new(1)`
 
 * *path* -- `yx-path(1)`
 
