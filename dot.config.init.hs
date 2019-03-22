@@ -37,7 +37,7 @@ module Main (main)
 
 import Control.Monad (unless, when)
 import Data.List (isPrefixOf)
-import GHC.TypeLits (Symbol)
+import GHC.TypeLits (KnownSymbol, Symbol, symbolVal)
 
 import System.Directory
     ( XdgDirectory(XdgCache, XdgConfig)
@@ -54,7 +54,13 @@ import Development.Shake.Classes (Binary, Hashable, NFData)
 
 
 newtype GitRepo (name :: Symbol) = GitRepo ()
-  deriving (Binary, Eq, Hashable, NFData, Show)
+  deriving (Binary, Eq, Hashable, NFData)
+
+instance KnownSymbol name => Show (GitRepo name) where
+    showsPrec d v = showParen (d > 10)
+        $ showString "GitRepo @" . showRepoName . showString " ()"
+      where
+        showRepoName = shows (symbolVal v)
 
 data GitRepoConfig (name :: Symbol) = GitRepoConfig
     { directory :: FilePath
