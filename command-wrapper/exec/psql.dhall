@@ -24,6 +24,9 @@ in    λ(pgpassFile : Optional Text)
             , "--username=${connect.username}"
             , "--dbname=${connect.database}"
             ]
+          # Optional/fold Natural connect.port (List Text)
+              (λ(port : Natural) → ["--port=${Natural/show port}"])
+              ([] : List Text)
           # arguments
       , environment =
           environment
