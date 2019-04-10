@@ -14,7 +14,9 @@ yx \[GLOBAL\_OPTIONS] jmp \[\--tmux|-t]
 
 yx \[GLOBAL\_OPTIONS] jmp {\--git-status|-g}
 
-yx \[GLOBAL\_OPTIONS] jmp {\--git-commit|-G} \[COMMIT]
+yx \[GLOBAL\_OPTIONS] jmp {\--git-commit|-G} \[*COMMIT*]
+
+yx \[GLOBAL\_OPTIONS] jmp {\--file={*FILE*|-}|\--file {*FILE*|-}|-f {*FILE*|-}}
 
 yx \[GLOBAL\_OPTIONS] jmp {\--help|-h}
 
@@ -50,14 +52,18 @@ For documentation of *GLOBAL_OPTIONS* see `command-wrapper(1)` manual page.
 :   Use `git status` command as a source instead of scrollback buffer.  This is
     Useful if you are working on set of files that weren't yet commited.
 
-\--git-commit [COMMIT], -G [COMMIT]
-:   Use list of files changed as part of a COMMIT as a source instead of Tmux
-    scrollback buffer.  Defaults to 'HEAD' if COMMIT is not specified.
+\--git-commit [*COMMIT*], -G [*COMMIT*]
+:   Use list of files changed as part of a *COMMIT* as a source instead of Tmux
+    scrollback buffer.  Defaults to 'HEAD' if *COMMIT* is not specified.
     Especially useful if you like to have a set of WIP (work in progres)
     commits.
 
-\--file {FILE|-}, -f {FILE|-}
-:   Read list of files from *FILE* or stdin.
+\--file={*FILE*|-}, \--file {*FILE*|-}, -f {*FILE*|-}
+:   Read list of files from *FILE* or `stdin`.
+
+\--root-dir=*DIR*, \--root-dir *DIR*
+:   When executing editor use this directory as a parent dir for the file that
+    is being edited.
 
 \--help, -h
 :   Print short help message and exit.  Same as: `yx help jmp`.

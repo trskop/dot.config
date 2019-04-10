@@ -39,7 +39,7 @@ Options:
     Use list of files changed as part of a COMMIT as a source instead of Tmux
     scrollback buffer.  Defaults to 'HEAD' if COMMIT is not specified.
 
-  --file {FILE|-}
+  --file={FILE|-}, --file {FILE|-}, -f {FILE|-}
     Read list of files from FILE or stdin.
 
   --root-dir=DIR, --root-dir DIR
