@@ -1,6 +1,6 @@
 % YX-JMP(1) YX Toolset 0.1.0 | YX Toolset
 % Peter Trsko
-% 3rd January 2019
+% 10th April 2019
 
 
 # NAME
@@ -55,6 +55,9 @@ For documentation of *GLOBAL_OPTIONS* see `command-wrapper(1)` manual page.
     scrollback buffer.  Defaults to 'HEAD' if COMMIT is not specified.
     Especially useful if you like to have a set of WIP (work in progres)
     commits.
+
+\--file {FILE|-}, -f {FILE|-}
+:   Read list of files from *FILE* or stdin.
 
 \--help, -h
 :   Print short help message and exit.  Same as: `yx help jmp`.

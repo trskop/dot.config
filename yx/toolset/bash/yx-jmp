@@ -39,6 +39,9 @@ Options:
     Use list of files changed as part of a COMMIT as a source instead of Tmux
     scrollback buffer.  Defaults to 'HEAD' if COMMIT is not specified.
 
+  --file {FILE|-}
+    Read list of files from FILE or stdin.
+
   --root-dir=DIR, --root-dir DIR
     When executing editor use this directory as a parent dir for the file that
     is being edited.
@@ -109,6 +112,7 @@ function main() {
     local gitCommit=''
 
     local rootDir=''
+    local inputFile=''
 
     local arg
     while (( $# )); do
@@ -128,6 +132,17 @@ function main() {
             --git-commit|-G)
                 doGitAction=1
                 gitAction='commit'
+                ;;
+            --file|-f)
+                if (( ! $# )); then
+                    die 1 "'%s': Missing argument DIR." "${arg}"
+                fi
+                doGitAction=0
+                inputFile="$1"; shift
+                ;;
+            --file=)
+                doGitAction=0
+                inputFile="${arg#*=}"
                 ;;
             --root-dir)
                 if (( ! $# )); then
@@ -162,6 +177,8 @@ function main() {
 
     if (( doGitAction )); then
         runGitAction "${rootDir}" "${gitAction}" "${gitCommit}"
+    elif [[ -n "${inputFile}" ]]; then
+        readFile "${rootDir}" "${inputFile}"
     else
         tmuxScrollback "${rootDir}"
     fi
@@ -247,6 +264,32 @@ function tmuxScrollback() {
     #   "${menuCommand[@]}".
     tmux capture-pane -S - -b scroll-buffer \; show-buffer -b scroll-buffer \; delete-buffer -b scroll-buffer \
     | sed -rn 's/^ *(.*):([0-9]+):[0-9]+: error:.*$/\1 +\2/;T;p' \
+    | uniq \
+    | "${menuCommand[@]}" \
+    | startEditor "${rootDir}"
+}
+
+# Usage:
+#
+#   readFile ROOT_DIR {FILE|-}
+function readFile() {
+    local -r rootDir="$1"; shift
+    local -r inputFile="$1"; shift
+
+    eval "$(declareCfg)"
+
+    function sed_() {
+        # TODO: Handle cases without line number.
+        sed -rn 's/^ *(.*):([0-9]+).*$/\1 +\2/;T;p' "$@"
+    }
+
+    {
+        if [[ "${inputFile}" = '-' ]]; then
+            sed_
+        else
+            sed_ "${inputFile}"
+        fi
+    } \
     | uniq \
     | "${menuCommand[@]}" \
     | startEditor "${rootDir}"
