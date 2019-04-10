@@ -1,0 +1,581 @@
+%YAML 1.2
+---
+name: Dhall
+file_extensions:
+  - dhall
+scope: source.dhall
+variables:
+  alpha: '[a-zA-Z]'
+  digit: '[0-9]'
+  hex_digit: '(?:{{digit}}|[a-fA-F])'
+  simple_label: '(?:{{alpha}}|_)(?:{{alpha}}|{{digit}}|[-/_])*'
+  quoted_label: '(?:{{alpha}}|{{digit}}|[-/_:\.])+'
+  exponent: '(?:e[+-]?{{digit}}+)'
+  path_character: '[^\s#/\\/,<>\?\(\)\[\]\{\}]'
+  path_component: '(?:/{{path_character}}+)'
+  directory: '(?:{{path_component}}*)'
+  file: '{{path_component}}'
+  local: '(?:(?:\.\.?|~)?{{directory}}{{file}})'
+  scheme: '(?:https?)'
+  url:
+    "(?:{{scheme}}://{{authority}}{{directory}}{{file}}(?:\\?{{query}})?\
+     (?:#{{fragment}})?)"
+  authority: '(?:(?:{{userinfo}}@)?{{host}}(?::{{port}})?)'
+  userinfo: '(?:(?:{{unreserved}}|{{pct_encoded}}|{{sub_delims}}|:)*)'
+  host: '(?:{{IP_literal}}|{{IPv4address}}|{{reg_name}})'
+  port: '(?:{{digit}}*)'
+  IP_literal: '(?:\[(?:{{IPv6address}}|{{IPvFuture}})\])'
+  IPvFuture: '(?:v{{hex_digit}}+\.(?:{{unreserved}}|{{sub_delims}}|:)+)'
+  IPv6address:
+    "(?:(?:{{h16}}:){6}{{ls32}}|::(?:{{h16}}:){5}{{ls32}}|(?:{{h16}})?::\
+     (?:{{h16}}:){4}{{ls32}}|(?:(?:{{h16}}:){1,}{{h16}})?::(?:{{h16}}:){3}\
+     {{ls32}}|(?:(?:{{h16}}:){2,}{{h16}})?::(?:{{h16}}:){2}{{ls32}}|\
+     (?:(?:{{h16}}:){3,}{{h16}})?::(?:{{h16}}:){1}{{ls32}}|(?:(?:{{h16}}:){4,}\
+     {{h16}})?::{{ls32}}|(?:(?:{{h16}}:){5,}{{h16}})?::{{h16}}|(?:(?:{{h16}}:)\
+     {6,}{{h16}})?::)"
+  h16: '(?:{{hex_digit}}{1,4})'
+  ls32: '(?:{{h16}}:{{h16}}|{{IPv4address}})'
+  IPv4address: '(?:{{dec_octet}}\.{{dec_octet}}\.{{dec_octet}}\.{{dec_octet}})'
+  dec_octet:
+    '(?:25[0-5]|2[0-4]{{digit}}|1{{digit}}{2}|[1-9]{{digit}}|{{digit}})'
+  reg_name: '(?:(?:{{unreserved}}|{{pct_encoded}}|{{sub_delims}})*)'
+  pchar: '(?:{{unreserved}}|{{pct_encoded}}|{{sub_delims}}|[:@])'
+  query: '(?:(?:{{pchar}}|[/?])*)'
+  fragment: '{{query}}'
+  pct_encoded: '(?:%{{hex_digit}}{2})'
+  unreserved: '(?:{{alpha}}|{{digit}}|[-\._~])'
+  sub_delims: '[!\$&''\(\)\*\+,;=]'
+  # env: '(?:env:(?:{{bash_env_var}}|"{{posix_env_var}}"))'
+  bash_env_var: '(?:(?:{{alpha}}|_)(?:{{alpha}}|{{digit}}|_)*)'
+  posix_env_var: '(?:{{posix_env_var_char}}+)'
+  posix_env_var_char: '(?:\\["\\abfnrtv]|[^"\\=])'
+
+contexts:
+  prototype:
+    - include: comment
+
+  main:
+    - include: let
+    - include: lambda
+    - include: for-all
+    - include: if
+    - include: keywords
+    - include: primitive
+    - include: builtins
+    - include: operators
+    - include: label
+
+  comment:
+    - include: comment-line
+    - include: comment-block
+
+  comment-block:
+    - match: '\{-'
+      scope: punctuation.definition.comment.begin.dhall
+      push:
+        - meta_scope: comment.block.brace-dash.dhall
+        - meta_include_prototype: false
+        - match: '-\}'
+          scope: punctuation.definition.comment.end.dhall
+          pop: true
+        - include: comment-block
+  comment-line:
+    - match: '--'
+      scope: punctuation.definition.comment.begin.dhall
+      push:
+        - meta_scope: comment.line.double-dash.dhall
+        - meta_include_prototype: false
+        - match: '$'
+          pop: true
+
+  operators:
+    - match: '(?:->|→)'
+      scope: keyword.operator.arrow.dhall
+    - match: ':'
+      scope: keyword.other.colon.dhall
+    # - match: '\?'
+    - match: '(?:\|{2}|&{2})'
+      scope: keyword.operator.logical.dhall
+    - match: '[!=]='
+      scope: keyword.operator.equality.dhall
+    - match: '='
+      scope: keyword.operator.assignment.dhall
+    - match: '(?:#|\+{2})'
+      scope: keyword.operator.sequence.dhall
+    - match: '[\+\*]'
+      scope: keyword.operator.arithmetic.dhall
+    - match: '(?:∧|/\\|⩓|//\\\\|⫽|//)'
+      scope: keyword.operator.combine.dhall
+
+  if:
+    - match: '\b(?:if|then|else)\b'
+      scope: keyword.control.conditional.dhall
+
+  keywords:
+    - match: '\b(?:as|using|missing|constructors|merge)\b'
+      scope: keyword.other.dhall
+
+  let:
+    - match: '\blet\b'
+      scope: keyword.other.let.dhall
+      push:
+        - equals
+        - optional-type-equals
+        - label-bind
+    - match: '\bin\b'
+      scope: keyword.other.in.dhall
+
+  label-bind:
+    - match: '{{simple_label}}'
+      scope: entity.name.function.dhall support.function.dhall
+      pop: true
+    - match: '(`)({{quoted_label}})(`)'
+      captures:
+        1: punctuation.section.backtick.begin.dhall
+        2: entity.name.function.dhall support.function.dhall
+        3: punctuation.section.backtick.end.dhall
+      pop: true
+    - include: make-optional-with-error
+
+  label:
+    - match: '{{simple_label}}'
+      scope: meta.label.dhall
+    - match: '(`)({{quoted_label}})(`)'
+      captures:
+        1: punctuation.section.backtick.begin.dhall
+        2: meta.label.dhall
+        3: punctuation.section.backtick.end.dhall
+
+  optional-type-equals:
+    - match: ':'
+      scope: keyword.other.colon.dhall
+      set:
+        - match: '(?==)'
+          pop: true
+        - include: main
+    - include: make-optional
+
+  equals:
+    - match: '='
+      scope: keyword.operator.assignment.dhall
+      pop: true
+    - include: make-optional-with-error
+
+  colon:
+    - match: ':'
+      scope: keyword.other.colon.dhall
+      pop: true
+    - include: make-optional-with-error
+
+  for-all:
+    - match: '(?:\bforall\b|∀)'
+      scope: storage.modifier.universal-quantifier.dhall
+      push:
+        - arrow
+        - parens
+
+  lambda:
+    - match: '[λ\\]'
+      scope: support.function.lambda.dhall
+      push:
+        - arrow
+        - parens
+
+  parens:
+    - match: '\('
+      scope: punctuation.section.parens.begin.dhall
+      set:
+        - meta_scope: meta.parens.dhall
+        - include: label-variable
+        - match: '\)'
+          scope: punctuation.section.parens.end.dhall
+          pop: true
+        - include: main
+    - include: make-optional-with-error
+
+  label-variable:
+    - match: '{{simple_label}}'
+      scope: variable.parameter.lambda.dhall
+      push: type
+    - match: '(`)({{quoted_label}})(`)'
+      captures:
+        1: punctuation.section.backtick.begin.dhall
+        2: variable.parameter.lambda.dhall
+        3: punctuation.section.backtick.end.dhall
+      push: type
+
+  type:
+    - match: ':'
+      scope: keyword.other.colon.dhall
+      set:
+        - match: '(?=\))'
+          pop: true
+        - include: main
+    - include: make-optional-with-error
+
+  arrow:
+    - match: '(?:->|→)'
+      scope: keyword.operator.arrow.dhall
+      pop: true
+    - include: make-optional-with-error
+
+  builtins:
+    - match:
+        "\\b(?:Natural/(?:fold|build|isZero|even|odd|toInteger|show|toDouble|\
+         show)|Double/show|List/(?:build|fold|length|head|last|indexed|\
+         reverse)|Optional/(?:fold|build)|Integer/(?:show|toDouble))\\b"
+      scope: support.function.dhall
+    - match: '\b(?:Bool|Optional|Natural|Integer|Double|Text|List|Type|Kind)\b'
+      scope: storage.type.dhall
+    - match: '\b(?:True|False)\b'
+      scope: constant.language.dhall
+
+  primitive:
+    - include: primitive-double
+    - include: primitive-natural
+    - include: primitive-integer
+    - include: primitive-url
+    - include: primitive-file
+    - include: primitive-env
+    - include: primitive-text
+    - include: primitive-record
+    - include: primitive-union
+    - include: primitive-list
+    - include: primitive-parens
+
+  # Better would be to use the stack as we have done elsewhere in this syntax.
+  primitive-url:
+    - match:
+        '({{url}})(?:\s*(sha256)(:)({{hex_digit}}{64}))?(?:\s*(as)\s*(Text))?'
+      captures:
+        1:
+          markup.underline.url.dhall string.unquoted.url.dhall
+          meta.path.url.dhall
+        2: storage.modifier.hash.dhall
+        3: punctuation.separator.colon.dhall
+        4: constant.numeric.integer.hash.dhall
+        5: storage.modifier.as.dhall
+        6: storage.type.dhall
+  primitive-file:
+    - match:
+        '({{local}})(?:\s*(sha256)(:)({{hex_digit}}{64}))?(?:\s*(as)\s*(Text))?'
+      captures:
+        1: string.unquoted.file.dhall meta.path.file.dhall
+        2: storage.modifier.hash.dhall
+        3: punctuation.separator.colon.dhall
+        4: constant.numeric.integer.hash.dhall
+        5: storage.modifier.as.dhall
+        6: storage.type.dhall
+  primitive-env:
+    - match:
+        "(env)(:)({{bash_env_var}})(?:\\s*(sha256)(:)({{hex_digit}}{64}))?\
+         (?:\\s*(as)\\s*(Text))?"
+      captures:
+        1: storage.modifier.environment-variable.dhall
+        2: punctuation.separator.colon.dhall
+        3: string.unquoted.environment-variable.dhall
+        4: storage.modifier.hash.dhall
+        5: punctuation.separator.colon.dhall
+        6: constant.numeric.integer.hash.dhall
+        7: storage.modifier.as.dhall
+        8: storage.type.dhall
+    - match:
+        "(env)(:)(\")({{posix_env_var}})(\")(?:\\s*(sha256)(:)\
+         ({{hex_digit}}{64}))?(?:\\s*(as)\\s*(Text))?"
+      captures:
+        1: storage.modifier.environment-variable.dhall
+        2: punctuation.separator.colon.dhall
+        3: punctuation.definition.string.begin.dhall
+        4: string.quoted.double.environment-variable.dhall
+        5: punctuation.definition.string.end.dhall
+        6: storage.modifier.hash.dhall
+        7: punctuation.separator.colon.dhall
+        8: constant.numeric.integer.hash.dhall
+        9: storage.modifier.as.dhall
+        10: storage.type.dhall
+
+  primitive-double:
+    - match: '[+-]?{{digit}}+(?:(\.){{digit}}+{{exponent}}?|{{exponent}})'
+      scope: constant.numeric.float.dhall
+
+  primitive-natural:
+    - match: '{{digit}}+'
+      scope: constant.numeric.natural.dhall
+
+  primitive-integer:
+    - match: '[+-]?{{digit}}+'
+      scope: constant.numeric.integer.dhall
+
+  primitive-text:
+    - include: primitive-text-double-quote
+    - include: primitive-text-single-quote
+
+  primitive-text-double-quote:
+    - match: '"'
+      scope: punctuation.definition.string.begin.dhall
+      push:
+        - meta_include_prototype: false
+        - meta_scope: string.quoted.double.dhall
+        - match: '\$\{'
+          push:
+            - meta_scope: constant.other.placeholder.dhall
+            - match: '\}'
+              pop: true
+            - include: primitive-text-double-quote-nested-braces
+        - match: '\\(?:["$\\/bfnrt]|[uU]{{hex_digit}}{4})'
+          scope: constant.character.escape.sequence.dhall
+        - match: '"'
+          scope: punctuation.definition.string.end.dhall
+          pop: true
+        - include: if-newline-then-indicate-error-and-pop
+  primitive-text-double-quote-nested-braces:
+    - match: '(?=")'
+      pop: true
+    - match: '\{'
+      push:
+        - meta_include_prototype: false
+        - match: '\}'
+          pop: true
+        - include: primitive-text-double-quote-nested-braces
+
+  primitive-text-single-quote:
+    - match: "''"
+      scope: punctuation.definition.string.begin.dhall
+      push:
+        - meta_include_prototype: false
+        - meta_scope: string.quoted.single.dhall
+        - match: "'''"
+          scope: constant.character.escape.quotes.dhall
+        - match: "''${"
+          scope: constant.character.escape.interpolate.dhall
+        - match: '\$\{'
+          push:
+            - meta_scope: constant.other.placeholder.dhall
+            - match: '\}'
+              pop: true
+            - include: primitive-text-single-quote-nested-braces
+        - match: '\\(?:["$\\/bfnrt]|[uU]{{hex_digit}}{4})'
+          scope: constant.character.escape.sequence.dhall
+        - match: "''"
+          scope: punctuation.definition.string.end.dhall
+          pop: true
+  primitive-text-single-quote-nested-braces:
+    - match: "(?='')"
+      pop: true
+    - match: '\{'
+      push:
+        - meta_include_prototype: false
+        - match: '\}'
+          pop: true
+        - include: primitive-text-single-quote-nested-braces
+
+  primitive-list:
+    - match: '\['
+      scope: punctuation.section.brackets.begin.list.dhall
+      push:
+        - meta_scope: meta.brackets.list.dhall
+        - match: '\]'
+          scope: punctuation.section.brackets.end.list.dhall
+          pop: true
+        - match: ','
+          scope: punctuation.separator.sequence.list.dhall
+        - include: main
+
+  primitive-parens:
+    - match: '\('
+      scope: punctuation.section.parens.begin.dhall
+      push:
+        - meta_scope: meta.parens.dhall
+        - match: '\)'
+          scope: punctuation.section.parens.end.dhall
+          pop: true
+        - include: main
+
+  primitive-record:
+    - match: '\{'
+      scope: punctuation.section.braces.begin.record.dhall
+      push:
+        - meta_scope: meta.braces.record.dhall
+        - include: primitive-record-pop
+        - include: primitive-record-label
+        - include: primitive-record-empty
+        # - include: main
+  primitive-record-empty:
+    - match: '='
+      scope: keyword.operator.assignment.dhall
+      push:
+        - include: gobble-whitespace
+        - include: primitive-record-pre-pop
+        - include: make-optional-with-error
+  primitive-record-label:
+    - match: '{{simple_label}}'
+      scope: string.unquoted.label.dhall entity.name.tag.dhall
+      push: primitive-record-label-cont
+    - match: '(`)({{quoted_label}})(`)'
+      captures:
+        1: punctuation.section.backtick.begin.dhall
+        2: string.unquoted.label.dhall entity.name.tag.dhall
+        3: punctuation.section.backtick.end.dhall
+      push: primitive-record-label-cont
+  primitive-record-label-cont:
+    - match: ':'
+      scope: keyword.other.colon.dhall
+      set:
+        - primitive-record-type
+        - primitive-record-main
+    - match: '='
+      scope: keyword.operator.assignment.dhall
+      set:
+        - primitive-record-value
+        - primitive-record-main
+    - include: primitive-record-common
+
+  primitive-record-type:
+    - match: '{{simple_label}}'
+      scope: string.unquoted.label.dhall entity.name.tag.dhall
+      push: primitive-record-type-cont
+    - match: '(`)({{quoted_label}})(`)'
+      captures:
+        1: punctuation.section.backtick.begin.dhall
+        2: string.unquoted.label.dhall entity.name.tag.dhall
+        3: punctuation.section.backtick.end.dhall
+      push: primitive-record-type-cont
+    - include: primitive-record-common
+  primitive-record-type-cont:
+    - match: ':'
+      scope: keyword.other.colon.dhall
+      set:
+        - primitive-record-type
+        - primitive-record-main
+    - include: primitive-record-common
+
+  primitive-record-value:
+    - match: '{{simple_label}}'
+      scope: string.unquoted.label.dhall entity.name.tag.dhall
+      push: primitive-record-value-cont
+    - match: '(`)({{quoted_label}})(`)'
+      captures:
+        1: punctuation.section.backtick.begin.dhall
+        2: string.unquoted.label.dhall entity.name.tag.dhall
+        3: punctuation.section.backtick.end.dhall
+      push: primitive-record-value-cont
+    - include: primitive-record-common
+  primitive-record-value-cont:
+    - match: '='
+      scope: keyword.operator.assignment.dhall
+      set:
+        - primitive-record-value
+        - primitive-record-main
+    - include: primitive-record-common
+
+  primitive-record-main:
+    - include: main
+    - match: ','
+      scope: punctuation.separator.sequence.record.dhall
+      pop: true
+    - include: primitive-record-pre-pop
+  primitive-record-common:
+    - include: primitive-record-pre-pop
+    - include: make-optional-with-error
+
+  primitive-record-pre-pop:
+    - match: '(?=\})'
+      pop: true
+  primitive-record-pop:
+    - match: '\}'
+      scope: punctuation.section.braces.end.record.dhall
+      pop: true
+
+  primitive-union:
+    - match: '<'
+      scope: punctuation.section.angles.begin.union.dhall
+      push:
+        - meta_scope: meta.angles.union.dhall
+        - include: primitive-union-pop
+        - include: primitive-union-both
+        # - include: main
+
+  primitive-union-both:
+    - match: '{{simple_label}}'
+      scope: string.unquoted.label.dhall entity.name.tag.dhall
+      push: primitive-union-both-cont
+    - match: '(`)({{quoted_label}})(`)'
+      captures:
+        1: punctuation.section.backtick.begin.dhall
+        2: string.unquoted.label.dhall entity.name.tag.dhall
+        3: punctuation.section.backtick.end.dhall
+      push: primitive-union-both-cont
+    - include: primitive-union-common
+  primitive-union-both-cont:
+    - match: ':'
+      scope: keyword.other.colon.dhall
+      set:
+        - primitive-union-both
+        - primitive-union-main
+    - match: '='
+      scope: keyword.operator.assignment.dhall
+      set:
+        - primitive-union-type
+        - primitive-union-main
+    - include: primitive-union-common
+
+  primitive-union-type:
+    - match: '{{simple_label}}'
+      scope: string.unquoted.label.dhall entity.name.tag.dhall
+      push: primitive-union-type-cont
+    - match: '(`)({{quoted_label}})(`)'
+      captures:
+        1: punctuation.section.backtick.begin.dhall
+        2: string.unquoted.label.dhall entity.name.tag.dhall
+        3: punctuation.section.backtick.end.dhall
+      push: primitive-union-type-cont
+    - include: primitive-union-common
+  primitive-union-type-cont:
+    - match: ':'
+      scope: keyword.other.colon.dhall
+      set:
+        - primitive-union-type
+        - primitive-union-main
+    - include: primitive-union-common
+
+  primitive-union-main:
+    - include: main
+    - match: '\|'
+      scope: punctuation.separator.sequence.union.dhall
+      pop: true
+    - include: primitive-union-pre-pop
+  primitive-union-common:
+    - include: primitive-union-pre-pop
+    - include: make-optional-with-error
+
+  primitive-union-pre-pop:
+    - match: '(?=>)'
+      pop: true
+  primitive-union-pop:
+    - match: '>'
+      scope: punctuation.section.angles.end.union.dhall
+      pop: true
+
+  make-optional:
+    - include: gobble-whitespace
+    - include: pop
+  make-optional-with-error:
+    - include: gobble-whitespace
+    - include: indicate-error-and-pop
+
+  if-newline-then-indicate-error-and-pop:
+    - match: '$\n'
+      scope: invalid.illegal.dhall
+      pop: true
+
+  indicate-error-and-pop:
+    - match: '.'
+      scope: invalid.illegal.dhall
+      pop: true
+
+  pop:
+    - match: '(?=.)'
+      pop: true
+
+  gobble-whitespace:
+    - match: '\s+'
