@@ -19,7 +19,16 @@ let foldSchema
       → λ(schema : Schema)
       → merge handler schema
 
-in  { Http = <Http = {=} | Https : {}> : Schema
-    , Https = <Http : {} | Https = {=}> : Schema
+let showSchema =
+        λ(s : Schema)
+      → foldSchema Text
+          { Http = λ(_ : {}) → "http"
+          , Https = λ(_ : {}) → "https"
+          }
+          s
+
+in  { Http = Schema.Http {=}
+    , Https = Schema.Https {=}
     , fold = foldSchema
+    , show = showSchema
     }
