@@ -3,9 +3,9 @@ let step =
       → λ(elem : a)
       → λ(input : {head : Optional a, tail : List a})
       → Optional/fold a input.head {head : Optional a, tail : List a}
-          (   λ(_ : a)
-            → { head = input.head
-              , tail = input.tail # [elem]
+          (   λ(prev : a)
+            → { head = Some elem
+              , tail = [prev] # input.tail
               }
           )
           { head = Some elem
