@@ -208,8 +208,6 @@ install Directories{..} opts = shakeArgs opts $ do
         , deinInstallDir </> "installed.lock"
 
         , nixTarget
-
-        , dotLocalDir </> "bin" </> "shellcheck"
         ]
 
     -- TODO: Refactor so that "~/.ghc" is actually a symbolic link to:
@@ -344,9 +342,6 @@ install Directories{..} opts = shakeArgs opts $ do
         writeFile' out ""
 
     nixRules nixParams
-
-    (dotLocalDir </> "bin" </> "shellcheck") %> \_ ->
-        cmd_ "stack --resolver=lts-13.16 install ShellCheck"
 
 data StackRulesParams = StackRulesParams
     { home :: FilePath
