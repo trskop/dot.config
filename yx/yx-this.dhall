@@ -1,6 +1,7 @@
-let purge = ./this/purge-packages.dhall ? ([] : List Text)
+let empty = [] : List Text
 
-let packages = ./this/packages.dhall ? ([] : List Text)
+-- TODO: Implement this functionality.
+let backup = ./this/backup-common.dhall # (./this/backup-local.dhall ? empty)
 
 let UpdateAction =
       < UpdateSystem : {}
@@ -8,43 +9,26 @@ let UpdateAction =
       | UpdateUserEnvironment : {}
       >
 
-in  { bootstrapPackages =
-        -- Store /etc in version control.  Git here is for 'etckeeper', but to
-        -- also mark it as manually installed.
-        [ "etckeeper", "git"
-
-        -- Essential for most of these tools to work reliably when used under
-        -- non-root user.
-        , "sudo"
-
-        -- Most of this tooling is in Haskell.  Stack provides a way how to run
-        -- Haskell scripts and istall rest of the tooling.
-        , "haskell-stack"
-
-        -- Access repositories via HTTPS.  Hopefully most Debian-like systems
-        -- have this by default now.
-        , "apt-transport-https"
-        ] : List Text
-
-    -- Get rid of all the abominations.
-    , purgePackages = ([ "nano" ] : List Text) # purge
-
-    , packages =
-        -- Be aware of possible issues on Debian, especially useful when
-        -- running on testing/unstable.
-        --
-        -- Package "apt-listbugs" had to be moved into included packages, since
-        -- it's not available on Ubuntu.
-        [ "apt-listchanges"
-
-        -- Use more advanced fallback editor.
-        , "vim-nox", "vim-doc"
-        ] # packages
-
-    , timezone = "Europe/London"
-
-    , defaults =
+in  { defaults =
         -- Empty list is the same thing as specifying all values.
         { update = [UpdateAction.UpdateUserEnvironment {=}] : List UpdateAction
+        }
+
+    , system =
+        { bootstrapPackages =
+            ./this/bootstrap-packages-common.dhall # (./this/bootstrap-packages-local.dhall ? empty)
+
+        , purgePackages =
+            ./this/purge-packages-common.dhall # (./this/purge-packages-local.dhall ? empty)
+
+        , packages =
+            ./this/packages-common.dhall # (./this/packages-local.dhall ? empty)
+
+        , timezone = "Europe/London"
+        }
+
+    , nix =
+        { packages =
+            ./this/nix-packages-common.dhall # (./this/nix-packages-local.dhall ? empty)
         }
     }

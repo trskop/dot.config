@@ -33,7 +33,14 @@ import qualified Data.Verbosity as Verbosity (Verbosity(..))
 import Turtle hiding (die)
 import System.Directory (XdgDirectory(XdgConfig), getXdgDirectory)
 
-import Main.Config.App (Config(..), Defaults(..), UpdateWhat(..))
+import Main.Config.App
+    ( Config(..)
+    , Defaults(..)
+    , NixConfig(..)
+    , SystemConfig(..)
+    , UpdateWhat(..)
+    )
+
 
 
 -- {{{ Update Action ----------------------------------------------------------
@@ -48,16 +55,21 @@ updateAction params config what' = do
         $ installPackages purgePackages (bootstrapPackages <> packages)
 
     when (Set.member UpdateUserEnvironment what)
-        $ updateUserEnvironment params
+        $ updateUserEnvironment params nix
   where
     Config
-        { bootstrapPackages
-        , purgePackages
-        , packages
-        , timezone
-        , defaults = Defaults
+        { defaults = Defaults
             { update = updateWhatDefault
             }
+
+        , system = SystemConfig
+            { bootstrapPackages
+            , purgePackages
+            , packages
+            , timezone
+            }
+
+        , nix
         } = config
 
     what
@@ -100,8 +112,8 @@ installPackages purge install = do
     printf (": sudo apt install " % w % "\n") install
     callProcess "sudo" (["apt", "install"] <> fmap Text.unpack install)
 
-updateUserEnvironment :: Params -> IO ()
-updateUserEnvironment Params{colour, verbosity} = do
+updateUserEnvironment :: Params -> NixConfig -> IO ()
+updateUserEnvironment Params{colour, verbosity} NixConfig{packages} = do
     useColours <- liftIO (shouldUseColours IO.stdout colour)
     let shakeOptions =
             ( if useColours
@@ -122,6 +134,18 @@ updateUserEnvironment Params{colour, verbosity} = do
     yxInstall <- liftIO (getXdgDirectory XdgConfig "yx/toolset/install")
     printf (": " % w % " " % w % "\n") yxInstall shakeOptions
     callProcess yxInstall shakeOptions
+
+    let nixEnv = "nix-env"
+
+        nixEnvOptions =
+            [ "--install"
+            , "--prebuilt-only"
+            , "--preserve-installed"
+            ] <> fmap Text.unpack packages
+
+    unless (null packages) $ do
+        printf (": " % w % " " % w % "\n") nixEnv nixEnvOptions
+        callProcess nixEnv nixEnvOptions
 
 -- }}} Update Action ----------------------------------------------------------
 

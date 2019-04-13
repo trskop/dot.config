@@ -1,3 +1,4 @@
+{-# LANGUAGE DuplicateRecordFields #-}
 -- |
 -- Module:      Main.Config.App
 -- Description: TODO: Module synopsis
@@ -13,6 +14,8 @@ module Main.Config.App
     ( Config(..)
     , Defaults(..)
     , UpdateWhat(..)
+    , SystemConfig(..)
+    , NixConfig(..)
     , read
     , writeDef
     )
@@ -41,13 +44,31 @@ import System.Directory (doesFileExist)
 data Config = Config
     { defaults :: Defaults
 
-    , bootstrapPackages :: [Text]
+    , system :: SystemConfig
+    , nix :: NixConfig
+
+-- TODO:
+--  , userAction :: Action
+    }
+  deriving stock (Eq, Generic, Show)
+  deriving anyclass (Dhall.Inject, Dhall.Interpret)
+
+data SystemConfig = SystemConfig
+    { bootstrapPackages :: [Text]
     , purgePackages :: [Text]
     , packages :: [Text]
     , timezone :: Text
 
 -- TODO:
---  , userAction :: Action
+--  , packageRepositories :: PackageRepository
+    }
+  deriving stock (Eq, Generic, Show)
+  deriving anyclass (Dhall.Inject, Dhall.Interpret)
+
+data NixConfig = NixConfig
+    { packages :: [Text]
+
+-- TODO:
 --  , packageRepositories :: PackageRepository
     }
   deriving stock (Eq, Generic, Show)
@@ -83,41 +104,47 @@ writeDef Params{config} =
 
 def :: Config
 def = Config
-    { bootstrapPackages =
-        -- Store /etc in version control.  Git here is for 'etckeeper', but to
-        -- also mark it as manually installed.
-        [ "etckeeper", "git"
-
-        -- Essential for most of these tools to work reliably when used under
-        -- non-root user.
-        , "sudo"
-
-        -- Most of this tooling is in Haskell.  Stack provides a way how to run
-        -- Haskell scripts and istall rest of the tooling.
-        , "haskell-stack"
-
-        -- Access repositories via HTTPS.  Hopefully most Debian-like systems
-        -- have this by default now.
-        , "apt-transport-https"
-        ]
-
-    , purgePackages =
-        -- Get rid of all the abominations.
-        [ "nano"
-        ]
-
-    , packages =
-        -- Be aware of possible issues on Debian, especially useful when
-        -- running on testing/unstable.
-        [ "apt-listbugs", "apt-listchanges"
-
-        -- Use more advanced fallback editor.
-        , "vim-nox", "vim-doc"
-        ]
-
-    , timezone = "Europe/London"
-
-    , defaults = Defaults
+    { defaults = Defaults
         { update = []   -- Empty is the same as all actions.
+        }
+
+    , system = SystemConfig
+        { bootstrapPackages =
+            -- Store /etc in version control.  Git here is for 'etckeeper', but to
+            -- also mark it as manually installed.
+            [ "etckeeper", "git"
+
+            -- Essential for most of these tools to work reliably when used under
+            -- non-root user.
+            , "sudo"
+
+            -- Most of this tooling is in Haskell.  Stack provides a way how to run
+            -- Haskell scripts and istall rest of the tooling.
+            , "haskell-stack"
+
+            -- Access repositories via HTTPS.  Hopefully most Debian-like systems
+            -- have this by default now.
+            , "apt-transport-https"
+            ]
+
+        , purgePackages =
+            -- Get rid of all the abominations.
+            [ "nano"
+            ]
+
+        , packages =
+            -- Be aware of possible issues on Debian, especially useful when
+            -- running on testing/unstable.
+            [ "apt-listbugs", "apt-listchanges"
+
+            -- Use more advanced fallback editor.
+            , "vim-nox", "vim-doc"
+            ]
+
+        , timezone = "Europe/London"
+        }
+
+    , nix = NixConfig
+        { packages = []
         }
     }

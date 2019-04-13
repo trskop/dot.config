@@ -1,0 +1,5 @@
+[ "ShellCheck"
+, "bat"
+, "plantuml"
+, "pandoc"
+]

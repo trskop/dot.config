@@ -51,7 +51,9 @@
 /yx/default/aliases.dhall
 /yx/new/templates.dhall
 /yx/this/backup-local.dhall
-/yx/this/packages.dhall
-/yx/this/purge-packages.dhall
+/yx/this/bootstrap-packages-local.dhall
+/yx/this/nix-packages-local.dhall
+/yx/this/packages-local.dhall
+/yx/this/purge-packages-local.dhall
 
 # }}} Command Wrapper #########################################################
