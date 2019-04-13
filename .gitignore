@@ -57,3 +57,24 @@
 /yx/this/purge-packages-local.dhall
 
 # }}} Command Wrapper #########################################################
+# {{{ Volatile ################################################################
+
+# Some applications store volatile data/configuration in here.  Purpose of this
+# section is to prevent accidental inclusion of such data, however, there is no
+# reason for these files/directories to actually exist.  Especially not on all
+# systems.
+/QtProject.conf
+/autostart/
+/chromium/
+/dconf/
+/geeqie/
+/google-chrome/
+/gtk-2.0/
+/gtk-3.0/
+/pulse/
+
+# This contains generated files.  Installation of FZF is handled by
+# ./dot.config.init.hs script.
+/fzf/
+
+# }}} Volatile ################################################################
