@@ -106,7 +106,12 @@ import qualified Main.Config.App as Config (read, writeDef)
 --     yx this s[earch] [PACKAGE_PATTERN]
 --     yx this [sho]w {[--list-files] PACKAGE_NAME|--file=FILE}
 --     yx this e[dit] [WHAT_TO_EDIT]
+--     yx this b[ackup] [WHAT_TO_EDIT]
 --     ```
+--
+-- - Backup functionality.  Just a simple wrapper for calling backup command
+--   with correct arguments.  List of files/directories for backup will be in
+--   `~/.config/yx/yx-this.dhall`.
 
 main :: IO ()
 main = do

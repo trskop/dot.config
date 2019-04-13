@@ -50,6 +50,7 @@
 /habit/toolset
 /yx/default/aliases.dhall
 /yx/new/templates.dhall
+/yx/this/backup-local.dhall
 /yx/this/packages.dhall
 /yx/this/purge-packages.dhall
 
