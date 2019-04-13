@@ -36,6 +36,7 @@ module Main (main)
   where
 
 import Control.Monad (unless, when)
+import Data.Functor ((<&>))
 import Data.List (isPrefixOf)
 import GHC.TypeLits (KnownSymbol, Symbol, symbolVal)
 
@@ -65,6 +66,7 @@ instance KnownSymbol name => Show (GitRepo name) where
 data GitRepoConfig (name :: Symbol) = GitRepoConfig
     { directory :: FilePath
     , url :: String
+    , cloneDepth :: Maybe Word
     }
   deriving (Show)
 
@@ -72,7 +74,7 @@ gitRepo :: GitRepoConfig name -> GitRepo name -> Action String
 gitRepo GitRepoConfig{..} GitRepo{} = do
     repoExists <- doesDirectoryExist directory
     unless repoExists
-        $ cmd "git clone" url directory
+        $ cmd "git clone" (cloneDepth <&> \n -> "--clone=" <> show n) url directory
     cmd_ "git -C" [directory] "fetch --all"
     Stdout hash <- cmd "git -C" [directory] "show-ref -s origin/HEAD"
     pure hash
@@ -85,6 +87,7 @@ mkCommandWrapperRepoConfig
 mkCommandWrapperRepoConfig dotLocalDir = GitRepoConfig
     { directory = dotLocalDir </> "src" </> "github.com" </> "trskop" </> "command-wrapper"
     , url = "https://github.com/trskop/command-wrapper.git"
+    , cloneDepth = Nothing
     }
 
 type instance RuleResult (GitRepo "github.com/trskop/genbashrc") = String
@@ -93,16 +96,7 @@ mkGenbashrcRepoConfig :: FilePath -> GitRepoConfig "github.com/trskop/genbashrc"
 mkGenbashrcRepoConfig dotLocalDir = GitRepoConfig
     { directory = dotLocalDir </> "src" </> "github.com" </> "trskop" </> "genbashrc"
     , url = "https://github.com/trskop/genbashrc.git"
-    }
-
-type instance RuleResult (GitRepo "github.com/powerline/fonts") = String
-
-mkPowerlineFontsRepoConfig
-    :: FilePath
-    -> GitRepoConfig "github.com/powerline/fonts"
-mkPowerlineFontsRepoConfig dotLocalDir = GitRepoConfig
-    { directory = dotLocalDir </> "src" </> "github.com" </> "powerline" </> "fonts"
-    , url = "https://github.com/powerline/fonts.git"
+    , cloneDepth = Nothing
     }
 
 type instance RuleResult (GitRepo "github.com/ryanoasis/nerd-fonts") = String
@@ -113,6 +107,7 @@ mkNerdFontsRepoConfig
 mkNerdFontsRepoConfig dotLocalDir = GitRepoConfig
     { directory = dotLocalDir </> "src" </> "github.com" </> "ryanoasis" </> "nerd-fonts"
     , url = "https://github.com/ryanoasis/nerd-fonts.git"
+    , cloneDepth = Just 1
     }
 
 type instance RuleResult (GitRepo "github.com/junegunn/fzf") = String
@@ -121,6 +116,7 @@ mkFzfRepoConfig :: FilePath -> GitRepoConfig "github.com/junegunn/fzf"
 mkFzfRepoConfig dotLocalDir = GitRepoConfig
     { directory = dotLocalDir </> "src" </> "github.com" </> "junegunn" </> "fzf"
     , url = "https://github.com/junegunn/fzf.git"
+    , cloneDepth = Nothing
     }
 
 data Directories = Directories
@@ -160,13 +156,8 @@ install Directories{..} opts = shakeArgs opts $ do
         commandWrapperLibDir = dotLocalDir </> "lib" </> "command-wrapper"
         commandWrapperRepoConfig = mkCommandWrapperRepoConfig dotLocalDir
         genbashrcRepoConfig = mkGenbashrcRepoConfig dotLocalDir
-        powerlineFontsRepoConfig = mkPowerlineFontsRepoConfig dotLocalDir
         nerdFontsRepoConfig = mkNerdFontsRepoConfig dotLocalDir
         fzfRepoConfig = mkFzfRepoConfig dotLocalDir
-
-        dejaVuSansMonoPowerlineTtf =
-            dotLocalDir </> "share" </> "fonts"
-            </> "DejaVu Sans Mono for Powerline.ttf"
 
         dejaVuSansMonoNerdFontTtf =
             dotLocalDir </> "share" </> "fonts" </> "NerdFonts"
@@ -193,7 +184,6 @@ install Directories{..} opts = shakeArgs opts $ do
         , home </> ".stack/global-project/stack.yaml"
         , binDir </> "stack-help"
 
-        , dejaVuSansMonoPowerlineTtf
         , dejaVuSansMonoNerdFontTtf
 
         , dotLocalDir </> "bin" </> "genbashrc"
@@ -277,14 +267,6 @@ install Directories{..} opts = shakeArgs opts $ do
         cmd_ "git -C" directory "pull"
         cmd_ "stack --stack-yaml" (directory </> "stack.yaml") "install"
 
-    powerlineFontsUpToDate <- addOracle (gitRepo powerlineFontsRepoConfig)
-
-    dejaVuSansMonoPowerlineTtf %> \_ -> do
-        _ <- powerlineFontsUpToDate (GitRepo ())
-        let GitRepoConfig{directory} = powerlineFontsRepoConfig
-        cmd_ "git -C" directory "pull"
-        cmd_ (Cwd directory) "./install.sh"
-
     nerdFontsUpToDate <- addOracle (gitRepo nerdFontsRepoConfig)
 
     dejaVuSansMonoNerdFontTtf %> \_ -> do
@@ -335,6 +317,7 @@ install Directories{..} opts = shakeArgs opts $ do
     habitRules HabitRulesParamams
         { configDir = habitDir
         , dotLocalDir
+        , commandWrapperLibDir
         }
 
     -- }}} CommandWrapper -----------------------------------------------------
@@ -408,6 +391,7 @@ data YxRulesParams = YxRulesParams
 yxRules :: YxRulesParams -> Rules ()
 yxRules YxRulesParams{..} = do
     (configDir </> "*.dhall") %> \out -> do
+        need [commandWrapperLibDir </> "command-wrapper"]
         let subdir = takeBaseName out `dropPrefix` "yx-"
             dir = configDir </> subdir
             src = dir </> "constructor.dhall"
@@ -427,13 +411,15 @@ yxRules YxRulesParams{..} = do
         let src = configDir </> "toolset" </> "bash" </> "yx-jmp"
         in symlink src out
 
-    (binDir </> "yx") %> \out ->
+    (binDir </> "yx") %> \out -> do
+        need [commandWrapperLibDir </> "command-wrapper"]
         let src = commandWrapperLibDir </> "command-wrapper"
-        in symlink src out
+        symlink src out
 
 data HabitRulesParamams = HabitRulesParamams
     { configDir :: FilePath
     , dotLocalDir :: FilePath
+    , commandWrapperLibDir :: FilePath
     }
 
 -- | CommandWrapper toolset `habit` is used at work. Most of the configuration
@@ -441,6 +427,7 @@ data HabitRulesParamams = HabitRulesParamams
 habitRules :: HabitRulesParamams -> Rules ()
 habitRules HabitRulesParamams{..} = do
     (configDir </> "*.dhall") %> \out -> do
+        need [commandWrapperLibDir </> "command-wrapper"]
         let subdir = takeBaseName out `dropPrefix` "habit-"
             dir = configDir </> subdir
             src = dir </> "constructor.dhall"
