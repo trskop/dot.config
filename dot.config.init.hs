@@ -1,6 +1,6 @@
 #!/usr/bin/env stack
 {- stack script
-    --resolver lts-13.11
+    --resolver lts-13.16
     --package directory
     --package executable-path
     --package shake
@@ -363,7 +363,7 @@ install Directories{..} opts = shakeArgs opts $ do
     nixRules nixParams
 
     (dotLocalDir </> "bin" </> "shellcheck") %> \_ ->
-        cmd_ "stack --resolver=lts-13.6 install ShellCheck"
+        cmd_ "stack --resolver=lts-13.16 install ShellCheck"
 
 data StackRulesParams = StackRulesParams
     { home :: FilePath
