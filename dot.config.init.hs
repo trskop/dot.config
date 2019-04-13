@@ -83,7 +83,7 @@ mkCommandWrapperRepoConfig
     :: FilePath
     -> GitRepoConfig "github.com/trskop/command-wrapper"
 mkCommandWrapperRepoConfig dotLocalDir = GitRepoConfig
-    { directory = dotLocalDir </> "src" </> "trskop" </> "command-wrapper"
+    { directory = dotLocalDir </> "src" </> "github.com" </> "trskop" </> "command-wrapper"
     , url = "https://github.com/trskop/command-wrapper.git"
     }
 
@@ -91,7 +91,7 @@ type instance RuleResult (GitRepo "github.com/trskop/genbashrc") = String
 
 mkGenbashrcRepoConfig :: FilePath -> GitRepoConfig "github.com/trskop/genbashrc"
 mkGenbashrcRepoConfig dotLocalDir = GitRepoConfig
-    { directory = dotLocalDir </> "src" </> "trskop" </> "genbashrc"
+    { directory = dotLocalDir </> "src" </> "github.com" </> "trskop" </> "genbashrc"
     , url = "https://github.com/trskop/genbashrc.git"
     }
 
@@ -101,7 +101,7 @@ mkPowerlineFontsRepoConfig
     :: FilePath
     -> GitRepoConfig "github.com/powerline/fonts"
 mkPowerlineFontsRepoConfig dotLocalDir = GitRepoConfig
-    { directory = dotLocalDir </> "src" </> "powerline" </> "fonts"
+    { directory = dotLocalDir </> "src" </> "github.com" </> "powerline" </> "fonts"
     , url = "https://github.com/powerline/fonts.git"
     }
 
@@ -111,7 +111,7 @@ mkNerdFontsRepoConfig
     :: FilePath
     -> GitRepoConfig "github.com/ryanoasis/nerd-fonts"
 mkNerdFontsRepoConfig dotLocalDir = GitRepoConfig
-    { directory = dotLocalDir </> "src" </> "ryanoasis" </> "nerd-fonts"
+    { directory = dotLocalDir </> "src" </> "github.com" </> "ryanoasis" </> "nerd-fonts"
     , url = "https://github.com/ryanoasis/nerd-fonts.git"
     }
 
@@ -119,7 +119,7 @@ type instance RuleResult (GitRepo "github.com/junegunn/fzf") = String
 
 mkFzfRepoConfig :: FilePath -> GitRepoConfig "github.com/junegunn/fzf"
 mkFzfRepoConfig dotLocalDir = GitRepoConfig
-    { directory = dotLocalDir </> "src" </> "junegunn" </> "fzf"
+    { directory = dotLocalDir </> "src" </> "github.com" </> "junegunn" </> "fzf"
     , url = "https://github.com/junegunn/fzf.git"
     }
 
