@@ -2,4 +2,6 @@
 , "bat"
 , "plantuml"
 , "pandoc"
+, "direnv"
+, "docker-compose"
 ]
