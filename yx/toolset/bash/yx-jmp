@@ -7,7 +7,7 @@ if [[ "${COMMAND_WRAPPER_VERBOSITY:-}" == 'annoying' ]]; then
 fi
 
 # shellcheck source=/dev/null
-source ~/.local/src/trskop/command-wrapper/bash/lib.sh
+source ~/.local/src/github.com/trskop/command-wrapper/bash/lib.sh
 
 function printHelp() {
     local -r command="${COMMAND_WRAPPER_NAME} ${COMMAND_WRAPPER_SUBCOMMAND}"
@@ -140,7 +140,7 @@ function main() {
                 doGitAction=0
                 inputFile="$1"; shift
                 ;;
-            --file=)
+            --file=*)
                 doGitAction=0
                 inputFile="${arg#*=}"
                 ;;
