@@ -190,13 +190,9 @@ install Directories{..} opts = shakeArgs opts $ do
 
         , commandWrapperLibDir </> "command-wrapper"
         , commandWrapperDir </> "default" <.> "dhall"
-        , commandWrapperDir </> "command-wrapper-cd" <.> "dhall"
-        , commandWrapperDir </> "command-wrapper-exec" <.> "dhall"
-        , commandWrapperDir </> "command-wrapper-skel" <.> "dhall"
 
         , binDir </> "yx"
         , yxDir </> "default" <.> "dhall"
-        , yxDir </> "yx-jmp" <.> "dhall"
         , yxLibDir </> "yx-jmp"
 
         , habitDir </> "default.dhall"

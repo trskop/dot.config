@@ -30,18 +30,19 @@
 !/command-wrapper/
 !/habit/
 !/yx/
-# Top-level Dhall configs are generated:
-/command-wrapper/*.dhall
+# Some top-level Dhall configs are generated:
+/command-wrapper/default.dhall
 /habit/*.dhall
-/yx/*.dhall
-!/yx/yx-new.dhall
-!/yx/yx-this.dhall
+/yx/default.dhall
+/yx/yx-env.dhall
 /yx/toolset/.shake
 /yx/toolset/.stack-work/
 /yx/toolset/*.cabal
 # This is machine specific, and it exposes too much information:
 /command-wrapper/cd/directories.dhall
+/command-wrapper/cd/directories-local.dhall
 /command-wrapper/exec/commands.dhall
+/command-wrapper/exec/commands-local.dhall
 /habit/default/aliases.dhall
 /habit/default/help-msg.txt
 /habit/pgpass.conf
@@ -50,6 +51,7 @@
 /habit/toolset
 /yx/default/aliases.dhall
 /yx/new/templates.dhall
+/yx/path/path-local.dhall
 /yx/this/backup-local.dhall
 /yx/this/bootstrap-packages-local.dhall
 /yx/this/nix-packages-local.dhall
