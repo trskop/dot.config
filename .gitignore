@@ -57,6 +57,7 @@
 /yx/this/nix-packages-local.dhall
 /yx/this/packages-local.dhall
 /yx/this/purge-packages-local.dhall
+/yx/this/system-info.dhall
 
 # }}} Command Wrapper #########################################################
 # {{{ Volatile ################################################################

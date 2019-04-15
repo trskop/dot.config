@@ -3,6 +3,8 @@ let empty = [] : List Text
 -- TODO: Implement this functionality.
 let backup = ./this/backup-common.dhall # (./this/backup-local.dhall ? empty)
 
+let system-info = ./this/system-info.dhall
+
 let UpdateAction =
       < UpdateSystem : {}
       | InstallPackages : {}
@@ -16,19 +18,23 @@ in  { defaults =
 
     , system =
         { bootstrapPackages =
-            ./this/bootstrap-packages-common.dhall # (./this/bootstrap-packages-local.dhall ? empty)
+              ./this/bootstrap-packages-common.dhall system-info.os
+            # (./this/bootstrap-packages-local.dhall ? empty)
 
         , purgePackages =
-            ./this/purge-packages-common.dhall # (./this/purge-packages-local.dhall ? empty)
+              ./this/purge-packages-common.dhall system-info.os
+            # (./this/purge-packages-local.dhall ? empty)
 
         , packages =
-            ./this/packages-common.dhall # (./this/packages-local.dhall ? empty)
+              ./this/packages-common.dhall system-info.os
+            # (./this/packages-local.dhall ? empty)
 
         , timezone = "Europe/London"
         }
 
     , nix =
         { packages =
-            ./this/nix-packages-common.dhall # (./this/nix-packages-local.dhall ? empty)
+              ./this/nix-packages-common.dhall
+            # (./this/nix-packages-local.dhall ? empty)
         }
     }
