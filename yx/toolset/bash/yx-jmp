@@ -20,17 +20,22 @@ files where they were encountered.
 
 Usage:
 
-  ${command} [--tmux|-t]
+  ${command} [--auto|--tmux|-t|--kitty|-k] [--root-dir=DIR] [--syntax=SYNTAX]
+  ${command} [--file={FILE|-}|-f {FILE|-}] [--root-dir=DIR] [--syntax=SYNTAX]
   ${command} {--git-status|-g}
   ${command} {--git-commit|-G} [COMMIT]
   ${command} {--help|-h}
   ${commandHelp}
 
 Options:
+  --auto (DEFAULT)
+    Use heuristic to decide if running in Tmux or Kitty.
 
-  --tmux, -t (DEFAULT)
-    Look for GHC error and warning messages in Tmux scrollback buffer.  This is
-    the default mode, when no options are specified.
+  --tmux, -t
+    Look for files to open in Tmux scrollback buffer.
+
+  --kitty, -k
+    Look for files to open in Kitty terminal emulator scrollback buffer.
 
   --git-status, -g
     Use 'git status' command as a source instead of Tmux scrollback buffer.
@@ -119,7 +124,22 @@ function main() {
 
     local rootDir=''
     local inputFile=''
+
+    # Input syntax can be either one of:
+    #
+    # - `plain` -- Just filenames, no parsing.  Nice for things like `ls`.
+    # - `ghc` -- GHC error and warning messages are parsed.
+    # - `psc` -- PureScript compiler `psc` error and warning messages are
+    #   parsed.
     local syntax='ghc'
+
+    # Use terminal-specific way of accessing its scrollback buffer.
+    #
+    # - `auto` -- Detect if we are running in a supported terminal and do
+    #   appropriate action.
+    # - `tmux` -- Expect to be running in a Tmux pane.
+    # - `kitty` -- Expect to be running in Kitty terminal emulator.
+    local expectTerminal='auto'
 
     local arg
     while (( $# )); do
@@ -129,8 +149,18 @@ function main() {
                 printHelp
                 exit 0
                 ;;
+            # TODO: We should consider using '--tty=NAME' instead.  Adding
+            # ad-hoc options is not the way to go.
+            --auto)
+                expectTerminal='aut'
+                ;;
             --tmux|-t)
                 doGitAction=0
+                expectTerminal='tmux'
+                ;;
+            --kitty|-k)
+                doGitAction=0
+                expectTerminal='kitty'
                 ;;
             --git-status|-g)
                 doGitAction=1
@@ -205,7 +235,32 @@ function main() {
     elif [[ -n "${inputFile}" ]]; then
         readFile "${rootDir}" "${syntax}" "${inputFile}"
     else
-        tmuxScrollback "${rootDir}" "${syntax}"
+        # TODO: This logic should probably be in a function.
+        case "${expectTerminal}" in
+            auto)
+                if [[ -n "${TMUX}" && -n "${TMUX_PANE}" ]]; then
+                    tmuxScrollback "${rootDir}" "${syntax}"
+                elif [[ -n "${KITTY_WINDOW_ID}" || "${TERM}" == 'xterm-kitty' ]]; then
+                    kittyScrollback "${rootDir}" "${syntax}"
+                else
+                    die 3 "Not running in a neither Kitty nor Tmux, see yx-jmp(1)."
+                fi
+                ;;
+            kitty)
+                if [[ -z "${KITTY_WINDOW_ID}" && "${TERM}" != 'xterm-kitty' ]]; then
+                    die 3 "Not running in a Kitty terminal emulator, see yx-jmp(1)."
+                fi
+
+                kittyScrollback "${rootDir}" "${syntax}"
+                ;;
+            tmux)
+                if [[ -z "${TMUX}" || -z "${TMUX_PANE}" ]]; then
+                    die 3 "Not running in a Tmux pane, see yx-jmp(1)."
+                fi
+
+                tmuxScrollback "${rootDir}" "${syntax}"
+                ;;
+        esac
     fi
 }
 
@@ -300,10 +355,6 @@ function tmuxScrollback() {
     local -r rootDir="$1"; shift
     local -r syntax="$1"; shift
 
-    if [[ -z "${TMUX}" || -z "${TMUX_PANE}" ]]; then
-        die 3 "Not running in a Tmux pane, see yx-jmp(1)."
-    fi
-
     eval "$(declareCfg)"
 
     # TODO:
@@ -312,6 +363,45 @@ function tmuxScrollback() {
     #   "${menuCommand[@]}".
     tmux capture-pane -S - -b scroll-buffer \; show-buffer -b scroll-buffer \; delete-buffer -b scroll-buffer \
     | parseInput "${syntax}" \
+    | uniq \
+    | "${menuCommand[@]}" \
+    | startEditor "${rootDir}"
+}
+
+# Usage:
+#
+#   kittyScrollback ROOT_DIR SYNTAX
+function kittyScrollback() {
+    local -r rootDir="$1"; shift
+    local -r syntax="$1"; shift
+
+    eval "$(declareCfg)"
+
+    # For some reason accessing Kitty scrollback buffer directly in a pipeline
+    # gets stuck.  The Python script responsible for it reports broken
+    # pipeline. Problem is probably buffering and how it's detected.  Using
+    # temporary bypasses the issue quite nicely, however, we need to make sure
+    # that the scrollback buffer is not freely available.  It contains
+    # sensitive data.
+    #
+    # TODO:
+    #
+    # * Remove temp file afterwards. Maybe using subshell via (...)?
+    # * Is ~/.cache good default?
+    # * We should probably create and use "${XDG_RUNTIME_DIR:-~/.cache}/yx-jmp"
+    #   instead of putting these files there directly.
+    local temp
+    temp=$(
+        mktemp --tmpdir="${XDG_RUNTIME_DIR:-~/.cache}" \
+            "${COMMAND_WRAPPER_NAME}-${COMMAND_WRAPPER_SUBCOMMAND}.XXXXXXXXXX"
+    )
+    kitty @ get-text --extent all --self > "${temp}"
+
+    # TODO:
+    #
+    # - Detect that the imput is empty and notify user instead of starting
+    #   "${menuCommand[@]}".
+    parseInput "${syntax}" "${temp}" \
     | uniq \
     | "${menuCommand[@]}" \
     | startEditor "${rootDir}"

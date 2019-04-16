@@ -10,13 +10,15 @@
 
 # USAGE
 
-yx \[GLOBAL\_OPTIONS] jmp \[\--tmux|-t]
+yx \[GLOBAL\_OPTIONS] jmp \[\--auto|\--tmux|-t|\--kitty|-k]
+\[\--root-dir=*DIR*|\--root-dir *DIR*] \[\--syntax=*SYNTAX*|\--syntax *SYNTAX*]
 
 yx \[GLOBAL\_OPTIONS] jmp {\--git-status|-g}
 
 yx \[GLOBAL\_OPTIONS] jmp {\--git-commit|-G} \[*COMMIT*]
 
-yx \[GLOBAL\_OPTIONS] jmp {\--file={*FILE*|-}|\--file {*FILE*|-}|-f {*FILE*|-}}
+yx \[GLOBAL\_OPTIONS] jmp \[\--file={FILE|-}|\--file {*FILE*|-}|-f {FILE|-}]
+\[\--root-dir=*DIR*|\--root-dir *DIR*] \[\--syntax=*SYNTAX*|\--syntax *SYNTAX*]
 
 yx \[GLOBAL\_OPTIONS] jmp {\--help|-h}
 
@@ -44,9 +46,15 @@ that as well.
 
 For documentation of *GLOBAL_OPTIONS* see `command-wrapper(1)` manual page.
 
+--auto
+:   Use heuristic to decide if running in Tmux or Kitty.  This is the default
+    mode, when no other mode-changing option is specified.
+
 \--tmux, -t
-:   (DEFAULT) Look for GHC error messages in Tmux scrollback buffer.  This is
-    the default mode, when no options are specified.
+:   Look for files to open in Tmux scrollback buffer.
+
+\--kitty, -k
+:   Look for files to open in Kitty terminal emulator scrollback buffer.
 
 \--git-status, -g
 :   Use `git status` command as a source instead of scrollback buffer.  This is
@@ -65,7 +73,7 @@ For documentation of *GLOBAL_OPTIONS* see `command-wrapper(1)` manual page.
 :   When executing editor use this directory as a parent dir for the file that
     is being edited.
 
-\--syntax=*SYNTAX*, --syntax *SYNTAX*
+\--syntax=*SYNTAX*, \--syntax *SYNTAX*
 :   Select SYNTAX of input from which filenames will be parsed.  Possible
     values for SYNTAX are: plain (just list of files, ghc (Haskell compiler)
     and psc (PureScript compiler).  This optinon is ignored when `--git-status`
