@@ -15,8 +15,8 @@ function printHelp() {
 
     cat <<EOF
 Let user select a relevant file to edit based on various sorces.  By default it
-looks for GHC error messages in Tmux scrollback buffer and lists files where
-they were encountered.
+looks for GHC error and warning messages in Tmux scrollback buffer, and lists
+files where they were encountered.
 
 Usage:
 
@@ -29,8 +29,8 @@ Usage:
 Options:
 
   --tmux, -t (DEFAULT)
-    Look for GHC error messages in Tmux scrollback buffer.  This is the default
-    mode, when no options are specified.
+    Look for GHC error and warning messages in Tmux scrollback buffer.  This is
+    the default mode, when no options are specified.
 
   --git-status, -g
     Use 'git status' command as a source instead of Tmux scrollback buffer.
@@ -283,7 +283,7 @@ function parseInput() {
 
     case "${syntax}" in
       ghc)
-        substitution='s/^ *(.*):([0-9]+):[0-9]+: error:.*$/\1 +\2/'
+        substitution='s/^ *(.*):([0-9]+):[0-9]+: (error|warning):.*$/\1 +\2/'
         ;;
       psc)
         substitution='s/^\[[^]]+\] *(.*):([0-9]+):[0-9]+.*$/\1 +\2/'
