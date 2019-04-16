@@ -46,6 +46,12 @@ Options:
     When executing editor use this directory as a parent dir for the file that
     is being edited.
 
+  --syntax=SYNTAX, --syntax SYNTAX
+    Select SYNTAX of input from which filenames will be parsed.  Possible
+    values for SYNTAX are: plain (just list of files, ghc (Haskell compiler)
+    and psc (PureScript compiler).  This optinon is ignored when '--git-status'
+    or '--git-commit' was specified.
+
   --help, -h
     Print short help message and exit.  Same as: ${commandHelp}
 
@@ -113,6 +119,7 @@ function main() {
 
     local rootDir=''
     local inputFile=''
+    local syntax='ghc'
 
     local arg
     while (( $# )); do
@@ -153,6 +160,15 @@ function main() {
             --root-dir=*)
                 rootDir="${arg#*=}"
                 ;;
+            --syntax)
+                if (( ! $# )); then
+                    die 1 "'%s': Missing argument DIR." "${arg}"
+                fi
+                syntax="$(tr '[:upper:]' '[:lower:]' <<< "$1")"; shift
+                ;;
+            --syntax=*)
+                syntax="$(tr '[:upper:]' '[:lower:]' <<< "${arg#*=}")"
+                ;;
             -*)
                 die 1 "'%s': Unknown option." "${arg}"
                 ;;
@@ -170,6 +186,15 @@ function main() {
         esac
     done
 
+    case "${syntax}" in
+      plain|ghc|psc)
+        :
+        ;;
+      *)
+        die 1 "'%s': Unrecognised syntax." "${syntax}"
+        ;;
+    esac
+
     if [[ ! -e "${COMMAND_WRAPPER_CONFIG}" ]]; then
         die 1 "'%s': Configuration file doesn't exist, see yx-jmp(1)." \
             "${COMMAND_WRAPPER_CONFIG}"
@@ -178,9 +203,9 @@ function main() {
     if (( doGitAction )); then
         runGitAction "${rootDir}" "${gitAction}" "${gitCommit}"
     elif [[ -n "${inputFile}" ]]; then
-        readFile "${rootDir}" "${inputFile}"
+        readFile "${rootDir}" "${syntax}" "${inputFile}"
     else
-        tmuxScrollback "${rootDir}"
+        tmuxScrollback "${rootDir}" "${syntax}"
     fi
 }
 
@@ -249,8 +274,31 @@ function gitCommit() {
     | startEditor "${rootDir}"
 }
 
+# Usage:
+#
+#   parseInput SYNTAX [FILE]
+function parseInput() {
+    local -r syntax="$1"; shift
+    local substitution='s/(.*)/\1 +0/'
+
+    case "${syntax}" in
+      ghc)
+        substitution='s/^ *(.*):([0-9]+):[0-9]+: error:.*$/\1 +\2/'
+        ;;
+      psc)
+        substitution='s/^\[[^]]+\] *(.*):([0-9]+):[0-9]+.*$/\1 +\2/'
+        ;;
+    esac
+
+    sed -rn "${substitution};T;p" -- "$@"
+}
+
+# Usage:
+#
+#   tmuxScrollback ROOT_DIR SYNTAX
 function tmuxScrollback() {
     local -r rootDir="$1"; shift
+    local -r syntax="$1"; shift
 
     if [[ -z "${TMUX}" || -z "${TMUX_PANE}" ]]; then
         die 3 "Not running in a Tmux pane, see yx-jmp(1)."
@@ -263,7 +311,7 @@ function tmuxScrollback() {
     # - Detect that the imput is empty and notify user instead of starting
     #   "${menuCommand[@]}".
     tmux capture-pane -S - -b scroll-buffer \; show-buffer -b scroll-buffer \; delete-buffer -b scroll-buffer \
-    | sed -rn 's/^ *(.*):([0-9]+):[0-9]+: error:.*$/\1 +\2/;T;p' \
+    | parseInput "${syntax}" \
     | uniq \
     | "${menuCommand[@]}" \
     | startEditor "${rootDir}"
@@ -271,23 +319,19 @@ function tmuxScrollback() {
 
 # Usage:
 #
-#   readFile ROOT_DIR {FILE|-}
+#   readFile ROOT_DIR SYNTAX {FILE|-}
 function readFile() {
     local -r rootDir="$1"; shift
+    local -r syntax="$1"; shift
     local -r inputFile="$1"; shift
 
     eval "$(declareCfg)"
 
-    function sed_() {
-        # TODO: Handle cases without line number.
-        sed -rn 's/^ *(.*):([0-9]+).*$/\1 +\2/;T;p' "$@"
-    }
-
     {
         if [[ "${inputFile}" = '-' ]]; then
-            sed_
+            parseInput "${syntax}"
         else
-            sed_ "${inputFile}"
+            parseInput "${syntax}" "${inputFile}"
         fi
     } \
     | uniq \

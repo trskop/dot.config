@@ -1,6 +1,6 @@
 % YX-JMP(1) YX Toolset 0.1.0 | YX Toolset
 % Peter Trsko
-% 10th April 2019
+% 16th April 2019
 
 
 # NAME
@@ -64,6 +64,12 @@ For documentation of *GLOBAL_OPTIONS* see `command-wrapper(1)` manual page.
 \--root-dir=*DIR*, \--root-dir *DIR*
 :   When executing editor use this directory as a parent dir for the file that
     is being edited.
+
+\--syntax=*SYNTAX*, --syntax *SYNTAX*
+:   Select SYNTAX of input from which filenames will be parsed.  Possible
+    values for SYNTAX are: plain (just list of files, ghc (Haskell compiler)
+    and psc (PureScript compiler).  This optinon is ignored when `--git-status`
+    or `--git-commit` was specified.
 
 \--help, -h
 :   Print short help message and exit.  Same as: `yx help jmp`.
@@ -161,6 +167,12 @@ cat > ${XDG_CONFIG_HOME:-$HOME/.config}/yx/yx-jmp.dhall <<EOF
     }
 }
 EOF
+```
+
+Using `ls` or `find` as a source:
+
+```
+yx jmp --file=<(ls *.json) --syntax=plain
 ```
 
 
