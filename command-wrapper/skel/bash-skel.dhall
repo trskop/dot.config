@@ -5,6 +5,10 @@
 
 set -e
 
+if [[ "${COMMAND_WRAPPER_VERBOSITY:-}" == 'annoying' ]]; then
+    set -x
+fi
+
 source '${libFile}'
 
 function printHelp() {
