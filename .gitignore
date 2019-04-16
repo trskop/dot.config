@@ -50,6 +50,7 @@
 !/habit/pgpass.d/.gitkeep
 /habit/toolset
 /yx/default/aliases.dhall
+/yx/default/aliases-local.dhall
 /yx/new/templates.dhall
 /yx/path/path-local.dhall
 /yx/this/backup-local.dhall
