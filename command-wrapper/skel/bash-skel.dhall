@@ -12,7 +12,7 @@ function printHelp() {
     local -r commandHelp="''${COMMAND_WRAPPER_NAME} help ''${COMMAND_WRAPPER_SUBCOMMAND}"
 
     cat <<EOF
-TODO: I promise to describe this subcommand one day.
+TODO: Hereby I promise to describe this subcommand one day.
 
 Usage:
 
