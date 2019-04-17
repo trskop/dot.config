@@ -8,6 +8,7 @@
 !/bat/
 !/git/
 !/haskeline/
+!/kitty/
 !/nvim/
 !/psql/
 !/readline/
@@ -19,6 +20,10 @@
 !dot.config.init.hs
 !user-dirs.dirs
 !user-dirs.locale
+
+# Machine specific configuration of Kitty.  See ./kitty/README.md for more
+# details.
+/kitty/kitty-local.conf
 
 # Contains private information like `ghci_history` and package database.
 /ghc/
