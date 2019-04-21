@@ -1,14 +1,13 @@
 let CommandWrapper = ../lib/Types.dhall
 
-let home = env:HOME as Text
-
-let fzf =
-      { command = "fzf"
+in    λ(query : Optional Text)
+    → { command = "fzf"
       , arguments =
-          [ "--height", "40%"
-          , "--reverse"
-          ]
+            [ "--height=40%"
+            , "--reverse"
+            ]
+          # Optional/fold Text query (List Text)
+              (λ(query : Text) → ["--query=${query}"])
+              ([] : List Text)
       , environment = [] : List CommandWrapper.EnvironmentVariable
-      }
-
-in  fzf : CommandWrapper.CommandWithEnvironment
+      } : CommandWrapper.CommandWithEnvironment

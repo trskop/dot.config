@@ -17,7 +17,7 @@ let directories =
 let customise =
         λ(defaults : CommandWrapper.CdConfig)
       → { directories = defaults.directories # commonDirectories # directories
-        , menuTool = ./cd/fzf.dhall
+        , menuTool = ./cd/fzf.dhall (None Text)
         , shell = "${env:SHELL as Text ? "/bin/bash"}"
         , terminalEmulator =
             let terminalEmulator =
