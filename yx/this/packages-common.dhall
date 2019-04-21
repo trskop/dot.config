@@ -11,6 +11,15 @@ let osSpecificPackages =
             -- needed to be installed via Pip:
             --, "python-dev", "python-pip"
             --, "python3-dev", "python3-pip"
+
+            -- TODO: Test that these packages are available on Buntish distros:
+
+            , "fzy" -- Fuzzy text selector like `fzf`, but simpler.  The
+                    --   algorithm, it uses, is slightly different, which may
+                    --   be better in some cases.
+
+            , "ripgrep" -- Grep alternative that is faster and uses recursive
+                        --   search by default.
             ]
 
       , BuntishLinux =
@@ -131,4 +140,5 @@ in
 
   , "dia" -- An editor for diagrams, graphs, charts etc.
   ]
+  # merge osSpecificPackages os
   -- }}} Desktop --------------------------------------------------------------
