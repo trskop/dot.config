@@ -20,6 +20,9 @@ let osSpecificPackages =
 
             , "ripgrep" -- Grep alternative that is faster and uses recursive
                         --   search by default.
+
+            , "bfs" -- a variant of the UNIX `find` command that operates
+                    --   breadth-first rather than depth-first.
             ]
 
       , BuntishLinux =
