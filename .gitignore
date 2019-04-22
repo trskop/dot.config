@@ -12,6 +12,7 @@
 !/nvim/
 !/psql/
 !/readline/
+!/ripgrep/
 !/sensible-editor/
 !/stack/
 !/tmux/

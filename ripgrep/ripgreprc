@@ -1,0 +1,6 @@
+# Configuration file for ripgrep (`rg`).  See README.md for documentation
+# links.
+
+# Searches case insensitively if the pattern is all lowercase. Search case
+# sensitively otherwise.
+--smart-case
