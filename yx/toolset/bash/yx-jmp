@@ -24,6 +24,7 @@ Usage:
   ${command} [--file={FILE|-}|-f {FILE|-}] [--root-dir=DIR] [--syntax=SYNTAX]
   ${command} {--git-status|-g}
   ${command} {--git-commit|-G} [COMMIT]
+  ${command} --git-grep GIT_GREP_ARGUMENTS
   ${command} {--help|-h}
   ${commandHelp}
 
@@ -44,6 +45,11 @@ Options:
     Use list of files changed as part of a COMMIT as a source instead of Tmux
     scrollback buffer.  Defaults to 'HEAD' if COMMIT is not specified.
 
+  --git-grep GIT_GREP_ARGUMENTS
+    Same as:
+
+      git grep GIT_GREP_ARGUMENTS | yx jmp -f - --syntax=grep-with-line-numbers
+
   --file={FILE|-}, --file {FILE|-}, -f {FILE|-}
     Read list of files from FILE or stdin.
 
@@ -53,9 +59,17 @@ Options:
 
   --syntax=SYNTAX, --syntax SYNTAX
     Select SYNTAX of input from which filenames will be parsed.  Possible
-    values for SYNTAX are: plain (just list of files, ghc (Haskell compiler)
-    and psc (PureScript compiler).  This optinon is ignored when '--git-status'
-    or '--git-commit' was specified.
+    values for SYNTAX are:
+
+    * plain (just list of files)
+    * ghc (Haskell compiler)
+    * psc (PureScript compiler)
+    * grep (output of grep command)
+    * grep-with-line-numbers (output of grep command when invoked with
+      '{-n|--line-number}' option; 'git grep' output has this format by
+      default)
+
+    This optinon is ignored when one of '--git-*' options was specified.
 
   --help, -h
     Print short help message and exit.  Same as: ${commandHelp}
@@ -113,6 +127,7 @@ function main() {
     # - `status` -- Use `git status` as a source.
     # - `commit` -- Use list of files changed as part of a specified commit as
     #   a source.
+    # - `grep` -- Use 'git grep' as an input.
     local gitAction=''
 
     # Used to store git commit reference in case of following configuration:
@@ -121,6 +136,10 @@ function main() {
     #
     # Empty value is valid and defaults to `HEAD`.
     local gitCommit=''
+
+    # Used to store additional arguments for Git command when invoked with
+    # doGitAction=1.
+    local -a gitActionArguments=()
 
     local rootDir=''
     local inputFile=''
@@ -131,6 +150,8 @@ function main() {
     # - `ghc` -- GHC error and warning messages are parsed.
     # - `psc` -- PureScript compiler `psc` error and warning messages are
     #   parsed.
+    # - `grep`
+    # - `grep-with-line-numbers`
     local syntax='ghc'
 
     # Use terminal-specific way of accessing its scrollback buffer.
@@ -152,7 +173,7 @@ function main() {
             # TODO: We should consider using '--tty=NAME' instead.  Adding
             # ad-hoc options is not the way to go.
             --auto)
-                expectTerminal='aut'
+                expectTerminal='auto'
                 ;;
             --tmux|-t)
                 doGitAction=0
@@ -169,6 +190,12 @@ function main() {
             --git-commit|-G)
                 doGitAction=1
                 gitAction='commit'
+                ;;
+            --git-grep)
+                doGitAction=1
+                gitAction='grep'
+                gitActionArguments=("$@")
+                break;
                 ;;
             --file|-f)
                 if (( ! $# )); then
@@ -217,7 +244,7 @@ function main() {
     done
 
     case "${syntax}" in
-      plain|ghc|psc)
+      plain|ghc|psc|grep|grep-with-line-number)
         :
         ;;
       *)
@@ -231,7 +258,8 @@ function main() {
     fi
 
     if (( doGitAction )); then
-        runGitAction "${rootDir}" "${gitAction}" "${gitCommit}"
+        runGitAction "${rootDir}" "${gitAction}" "${gitCommit}" \
+            "${gitActionArguments[@]}"
     elif [[ -n "${inputFile}" ]]; then
         readFile "${rootDir}" "${syntax}" "${inputFile}"
     else
@@ -264,10 +292,16 @@ function main() {
     fi
 }
 
+# Usage:
+#
+#   runGitAction ROOT_DIR {status|commit|grep} {COMMIT|''} [EXTRA_ARGUMENT ...]
 function runGitAction() {
     local -r rootDir="$1"; shift
     local -r action="$1"; shift
     local -r commit="$1"; shift
+
+    # Extra arguments passed to Git subcommand.  Only used in certain cases.
+    local -ra arguments=("$@")
 
     if ! type git >/dev/null; then
         # Status code choosen based on command-wrapper-subcommand-protocol(1)
@@ -282,6 +316,9 @@ function runGitAction() {
         'commit')
             gitCommit "${rootDir}" "${commit}"
             ;;
+        'grep')
+            gitGrep "${rootDir}" "${arguments[@]}"
+            ;;
         *)
             die 4 "'%s': Unknown internal Git action; probably a bug." \
                 "${action}"
@@ -291,6 +328,8 @@ function runGitAction() {
 
 function gitStatus() {
     local -r rootDir="$1"; shift
+    local -ra arguments=("$@")
+
     eval "$(declareCfg)"
 
     # TODO:
@@ -302,7 +341,7 @@ function gitStatus() {
     #   "${menuCommand[@]}".
 
     # shellcheck disable=SC2154
-    git status -s \
+    git status -s "${arguments[@]}" \
     | sed 's/^.. \(.*\)$/\1 +1/' \
     | "${menuCommand[@]}" \
     | startEditor "${rootDir}"
@@ -331,6 +370,15 @@ function gitCommit() {
 
 # Usage:
 #
+#   gitGrep ROOT_DIR [ARGUMENT ...]
+function gitGrep() {
+    local -r rootDir="$1"; shift
+
+    git grep "$@" | readFile "${rootDir}" 'grep-with-line-numbers' -
+}
+
+# Usage:
+#
 #   parseInput SYNTAX [FILE]
 function parseInput() {
     local -r syntax="$1"; shift
@@ -342,6 +390,14 @@ function parseInput() {
         ;;
       psc)
         substitution='s/^\[[^]]+\] *(.*):([0-9]+):[0-9]+.*$/\1 +\2/'
+        ;;
+      grep)
+        # ${file}:${lineContent}
+        substitution='s/^([^:]+):.*$/\1 +0/'
+        ;;
+      grep-with-line-numbers)
+        # ${file}:${lineNumber}:${lineContent}
+        substitution='s/^([^:]+):([0-9]+):.*$/\1 +\2/'
         ;;
     esac
 

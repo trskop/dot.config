@@ -1,6 +1,6 @@
 % YX-JMP(1) YX Toolset 0.1.0 | YX Toolset
 % Peter Trsko
-% 16th April 2019
+% 27th April 2019
 
 
 # NAME
@@ -16,6 +16,8 @@ yx \[GLOBAL\_OPTIONS] jmp \[\--auto|\--tmux|-t|\--kitty|-k]
 yx \[GLOBAL\_OPTIONS] jmp {\--git-status|-g}
 
 yx \[GLOBAL\_OPTIONS] jmp {\--git-commit|-G} \[*COMMIT*]
+
+yx \[GLOBAL\_OPTIONS] jmp \--git-grep *GIT\_GREP\_ARGUMENTS*
 
 yx \[GLOBAL\_OPTIONS] jmp \[\--file={FILE|-}|\--file {*FILE*|-}|-f {FILE|-}]
 \[\--root-dir=*DIR*|\--root-dir *DIR*] \[\--syntax=*SYNTAX*|\--syntax *SYNTAX*]
@@ -66,6 +68,13 @@ For documentation of *GLOBAL_OPTIONS* see `command-wrapper(1)` manual page.
     Especially useful if you like to have a set of WIP (work in progres)
     commits.
 
+\--git-grep *GIT\_GREP\_ARGUMENTS*
+:   Same as:
+
+    ```
+    git grep GIT_GREP_ARGUMENTS | yx jmp -f - --syntax=grep-with-line-numbers
+    ```
+
 \--file={*FILE*|-}, \--file {*FILE*|-}, -f {*FILE*|-}
 :   Read list of files from *FILE* or `stdin`.
 
@@ -74,10 +83,18 @@ For documentation of *GLOBAL_OPTIONS* see `command-wrapper(1)` manual page.
     is being edited.
 
 \--syntax=*SYNTAX*, \--syntax *SYNTAX*
-:   Select SYNTAX of input from which filenames will be parsed.  Possible
-    values for SYNTAX are: plain (just list of files, ghc (Haskell compiler)
-    and psc (PureScript compiler).  This optinon is ignored when `--git-status`
-    or `--git-commit` was specified.
+:   Select *SYNTAX* of input from which filenames will be parsed.  Possible
+    values for *SYNTAX* are:
+
+    *   *plain* (just list of files)
+    *   *ghc* (Haskell compiler)
+    *   *psc* (PureScript compiler)
+    *   *grep* (output of grep command)
+    *   *grep-with-line-numbers* (output of grep command when invoked with
+        `{-n|--line-number}` option; `git grep` output has this format by
+        default)
+
+    This optinon is ignored when one of `--git-*` options was specified.
 
 \--help, -h
 :   Print short help message and exit.  Same as: `yx help jmp`.
