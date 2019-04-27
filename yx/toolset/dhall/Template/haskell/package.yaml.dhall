@@ -14,13 +14,14 @@
         Optional/fold Text package.executable-dir Text
           ( λ(dir : Text)
           → ''
-            executables:
-              *this:
-                source-dirs: ${dir}
-                main: Main.hs
-                dependencies:
-                  - *this
-            ''
+
+executables:
+  *this:
+    source-dirs: ${dir}
+    main: Main.hs
+    dependencies:
+      - *this
+''
           )
           ""
 
