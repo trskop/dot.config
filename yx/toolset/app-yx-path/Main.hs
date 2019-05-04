@@ -15,7 +15,14 @@ module Main (main)
 import Control.Applicative (many)
 --import Data.String (fromString)
 
-import CommandWrapper.Prelude (Params(Params, config), subcommandParams)
+import CommandWrapper.Prelude
+    ( HaveCompletionInfo(completionInfoMode)
+    , Params(Params, config)
+    , completionInfoFlag
+    , printOptparseCompletionInfoExpression
+    , stdout
+    , subcommandParams
+    )
 import Data.Monoid.Endo (E)
 import Data.Text (Text)
 import qualified Data.Text as Text (strip, {-unlines,-} unwords)
@@ -27,19 +34,32 @@ import qualified Main.Dhall as Dhall (Options(..), Output(..))
 import qualified Main.Paths as Paths (mk)
 
 
+data Mode
+    = DefaultMode Dhall.Options Text
+    | CompletionInfo
+
+instance HaveCompletionInfo Mode where
+    completionInfoMode = const CompletionInfo
+
 main :: IO ()
 main = do
-    params@Params{config} <- subcommandParams
+    params <- subcommandParams
+    parseOptions >>= \case
+        DefaultMode dhallOptions possibleExpression ->
+            defaultAction params dhallOptions possibleExpression
 
-    configExists <- Turtle.testfile (Turtle.fromString config)
+        CompletionInfo ->
+            printOptparseCompletionInfoExpression stdout
+  where
+    defaultAction params@Params{config} dhallOptions possibleExpression = do
+        configExists <- Turtle.testfile (Turtle.fromString config)
+        paths <- Paths.mk params
+        let configFile = if configExists then Just config else Nothing
+        dhall dhallOptions paths configFile =<< case possibleExpression of
+            "" -> pure "data : {paths : Paths, config : Config}"
+            "-" -> Text.getContents
+            _ -> pure possibleExpression
 
-    (dhallOptions, possibleExpressionText) <- parseOptions
-    paths <- Paths.mk params
-    let configFile = if configExists then Just config else Nothing
-    dhall dhallOptions paths configFile =<< case possibleExpressionText of
-        "" -> pure "data : {paths : Paths, config : Config}"
-        "-" -> Text.getContents
-        _ -> pure possibleExpressionText
 
 --printHelp :: Params -> IO ()
 --printHelp Params{name} = Text.putStr . Text.unlines $ fmap Text.unwords
@@ -52,13 +72,13 @@ main = do
 --  where
 --    options = "[--plain|--type]"
 
-parseOptions :: IO (Dhall.Options, Text)
-parseOptions = Turtle.options "Paths"
-    ( go
-        <$> plainOption
-        <*> typeOption
-        <*> many (Turtle.argText "EXPRESSION" "Dhall expression.")
-    )
+parseOptions :: IO Mode
+parseOptions = Turtle.options "Paths" $ completionInfoFlag
+    <*> ( go
+            <$> plainOption
+            <*> typeOption
+            <*> many (Turtle.argText "EXPRESSION" "Dhall expression.")
+        )
   where
     plainOption, typeOption :: Turtle.Parser (E Dhall.Output)
     plainOutput, typeOutput :: Bool -> E Dhall.Output
@@ -80,13 +100,12 @@ parseOptions = Turtle.options "Paths"
       | p = const Dhall.DhallType
       | otherwise = id
 
-    go :: E Dhall.Output -> E Dhall.Output -> [Text] -> (Dhall.Options, Text)
-    go f g as =
-        ( Dhall.Options
+    go :: E Dhall.Output -> E Dhall.Output -> [Text] -> Mode
+    go f g as = DefaultMode
+        Dhall.Options
             { Dhall.output = f (g Dhall.DhallExpression)
             }
-        , Text.strip (Text.unwords as)
-        )
+        (Text.strip (Text.unwords as))
 
 -- TODO:
 --

@@ -48,7 +48,7 @@ that as well.
 
 For documentation of *GLOBAL_OPTIONS* see `command-wrapper(1)` manual page.
 
---auto
+\--auto
 :   Use heuristic to decide if running in Tmux or Kitty.  This is the default
     mode, when no other mode-changing option is specified.
 

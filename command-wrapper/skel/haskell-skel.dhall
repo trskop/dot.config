@@ -6,12 +6,17 @@
 module Main (main)
   where
 
+import Data.Function (const)
 import GHC.Generics (Generic)
-import System.IO (stderr)
 
 import CommandWrapper.Prelude
-    ( Params(Params, config)
+    ( HaveCompletionInfo(completionInfoMode)
+    , Params(Params, config)
+    , completionInfoFlag
     , dieWith
+    , printOptparseCompletionInfoExpression
+    , stderr
+    , stdout
     , subcommandParams
     )
 import qualified Dhall
@@ -22,19 +27,27 @@ data Config = Config
   deriving stock (Generic, Show)
   deriving anyclass (Dhall.Interpret)
 
-data Mode = Mode
+data Mode
+    = DefaultMode
+    | CompletionInfo
   deriving stock (Generic, Show)
+
+instance HaveCompletionInfo Mode where
+    completionInfoMode = const CompletionInfo
 
 main :: IO ()
 main = do
     params@Params{config = configFile} <- subcommandParams
-    mode <- Turtle.options "TODO: Describe me!" parseOptions
+    mode <- Turtle.options description (completionInfoFlag <*> parseOptions)
     config <- Dhall.inputFile Dhall.auto configFile
     realMain params config mode
+  where
+    description = "TODO: Hereby I promise to describe this subcommand one day."
 
 parseOptions :: Turtle.Parser Mode
-parseOptions = pure Mode
+parseOptions = pure DefaultMode
 
 realMain :: Params -> Config -> Mode -> IO ()
 realMain params _config = \case
-    Mode -> dieWith params stderr 125 "Not yet implemented!"''
+    DefaultMode -> dieWith params stderr 125 "Not yet implemented!"
+    CompletionInfo -> printOptparseCompletionInfoExpression stdout''

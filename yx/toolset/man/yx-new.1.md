@@ -1,6 +1,6 @@
 % YX-NEW(1) YX Toolset 0.1.0 | YX Toolset
 % Peter Trsko
-% 20th January 2019
+% 5th May 2019
 
 
 # NAME
@@ -21,7 +21,8 @@ yx \[GLOBAL\_OPTIONS] help new
 
 # DESCRIPTION
 
-**TODO**
+Create a package/project structure from a template.  As opposed to other
+project templating application this one uses Dhall for template definition.
 
 
 # OPTIONS

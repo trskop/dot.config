@@ -17,11 +17,14 @@ import Control.Monad (unless, when)
 import Data.Foldable (asum, forM_)
 import Data.Functor ((<&>))
 import GHC.Generics (Generic)
-import System.IO (stderr)
+import System.IO (stderr, stdout)
 
 import CommandWrapper.Prelude
-    ( Params(Params, config)
+    ( HaveCompletionInfo(completionInfoMode)
+    , Params(Params, config)
+    , completionInfoFlag
     , dieWith
+    , printOptparseCompletionInfoExpression
     , subcommandParams
     )
 import qualified Data.HashMap.Strict as HashMap (fromList, lookup)
@@ -69,17 +72,23 @@ data Mode a
     = New Text (Maybe FilePath) a
     | List a
     | Help a
+    | CompletionInfo
   deriving stock (Generic, Show)
+
+instance HaveCompletionInfo (Mode a) where
+    completionInfoMode = const CompletionInfo
 
 main :: IO ()
 main = do
     params@Params{config = configFile} <- subcommandParams
-    mode <- Turtle.options "TODO: Describe me!" parseOptions
+    mode <- Turtle.options description parseOptions
     config <- Dhall.inputFile Dhall.auto configFile
     realMain params config mode
+  where
+    description = "Create a package/project structure from a template."
 
 parseOptions :: Turtle.Parser (Mode (Config -> Config))
-parseOptions = asum
+parseOptions = completionInfoFlag <*> asum
     [ new
         <$> Turtle.argText "TEMPLATE_NAME" "Name of template to use"
         <*> optional (Turtle.argText "DIRECTORY" "Directory")
@@ -98,6 +107,9 @@ realMain :: Params -> Config -> Mode (Config -> Config) -> IO ()
 realMain params config = \case
     Help _ ->
         dieWith params stderr 125 "Bug: This should not happen at the moment."
+
+    CompletionInfo ->
+        printOptparseCompletionInfoExpression stdout
 
     List f ->
         mapM_ Text.putStrLn $ templateNames (f config)

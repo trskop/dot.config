@@ -18,9 +18,13 @@ import Data.Monoid (Endo(..), mempty)
 import Data.String (fromString)
 
 import CommandWrapper.Prelude
-    ( Params(Params, config)
+    ( HaveCompletionInfo(completionInfoMode)
+    , Params(Params, config)
+    , completionInfoFlag
     , dieWith
+    , printOptparseCompletionInfoExpression
     , stderr
+    , stdout
     , subcommandParams
     )
 import Data.Monoid.Endo.Fold (dualFoldEndo)
@@ -136,6 +140,9 @@ main = do
         Default (Just config) ->
             defaultAction params config
 
+        CompletionInfo ->
+            printOptparseCompletionInfoExpression stdout
+
         _ ->
             let Params{config} = params
             in dieWith params stderr 1
@@ -151,7 +158,11 @@ data Mode config
     | Edit EditWhat config
     | CreateDefaultConfig config
     | Default config
+    | CompletionInfo
   deriving stock (Functor, Show)
+
+instance HaveCompletionInfo (Mode config) where
+    completionInfoMode = const CompletionInfo
 
 switchMode :: (forall x. x -> Mode x) -> Endo (Mode config)
 switchMode f = Endo $ \case
@@ -159,6 +170,7 @@ switchMode f = Endo $ \case
     Edit _ config -> f config
     CreateDefaultConfig config -> f config
     Default config -> f config
+    CompletionInfo -> CompletionInfo
 
 switchMode1 :: (forall x. a -> x -> Mode x) -> a -> Endo (Mode config)
 switchMode1 f a = switchMode (f a)
@@ -171,7 +183,8 @@ parseOptions = Turtle.options "TODO: Describe me!" options
 
 options :: Options.Parser (Endo (Mode config))
 options = asum
-    [ dualFoldEndo
+    [ Endo <$> completionInfoFlag
+    , dualFoldEndo
         <$> updateFlag
         <*> many
             ( systemFlag

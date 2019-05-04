@@ -7,7 +7,7 @@ if [[ "${COMMAND_WRAPPER_VERBOSITY:-}" == 'annoying' ]]; then
 fi
 
 # shellcheck source=/dev/null
-source ~/.local/src/github.com/trskop/command-wrapper/bash/lib.sh
+source <(COMMAND_WRAPPER_INVOKE_AS="${COMMAND_WRAPPER_NAME}" "${COMMAND_WRAPPER_EXE}" completion --library --shell=bash)
 
 function printHelp() {
     local -r command="${COMMAND_WRAPPER_NAME} ${COMMAND_WRAPPER_SUBCOMMAND}"
@@ -76,6 +76,72 @@ Options:
 
 See yx-jmp(1) manual page for documentation.
 EOF
+}
+
+# Print Dhall expression that describes how this subcommand should be invoked
+# when performing command line completion.  See
+# `command-wrapper-subcommand-protocol(7)` for more details on how this works.
+function completionInfo() {
+    cat <<"EOF"
+  λ(_ : <Bash : {} | Fish : {} | Zsh : {}>)
+→ λ(index : Natural)
+→ λ(words : List Text)
+→ [ "--completion", "--index=${Natural/show index}", "--" ] # words
+EOF
+}
+
+# Perform command line completion.
+#
+# Usage:
+#
+#   completion [--index=INDEX] [[--] WORD [...]]
+#
+# Bash itself provides `compgen` builtin command that can do a lot of standard
+# command line completion functions.  See `bash(1)` or `help compgen` for more
+# details.
+function completion() {
+    local index=-1
+    local -a words=
+
+    local arg
+    while (( $# )); do
+        arg="$1"; shift
+        case "${arg}" in
+            --index=*)
+                index="${arg#*=}"
+                ;;
+            --)
+                words=("$@")
+                break
+                ;;
+            -*)
+                die 1 "'%s': Unknown completion option." "${arg}"
+                ;;
+            *)
+                words=("${arg}" "$@")
+                break
+                ;;
+        esac
+    done
+
+    if (( ! ${#words[@]} )); then
+        words=("")
+    fi
+
+    # TODO: This completion is quite naive.
+    local -r options="--auto
+--tmux -t
+--kitty -k
+--git-status -g
+--git-commit -G
+--git-grep
+--file= --file -f
+--root-dir= --root-dir
+--syntax --syntax=plain --syntax=ghc --syntax=psc --syntax=grep
+  --syntax=grep-with-line-numbers
+--help -h"
+
+    compgen -W "${options}" -- "${words[${index}]}"
 }
 
 function declareCfg() {
@@ -170,6 +236,15 @@ function main() {
                 printHelp
                 exit 0
                 ;;
+            --completion-info)
+                completionInfo
+                exit 0
+                ;;
+            --completion)
+                completion "$@"
+                exit 0
+                ;;
+
             # TODO: We should consider using '--tty=NAME' instead.  Adding
             # ad-hoc options is not the way to go.
             --auto)

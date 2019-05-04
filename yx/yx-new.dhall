@@ -1,4 +1,4 @@
-let NamedTemplate = ./new/NamedTemplate.dhall
+let NamedTemplate = (./toolset/dhall/Template/Types.dhall).NamedTemplate
 
 let noTemplates = [] : List NamedTemplate
 

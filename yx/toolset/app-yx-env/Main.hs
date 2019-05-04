@@ -28,12 +28,16 @@ import System.IO
     , hPutStr
     , hPutStrLn
     , openTempFile
+    , stdout
     )
 
 import CommandWrapper.Prelude
-    ( Params(Params, colour, config, name, subcommand, verbosity)
-    , subcommandParams
+    ( HaveCompletionInfo(completionInfoMode)
+    , Params(Params, colour, config, name, subcommand, verbosity)
+    , completionInfoFlag
+    , printOptparseCompletionInfoExpression
     , shouldUseColours
+    , subcommandParams
     )
 import Data.HashMap.Strict (HashMap)
 import qualified Data.HashMap.Strict as HashMap (fromList, lookup)
@@ -124,7 +128,11 @@ data Mode a
     | Dump FilePath a
     | Diff FilePath a
     | Default a
+    | CompletionInfo
   deriving stock (Show)
+
+instance HaveCompletionInfo (Mode a) where
+    completionInfoMode = const CompletionInfo
 
 switchMode :: (forall b. b -> Mode b) -> Mode cfg -> Mode cfg
 switchMode f = \case
@@ -137,6 +145,7 @@ switchMode f = \case
     Dump _ cfg -> f cfg
     Diff _ cfg -> f cfg
     Default cfg -> f cfg
+    CompletionInfo -> CompletionInfo
 
 switchMode1 :: (forall b. a -> b -> Mode b) -> a -> Mode cfg -> Mode cfg
 switchMode1 f a = switchMode (f a)
@@ -146,8 +155,10 @@ switchMode1 f a = switchMode (f a)
 parseOptions :: Config -> IO (Mode Config)
 parseOptions config = Turtle.options "env" options <&> ($ Default config)
   where
-    options = asum
-        [ runHookMode <$> Turtle.optText "run-hook" 'r'
+    options =asum
+        [ completionInfoFlag
+
+        , runHookMode <$> Turtle.optText "run-hook" 'r'
             "Execute shell hook.  This is usually called when shell prompt is\
             \ redrawn.  See also '--script' option."
 
@@ -212,6 +223,9 @@ parseOptions config = Turtle.options "env" options <&> ($ Default config)
 
 env :: Params -> Mode Config -> IO ()
 env params@Params{name, subcommand} = \case
+    CompletionInfo ->
+        printOptparseCompletionInfoExpression stdout
+
     Default config ->
         defaultAction params config
 

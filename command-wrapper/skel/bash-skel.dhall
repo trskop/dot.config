@@ -5,12 +5,15 @@
 
 set -e
 
-if [[ "${COMMAND_WRAPPER_VERBOSITY:-}" == 'annoying' ]]; then
+if [[ "''${COMMAND_WRAPPER_VERBOSITY:-}" == 'annoying' ]]; then
+    # This will cause Bash to print commands before executing them.
     set -x
 fi
 
-source '${libFile}'
+# shellcheck source=/dev/null
+source <(COMMAND_WRAPPER_INVOKE_AS="''${COMMAND_WRAPPER_NAME}" "''${COMMAND_WRAPPER_EXE}" completion --library --shell=bash)
 
+# Print help message to standard output.
 function printHelp() {
     local -r command="''${COMMAND_WRAPPER_NAME} ''${COMMAND_WRAPPER_SUBCOMMAND}"
     local -r commandHelp="''${COMMAND_WRAPPER_NAME} help ''${COMMAND_WRAPPER_SUBCOMMAND}"
@@ -26,9 +29,62 @@ Usage:
 
 Options:
 
-  -h, --help
+  --help, -h
     Print short help message and exit.  Same as: ''${commandHelp}
 EOF
+}
+
+# Print Dhall expression that describes how this subcommand should be invoked
+# when performing command line completion.  See
+# `command-wrapper-subcommand-protocol(7)` for more details on how this works.
+function completionInfo() {
+    cat <<"EOF"
+  λ(_ : <Bash : {} | Fish : {} | Zsh : {}>)
+→ λ(index : Natural)
+→ λ(words : List Text)
+→ [ "--completion", "--index=''${Natural/show index}", "--" ] # words
+EOF
+}
+
+# Perform command line completion.
+#
+# Usage:
+#
+#   completion [--index=INDEX] [[--] WORD [...]]
+#
+# Bash itself provides `compgen` builtin command that can do a lot of standard
+# command line completion functions.  See `bash(1)` or `help compgen` for more
+# details.
+function completion() {
+    local index=-1
+    local -a words=
+
+    local arg
+    while (( $# )); do
+        arg="$1"; shift
+        case "''${arg}" in
+            --index=*)
+                index="''${arg#*=}"
+                ;;
+            --)
+                words=("$@")
+                break
+                ;;
+            -*)
+                die 1 "'%s': Unknown completion option." "''${arg}"
+                ;;
+            *)
+                words=("''${arg}" "$@")
+                break
+                ;;
+        esac
+    done
+
+    if (( ! ''${#words[@]} )); then
+        words=("")
+    fi
+
+    compgen -W '--help -h' -- "''${words[''${index}]}"
 }
 
 # Read configuration file in Dhall format and declare Bash variables based on
@@ -62,20 +118,47 @@ function main() {
     #   command-wrapper-subcommand-protocol(7)
     dieIfExecutedOutsideOfCommandWrapperEnvironment
 
+    # It is upto subcommand to decide what command linen options should be
+    # supported, and how they should be parsed, but each subcommand has to
+    # support following:
+    #
+    # * --help, -h
+    # * --completion-info
+    #
+    # See Command Wrapper's Subcommand Protocol for more information.  It is
+    # available in the form of command-wrapper-subcommand-protocol(7) manual
+    # page.
     local arg
     while (( $# )); do
         arg="$1"; shift
         case "''${arg}" in
-            # Supporting '--help' is required by the
-            # command-wrapper-subcommand-protocol(7).
+            # Supporting '--help' is required by the Subcommand Protocol.
             -h|--help)
                 printHelp
                 exit 0
                 ;;
+
+            # Supporting '--completion-info' is required by the Subcommand
+            # Protocol.
+            --completion-info)
+                completionInfo
+                exit 0
+                ;;
+
+            # Implementation of command line completion.  It is upto individual
+            # subcommands to decide how this should be implemented, however
+            # the implementation of '--completion-info' has to print Dhall
+            # expression that is consistent with the choosen approach.
+            --completion)
+                completion "$@"
+                exit 0
+                ;;
+
             # TODO: Define additional options here.
             -*)
                 die 1 "'%s': Unknown option." "''${arg}"
                 ;;
+
             # TODO: Define arguments here.
             *)
                 die 1 "'%s': Too many arguments." "''${arg}"
