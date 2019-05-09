@@ -1,7 +1,7 @@
 # For advanced use and comprehensive documentation of the format, please see:
 # https://docs.haskellstack.org/en/stable/yaml_configuration/
 
-resolver: lts-13.19
+resolver: lts-13.20
 
 packages:
   - '.'
@@ -15,7 +15,7 @@ packages:
     extra-dep: True
   - location:
       git: https://github.com/trskop/command-wrapper.git
-      commit: e1b8976a679970c62213d1420b1e8fdb70aee528
+      commit: 7f81a88b60ef27d7ae64988d87f0e9ffcb1d9ca1
     extra-dep: True
   - location:
       git: https://github.com/trskop/genbashrc.git
@@ -27,10 +27,10 @@ extra-deps:
   - fuzzy-0.1.0.0
   - verbosity-0.3.0.0
 
-  - dhall-1.21.0
-  - dhall-bash-1.0.19
-  - dhall-json-1.2.7
-  - dhall-text-1.0.16
+  - dhall-1.22.0
+  - dhall-bash-1.0.20
+  - dhall-json-1.2.8
+  - dhall-text-1.0.17
 
 # Keeping the following in case of new Dhall release:
   # Dhall dependencies:
