@@ -294,7 +294,8 @@ install Directories{..} opts = shakeArgs opts $ do
         -- We need to make sure that correct version of dhall command is used.
         -- Stack may give access to a different version based on resolver in
         -- this script, that is the reason for absolute path to the executable.
-        cmd_ (Stdin src) (FileStdout out) [dotLocalDir </> "bin" </> "dhall"]
+        cmd_ (Stdin src) (FileStdout out)
+            [dotLocalDir </> "bin" </> "dhall", "freeze", "--all"]
 
     yxRules YxRulesParams
         { configDir = yxDir
@@ -396,7 +397,8 @@ yxRules YxRulesParams{..} = do
         -- We need to make sure that correct version of dhall command is used.
         -- Stack may give access to a different version based on resolver in
         -- this script, that is the reason for absolute path to the executable.
-        cmd_ (Stdin src) (FileStdout out) [dotLocalDir </> "bin" </> "dhall"]
+        cmd_ (Stdin src) (FileStdout out)
+            [dotLocalDir </> "bin" </> "dhall", "freeze", "--all"]
 
     (libDir </> "yx-jmp") %> \out ->
         let src = configDir </> "toolset" </> "bash" </> "yx-jmp"
@@ -428,7 +430,8 @@ habitRules HabitRulesParamams{..} = do
         -- We need to make sure that correct version of dhall command is used.
         -- Stack may give access to a different version based on resolver in
         -- this script, that is the reason for absolute path to the executable.
-        cmd_ (Stdin src) (FileStdout out) [dotLocalDir </> "bin" </> "dhall"]
+        cmd_ (Stdin src) (FileStdout out)
+            [dotLocalDir </> "bin" </> "dhall", "freeze", "--all"]
 
     -- See `psql(1)` for more details about `pgpass` file.
     (configDir </> "pgpass.conf") %> \out -> do
