@@ -23,6 +23,9 @@ let osSpecificPackages =
 
             , "bfs" -- a variant of the UNIX `find` command that operates
                     --   breadth-first rather than depth-first.
+
+            , "mbuffer" -- Stream buffering tool that also shows the I/O rate
+                        --   and summary to the user.
             ]
 
       , BuntishLinux =
