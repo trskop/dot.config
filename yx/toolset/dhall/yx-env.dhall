@@ -51,8 +51,8 @@
 --
 -- let VariableOperation : Type =
 --       < Set : {name : Text, value : Text}  -- Same as 'Variable'.
---       , Unset : {name : Text}
---       , Modify : {name : Text, modify : Optional Text → Optional Text}
+--       | Unset : {name : Text}
+--       | Modify : {name : Text, modify : Optional Text → Optional Text}
 --       >
 --
 -- let VariableOperations : Type = List VariableOperation
