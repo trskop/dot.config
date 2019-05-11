@@ -71,7 +71,6 @@ operation = \case
             [ previouslyDefined name (Just value)
             , "unset " <> name
             ]
-
   where
     previouslyDefined name value =
         "# " <> name <> "=" <> fromMaybe "" value

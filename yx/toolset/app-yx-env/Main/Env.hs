@@ -1,3 +1,4 @@
+{-# LANGUAGE BlockArguments #-}
 -- |
 -- Module:      Main.Env
 -- Description: Algebra of environment modifications.
@@ -16,19 +17,21 @@ module Main.Env
     , reverseOperation
     , apply
     , diff
+    , summary
     )
   where
 
 import Data.Function (on)
 import Data.Functor ((<&>))
 import qualified Data.List as List (sort)
-import Data.Maybe (mapMaybe)
+import Data.Maybe (isNothing, mapMaybe)
 import Data.Monoid (Endo(..))
 import GHC.Generics (Generic)
 
 import Data.Algorithm.Diff (Diff(..), getDiffBy)
 import Data.HashMap.Strict (HashMap)
 import qualified Data.HashMap.Strict as HashMap (delete, insert, lookup)
+import Data.Text (Text)
 import qualified Dhall (Inject, Interpret)
 import System.Environment.Variable (EnvVarName, EnvVarValue)
 
@@ -149,3 +152,15 @@ diff old new =
 
           | otherwise ->
                 Just SetEnv{name, value, originalValue = Just originalValue}
+
+summary :: [SetOrUnsetEnvVar] -> HashMap EnvVarName EnvVarValue -> [Text]
+summary = foldMap \case
+    SetEnv{name, value} -> \env ->
+        case HashMap.lookup name env of
+            Nothing -> ["+" <> name]
+            Just v
+              | v /= value -> ["~" <> name]
+              | otherwise  -> []
+
+    UnsetEnv{name} -> \env ->
+        if isNothing (HashMap.lookup name env) then ["-" <> name] else []

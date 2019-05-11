@@ -44,7 +44,7 @@ import CommandWrapper.Prelude
 import Data.HashMap.Strict (HashMap)
 import qualified Data.HashMap.Strict as HashMap (fromList, lookup)
 import Data.Text (Text)
-import qualified Data.Text as Text (unpack)
+import qualified Data.Text as Text (unpack, unwords)
 import qualified Data.Text.IO as Text (hPutStr, putStr)
 import qualified Data.Text.Lazy as Lazy (Text)
 import qualified Data.Text.Lazy as Lazy.Text (null, toStrict)
@@ -94,7 +94,7 @@ import qualified Main.Shell.Bash as Bash
     , unsetEnvDir
     , unsetState
     )
-import Main.Env (SetOrUnsetEnvVar)
+import Main.Env (SetOrUnsetEnvVar, reverseOperation, summary)
 import qualified Main.Env as Env (apply)
 import Main.State (File(..), State(..), emptyState, readState, writeState)
 
@@ -400,7 +400,7 @@ enterEnv stateEnvVar params possiblyEnv shellPid envVars = do
 
     unless (Lazy.Text.null applyEnv) $ do
         printMsg params Info "Updating environment:"
-        printMsg params Notice (Lazy.Text.toStrict applyEnv)
+        printMsg params Notice $ Text.unwords (summary changes envVars)
   where
     getChanges :: (Text, Text, [SetOrUnsetEnvVar], Lazy.Text)
     getChanges = maybe mempty getChanges' possiblyEnv
@@ -464,17 +464,18 @@ leaveEnv
     -> Maybe File
     -> HashMap Text Text
     -> IO (HashMap Text Text)
-leaveEnv params State{changes} possiblyEnvFile e = do
+leaveEnv params State{changes} possiblyEnvFile envVars = do
     let restore = Lazy.Text.toStrict . genBash $ Bash.reverseOperations changes
 
     unless (null changes) $ do
         printMsg params Info "Restoring environment:"
-        printMsg params Notice restore
+        let report = summary (reverseOperation <$> changes) envVars
+        printMsg params Notice (Text.unwords report)
 
     when (isNothing possiblyEnvFile)
         $ Lazy.Text.putStr (Bash.unsetEnvDir "YX_ENV_DIR")
 
-    Env.apply changes e <$ Text.putStr restore
+    Env.apply changes envVars <$ Text.putStr restore
 
 -- ----------------------------------------------------------------------------
 
