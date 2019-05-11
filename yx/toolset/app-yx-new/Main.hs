@@ -73,6 +73,7 @@ data Mode a
     | List a
     | Help a
     | CompletionInfo
+    | Completion Word [String]
   deriving stock (Generic, Show)
 
 instance HaveCompletionInfo (Mode a) where
@@ -92,6 +93,7 @@ parseOptions = completionInfoFlag <*> asum
     [ new
         <$> Turtle.argText "TEMPLATE_NAME" "Name of template to use"
         <*> optional (Turtle.argText "DIRECTORY" "Directory")
+
     , Options.flag' (List id) $ mconcat
         [ Options.long "list"
         , Options.long "ls"
@@ -106,10 +108,13 @@ parseOptions = completionInfoFlag <*> asum
 realMain :: Params -> Config -> Mode (Config -> Config) -> IO ()
 realMain params config = \case
     Help _ ->
-        dieWith params stderr 125 "Bug: This should not happen at the moment."
+        notYetImplemented
 
     CompletionInfo ->
         printOptparseCompletionInfoExpression stdout
+
+    Completion _ _ ->
+        notYetImplemented
 
     List f ->
         mapM_ Text.putStrLn $ templateNames (f config)
@@ -128,6 +133,9 @@ realMain params config = \case
             (name, template)
 
     templateNames Config{templates} = name <$> templates
+
+    notYetImplemented =
+        dieWith params stderr 125 "Bug: This should not happen at the moment."
 
 createProjectFromTemplate :: Params -> Text -> Maybe Template -> IO ()
 createProjectFromTemplate params name = \case

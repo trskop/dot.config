@@ -143,12 +143,29 @@ main = do
         CompletionInfo ->
             printOptparseCompletionInfoExpression stdout
 
-        _ ->
-            let Params{config} = params
-            in dieWith params stderr 1
-                ( fromString (show config) <> ": Configuration file is missing\
-                \, you can use '--default-config' to generate initial value."
-                )
+        Completion _ _ ->
+            notYetImplemented params
+
+        Help ->
+            notYetImplemented params
+
+        Update _ Nothing ->
+            missingConfig params
+
+        Edit _ Nothing ->
+            missingConfig params
+
+        Default Nothing ->
+            missingConfig params
+  where
+    missingConfig params@Params{config} = dieWith params stderr 1
+        ( fromString (show config) <> ": Configuration file is missing, you\
+            \ can use '--default-config' to generate initial value."
+        )
+
+    notYetImplemented params =
+        dieWith params stderr 125 "Bug: This should not happen at the moment."
+
 
 readConfig :: Params -> mode a -> IO (Either String (Endo (Maybe Config)))
 readConfig params _ = Right . Endo . const <$> Config.read params
@@ -159,6 +176,8 @@ data Mode config
     | CreateDefaultConfig config
     | Default config
     | CompletionInfo
+    | Completion Word [String]
+    | Help
   deriving stock (Functor, Show)
 
 instance HaveCompletionInfo (Mode config) where
@@ -171,6 +190,8 @@ switchMode f = Endo $ \case
     CreateDefaultConfig config -> f config
     Default config -> f config
     CompletionInfo -> CompletionInfo
+    Completion i ws -> Completion i ws
+    Help -> Help
 
 switchMode1 :: (forall x. a -> x -> Mode x) -> a -> Endo (Mode config)
 switchMode1 f a = switchMode (f a)

@@ -28,6 +28,7 @@ import System.IO
     , hPutStr
     , hPutStrLn
     , openTempFile
+    , stderr
     , stdout
     )
 
@@ -35,6 +36,7 @@ import CommandWrapper.Prelude
     ( HaveCompletionInfo(completionInfoMode)
     , Params(Params, colour, config, name, subcommand, verbosity)
     , completionInfoFlag
+    , dieWith
     , printOptparseCompletionInfoExpression
     , shouldUseColours
     , subcommandParams
@@ -129,6 +131,8 @@ data Mode a
     | Diff FilePath a
     | Default a
     | CompletionInfo
+    | Completion Word [String]
+    | Help
   deriving stock (Show)
 
 instance HaveCompletionInfo (Mode a) where
@@ -146,6 +150,8 @@ switchMode f = \case
     Diff _ cfg -> f cfg
     Default cfg -> f cfg
     CompletionInfo -> CompletionInfo
+    Completion i ws -> Completion i ws
+    Help -> Help
 
 switchMode1 :: (forall b. a -> b -> Mode b) -> a -> Mode cfg -> Mode cfg
 switchMode1 f a = switchMode (f a)
@@ -225,6 +231,12 @@ env :: Params -> Mode Config -> IO ()
 env params@Params{name, subcommand} = \case
     CompletionInfo ->
         printOptparseCompletionInfoExpression stdout
+
+    Completion _ _ ->
+        notYetImplemented
+
+    Help ->
+        notYetImplemented
 
     Default config ->
         defaultAction params config
@@ -356,6 +368,9 @@ env params@Params{name, subcommand} = \case
         diffAction params config file
   where
     stateEnvVar = "YX_ENV_STATE" :: Text
+
+    notYetImplemented =
+        dieWith params stderr 125 "Bug: This should not happen at the moment."
 
 isStateStale :: State -> Maybe File -> Bool
 isStateStale State{config} currentConfig = config /= currentConfig
