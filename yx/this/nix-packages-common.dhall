@@ -19,4 +19,5 @@
                     -- applications. <https://docs.docker.com/compose/>
 
 , "neovim-remote" -- Control Neovim process from shell.
+                  -- <https://github.com/mhinz/neovim-remote>
 ]

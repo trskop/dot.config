@@ -128,6 +128,13 @@ subcommand will be listed below.
           , arguments : List Text
           }
 
+    , neovimRemote
+        : ∀(file : Text)     -- File to be edited.
+        → ∀(line : Natural)  -- Move cursor to this line.
+        → { command : Text
+          , arguments : List Text
+          }
+
     , menu : { command : Text, arguments : List Text }
     }
     ```
@@ -177,6 +184,7 @@ mentioned there applies to this subcommand as well.
 :   Allows `yx jmp` to determine if it's running inside Vim/Neovim terminal.
     Even if Vim/Neovim is running inside Tmux or Kitty we are unable to access
     scrollback buffer when running inside Vim/Neovim terminal.
+    <https://vi.stackexchange.com/questions/6178/detect-neovim-terminal-from-bash-in-bashrc>
 
 `NVIM_LISTEN_ADDRESS`
 :   If set it allows `yx jmp` to open files in remote Neovim instead of
@@ -198,6 +206,14 @@ cat > ${XDG_CONFIG_HOME:-$HOME/.config}/yx/yx-jmp.dhall <<EOF
           env:VISUAL as Text ? "nvim"
 
       , arguments = [file, "+${Natural/show line}"]
+      }
+
+, neovimRemote =
+      λ(file : Text)
+    → λ(line : Natural)
+    → { command = "nvr"
+      -- Open files using ':vsplit'.
+      , arguments = ["--nostart", "-O", file]
       }
 
 , menu =
@@ -227,6 +243,9 @@ yx-env(1), yx-new(1), yx-path(1), yx-this(1), yx(1), command-wrapper(1)
 
 * [XDG Base Directory Specification
   ](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html)
+* [neovim-remote](https://github.com/mhinz/neovim-remote)
+* [Neovim restore --remote (+clientserver) #1750
+  ](https://github.com/neovim/neovim/issues/1750)
 
 
 # BUGS
