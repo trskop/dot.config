@@ -75,6 +75,12 @@ Options:
 
       This optinon is ignored when one of '--git-*' options was specified.
 
+  --[no-]neovim-remote
+      Allow/disable Neovim remote control functionality when
+      'NVIM_LISTEN_ADDRESS' environment variable is set.  When enabled 'yx jmp'
+      will try to open file in remote Neovim instead of starting a new editor
+      process.
+
   --help, -h
       Print short help message and exit.  Same as: ${commandHelp}
 
@@ -159,6 +165,7 @@ EOF
 }
 
 function startEditor() {
+    local -r -i allowNeovimRemote="$1"; shift
     local -r rootDir="$1"; shift
     local params=''
     read -r params
@@ -173,11 +180,19 @@ function startEditor() {
     local -r file="${rootDir%/}${rootDir:+/}${params% +[0-9]*}"
     local -r line="${params##* +}"
 
-    eval "$(dhall-to-bash --declare 'editorCommand' <<EOF
+    if (( allowNeovimRemote )) && [[ -n "${NVIM_LISTEN_ADDRESS}" ]]; then
+        eval "$(dhall-to-bash --declare 'editorCommand' <<EOF
+let editor = (${COMMAND_WRAPPER_CONFIG}).neovimRemote "${file}" ${line}
+in  [editor.command] # editor.arguments
+EOF
+        )"
+    else
+        eval "$(dhall-to-bash --declare 'editorCommand' <<EOF
 let editor = (${COMMAND_WRAPPER_CONFIG}).editor "${file}" ${line}
 in  [editor.command] # editor.arguments
 EOF
         )"
+    fi
 
     # shellcheck disable=SC2154
     exec "${editorCommand[@]}"
@@ -231,6 +246,8 @@ function main() {
     # - `tmux` -- Expect to be running in a Tmux pane.
     # - `kitty` -- Expect to be running in Kitty terminal emulator.
     local expectTerminal='auto'
+
+    local allowNeovimRemote=1
 
     local arg
     while (( $# )); do
@@ -305,6 +322,12 @@ function main() {
             --syntax=*)
                 syntax="$(tr '[:upper:]' '[:lower:]' <<< "${arg#*=}")"
                 ;;
+            --neovim-remote)
+                allowNeovimRemote=0
+                ;;
+            --no-neovim-remote)
+                allowNeovimRemote=1
+                ;;
             -*)
                 die 1 "'%s': Unknown option." "${arg}"
                 ;;
@@ -337,18 +360,23 @@ function main() {
     fi
 
     if (( doGitAction )); then
-        runGitAction "${rootDir}" "${gitAction}" "${gitCommit}" \
-            "${gitActionArguments[@]}"
+        runGitAction "${allowNeovimRemote}" "${rootDir}" "${gitAction}" \
+            "${gitCommit}" "${gitActionArguments[@]}"
     elif [[ -n "${inputFile}" ]]; then
-        readFile "${rootDir}" "${syntax}" "${inputFile}"
+        readFile "${allowNeovimRemote}" "${rootDir}" "${syntax}" "${inputFile}"
     else
         # TODO: This logic should probably be in a function.
         case "${expectTerminal}" in
             auto)
-                if [[ -n "${TMUX}" && -n "${TMUX_PANE}" ]]; then
-                    tmuxScrollback "${rootDir}" "${syntax}"
+                if [[ -n "${VIM}" && -n "${VIMRUNTIME}" ]]; then
+                    # Running inside Vim/Neovim terminal
+                    die 3 "Not running in a neither Kitty nor Tmux, see yx-jmp(1)."
+                elif [[ -n "${TMUX}" && -n "${TMUX_PANE}" ]]; then
+                    tmuxScrollback "${allowNeovimRemote}" "${rootDir}" \
+                        "${syntax}"
                 elif [[ -n "${KITTY_WINDOW_ID}" || "${TERM}" == 'xterm-kitty' ]]; then
-                    kittyScrollback "${rootDir}" "${syntax}"
+                    kittyScrollback "${allowNeovimRemote}" "${rootDir}" \
+                        "${syntax}"
                 else
                     die 3 "Not running in a neither Kitty nor Tmux, see yx-jmp(1)."
                 fi
@@ -357,15 +385,23 @@ function main() {
                 if [[ -z "${KITTY_WINDOW_ID}" && "${TERM}" != 'xterm-kitty' ]]; then
                     die 3 "Not running in a Kitty terminal emulator, see yx-jmp(1)."
                 fi
+                if [[ -n "${VIM}" && -n "${VIMRUNTIME}" ]]; then
+                    # Running inside Vim/Neovim terminal
+                    die 3 "Not running in a Kitty terminal emulator, see yx-jmp(1)."
+                fi
 
-                kittyScrollback "${rootDir}" "${syntax}"
+                kittyScrollback "${allowNeovimRemote}" "${rootDir}" "${syntax}"
                 ;;
             tmux)
                 if [[ -z "${TMUX}" || -z "${TMUX_PANE}" ]]; then
                     die 3 "Not running in a Tmux pane, see yx-jmp(1)."
                 fi
+                if [[ -n "${VIM}" && -n "${VIMRUNTIME}" ]]; then
+                    # Running inside Vim/Neovim terminal
+                    die 3 "Not running in a Kitty terminal emulator, see yx-jmp(1)."
+                fi
 
-                tmuxScrollback "${rootDir}" "${syntax}"
+                tmuxScrollback "${allowNeovimRemote}" "${rootDir}" "${syntax}"
                 ;;
         esac
     fi
@@ -375,6 +411,7 @@ function main() {
 #
 #   runGitAction ROOT_DIR {status|commit|grep} {COMMIT|''} [EXTRA_ARGUMENT ...]
 function runGitAction() {
+    local -r -i allowNeovimRemote="$1"; shift
     local -r rootDir="$1"; shift
     local -r action="$1"; shift
     local -r commit="$1"; shift
@@ -390,13 +427,13 @@ function runGitAction() {
 
     case "${action}" in
         'status')
-            gitStatus "${rootDir}"
+            gitStatus "${allowNeovimRemote}" "${rootDir}"
             ;;
         'commit')
-            gitCommit "${rootDir}" "${commit}"
+            gitCommit "${allowNeovimRemote}" "${rootDir}" "${commit}"
             ;;
         'grep')
-            gitGrep "${rootDir}" "${arguments[@]}"
+            gitGrep "${allowNeovimRemote}" "${rootDir}" "${arguments[@]}"
             ;;
         *)
             die 4 "'%s': Unknown internal Git action; probably a bug." \
@@ -406,6 +443,7 @@ function runGitAction() {
 }
 
 function gitStatus() {
+    local -r -i allowNeovimRemote="$1"; shift
     local -r rootDir="$1"; shift
     local -ra arguments=("$@")
 
@@ -423,10 +461,11 @@ function gitStatus() {
     git status -s "${arguments[@]}" \
     | sed 's/^.. \(.*\)$/\1 +1/' \
     | "${menuCommand[@]}" \
-    | startEditor "${rootDir}"
+    | startEditor "${allowNeovimRemote}" "${rootDir}"
 }
 
 function gitCommit() {
+    local -r -i allowNeovimRemote="$1"; shift
     local -r rootDir="$1"; shift
     local -r commit="$1"; shift
 
@@ -444,13 +483,14 @@ function gitCommit() {
     git diff-tree --no-commit-id --name-only -r "${commit:-HEAD}" \
     | sed -r "s|^(.*)\$|$(git rev-parse --show-toplevel)/\\1 +1|" \
     | "${menuCommand[@]}" \
-    | startEditor "${rootDir}"
+    | startEditor "${allowNeovimRemote}" "${rootDir}"
 }
 
 # Usage:
 #
 #   gitGrep ROOT_DIR [ARGUMENT ...]
 function gitGrep() {
+    local -r -i allowNeovimRemote="$1"; shift
     local -r rootDir="$1"; shift
 
     git grep "$@" | readFile "${rootDir}" 'grep-with-line-numbers' -
@@ -487,6 +527,7 @@ function parseInput() {
 #
 #   tmuxScrollback ROOT_DIR SYNTAX
 function tmuxScrollback() {
+    local -r -i allowNeovimRemote="$1"; shift
     local -r rootDir="$1"; shift
     local -r syntax="$1"; shift
 
@@ -500,13 +541,14 @@ function tmuxScrollback() {
     | parseInput "${syntax}" \
     | uniq \
     | "${menuCommand[@]}" \
-    | startEditor "${rootDir}"
+    | startEditor "${allowNeovimRemote}" "${rootDir}"
 }
 
 # Usage:
 #
 #   kittyScrollback ROOT_DIR SYNTAX
 function kittyScrollback() {
+    local -r -i allowNeovimRemote="$1"; shift
     local -r rootDir="$1"; shift
     local -r syntax="$1"; shift
 
@@ -539,13 +581,14 @@ function kittyScrollback() {
     parseInput "${syntax}" "${temp}" \
     | uniq \
     | "${menuCommand[@]}" \
-    | startEditor "${rootDir}"
+    | startEditor "${allowNeovimRemote}" "${rootDir}"
 }
 
 # Usage:
 #
 #   readFile ROOT_DIR SYNTAX {FILE|-}
 function readFile() {
+    local -r -i allowNeovimRemote="$1"; shift
     local -r rootDir="$1"; shift
     local -r syntax="$1"; shift
     local -r inputFile="$1"; shift
@@ -561,7 +604,7 @@ function readFile() {
     } \
     | uniq \
     | "${menuCommand[@]}" \
-    | startEditor "${rootDir}"
+    | startEditor "${allowNeovimRemote}" "${rootDir}"
 }
 
 main "$@"

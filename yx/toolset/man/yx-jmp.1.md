@@ -1,6 +1,6 @@
 % YX-JMP(1) YX Toolset 0.1.0 | YX Toolset
 % Peter Trsko
-% 27th April 2019
+% 12th May 2019
 
 
 # NAME
@@ -96,6 +96,11 @@ For documentation of *GLOBAL_OPTIONS* see `command-wrapper(1)` manual page.
 
     This optinon is ignored when one of `--git-*` options was specified.
 
+\--[no-]neovim-remote
+:   Allow/disable Neovim remote control functionality when `NVIM_LISTEN_ADDRESS`
+    environment variable is set.  When enabled 'yx jmp' will try to open file
+    in remote Neovim instead of starting a new editor process.
+
 \--help, -h
 :   Print short help message and exit.  Same as: `yx help jmp`.
 
@@ -161,6 +166,21 @@ mentioned there applies to this subcommand as well.
     See [XDG Base Directory Specification
     ](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html)
     for more information on rationale behind this.
+
+`TMUX`, `TMUX_PANE`
+:   Allows `yx jmp` to determine if it's running inside Tmux.
+
+`KITTY_WINDOW_ID`, `TERM`
+:   Allows `yx jmp` to determine if it's running inside Kitty terminal emulator.
+
+`VIM`, `VIMRUNTIME`
+:   Allows `yx jmp` to determine if it's running inside Vim/Neovim terminal.
+    Even if Vim/Neovim is running inside Tmux or Kitty we are unable to access
+    scrollback buffer when running inside Vim/Neovim terminal.
+
+`NVIM_LISTEN_ADDRESS`
+:   If set it allows `yx jmp` to open files in remote Neovim instead of
+    starting new editory.  See also `--[no-]neovim-remote` option.
 
 
 # EXAMPLES
