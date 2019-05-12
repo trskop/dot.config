@@ -17,4 +17,6 @@
 
 , "docker-compose"  -- A tool for defining and running multi-container Docker
                     -- applications. <https://docs.docker.com/compose/>
+
+, "neovim-remote" -- Control Neovim process from shell.
 ]
