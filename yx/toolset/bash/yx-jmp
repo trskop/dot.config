@@ -493,7 +493,8 @@ function gitGrep() {
     local -r -i allowNeovimRemote="$1"; shift
     local -r rootDir="$1"; shift
 
-    git grep "$@" | readFile "${rootDir}" 'grep-with-line-numbers' -
+    git grep "$@" \
+    | readFile "${allowNeovimRemote}" "${rootDir}" 'grep-with-line-numbers' -
 }
 
 # Usage:
