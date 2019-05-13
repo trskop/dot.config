@@ -43,7 +43,11 @@ let customise =
       → commandWrapper.toolsetConfig.addSubcommandAliases
           yx.aliases
           "${helpMessage}${yx.helpMessage}"
-          defaults
+          ( defaults
+              //  { description =
+                      Some "Y repeate X; set of personalised command line tools."
+                  }
+          )
         : CommandWrapper.DefaultConfig
 
 in  commandWrapper.toolsetConfig.mkConfig context customise

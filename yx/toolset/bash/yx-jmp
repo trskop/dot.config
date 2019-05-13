@@ -51,7 +51,7 @@ Options:
   --git-grep GIT_GREP_ARGUMENTS
       Same as:
 
-        git grep GIT_GREP_ARGUMENTS \
+        git grep GIT_GREP_ARGUMENTS \\
         | yx jmp -f - --syntax=grep-with-line-numbers
 
   --file={FILE|-}, --file {FILE|-}, -f {FILE|-}
