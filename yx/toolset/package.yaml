@@ -38,7 +38,7 @@ dependencies:
 
   - case-insensitive
   - comonad
-  - dhall >=1.19
+  - dhall >=1.23  # Functional support of Dhall Standard 7.0.0
   - dhall-bash
   - dhall-json
   - directory

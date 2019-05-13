@@ -2,42 +2,40 @@ let SystemInfo = ./SystemInfo.dhall
 
 let osSpecificPackages =
       { DebianLinux =
-            λ(_ : {})
-          → [ "neovim/unstable", "lua-nvim"
-            -- Neovim Python provider is required by some plugins that I'm using:
-            , "python-neovim", "python3-neovim"
+          [ "neovim/unstable", "lua-nvim"
+          -- Neovim Python provider is required by some plugins that I'm using:
+          , "python-neovim", "python3-neovim"
 
-            -- Neovim Python provider dependencies for the case when they
-            -- needed to be installed via Pip:
-            --, "python-dev", "python-pip"
-            --, "python3-dev", "python3-pip"
+          -- Neovim Python provider dependencies for the case when they
+          -- needed to be installed via Pip:
+          --, "python-dev", "python-pip"
+          --, "python3-dev", "python3-pip"
 
-            -- TODO: Test that these packages are available on Buntish distros:
+          -- TODO: Test that these packages are available on Buntish distros:
 
-            , "fzy" -- Fuzzy text selector like `fzf`, but simpler.  The
-                    --   algorithm, it uses, is slightly different, which may
-                    --   be better in some cases.
+          , "fzy" -- Fuzzy text selector like `fzf`, but simpler.  The
+                  --   algorithm, it uses, is slightly different, which may
+                  --   be better in some cases.
 
-            , "ripgrep" -- Grep alternative that is faster and uses recursive
-                        --   search by default.
+          , "ripgrep" -- Grep alternative that is faster and uses recursive
+                      --   search by default.
 
-            , "bfs" -- a variant of the UNIX `find` command that operates
-                    --   breadth-first rather than depth-first.
+          , "bfs" -- a variant of the UNIX `find` command that operates
+                  --   breadth-first rather than depth-first.
 
-            , "mbuffer" -- Stream buffering tool that also shows the I/O rate
-                        --   and summary to the user.
-            ]
+          , "mbuffer" -- Stream buffering tool that also shows the I/O rate
+                      --   and summary to the user.
+          ]
 
       , BuntishLinux =
-            λ(_ : {})
-            -- https://github.com/neovim/neovim/wiki/Installing-Neovim#ubuntu
-          → [ "neovim"
-            , "python-dev", "python-pip"
-            , "python3-dev", "python3-pip"
+          -- https://github.com/neovim/neovim/wiki/Installing-Neovim#ubuntu
+          [ "neovim"
+          , "python-dev", "python-pip"
+          , "python3-dev", "python3-pip"
 
-            -- Currently doesn't work on Debian:
-            , "gcc-doc"
-            ] : List Text
+          -- Currently doesn't work on Debian:
+          , "gcc-doc"
+          ] : List Text
       }
 
 in

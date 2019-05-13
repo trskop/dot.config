@@ -2,12 +2,10 @@ let SystemInfo = ./SystemInfo.dhall
 
 let osSpecificPackages =
       { DebianLinux =
-            λ(_ : {})
-          → [] : List Text
+          [] : List Text
 
       , BuntishLinux =
-            λ(_ : {})
-          → [] : List Text
+          [] : List Text
       }
 
 in

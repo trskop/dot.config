@@ -1,2 +1,2 @@
 ~/.local/src/github.com/trskop/command-wrapper/dhall/CommandWrapper/package.dhall
-sha256:993a03cd0c743897e659fac6c144d4ba4dd6a3a7ecf0d77c325328f1d053c1dd
+sha256:8c425f4bc960c51e0898a5bf914bc84fd550b4ecfd8227195fe64984e1e0305f

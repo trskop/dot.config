@@ -1,6 +1,6 @@
 let Os =
-      < DebianLinux : {}
-      | BuntishLinux : {}
+      < DebianLinux
+      | BuntishLinux
       >
 
 let SystemInfo =
