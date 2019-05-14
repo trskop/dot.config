@@ -1,6 +1,4 @@
-  λ(libFile : Text)
-→ λ(subcommandName : Text)
-→ ''
+''
 #!/usr/bin/env bash
 
 set -e
@@ -30,7 +28,7 @@ Usage:
 Options:
 
   --help, -h
-    Print short help message and exit.  Same as: ''${commandHelp}
+      Print short help message and exit.  Same as: ''${commandHelp}
 EOF
 }
 
@@ -39,7 +37,7 @@ EOF
 # `command-wrapper-subcommand-protocol(7)` for more details on how this works.
 function completionInfo() {
     cat <<"EOF"
-  λ(_ : <Bash : {} | Fish : {} | Zsh : {}>)
+  λ(_ : < Bash | Fish | Zsh >)
 → λ(index : Natural)
 → λ(words : List Text)
 → [ "--completion", "--index=''${Natural/show index}", "--" ] # words

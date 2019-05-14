@@ -1,7 +1,5 @@
 let home = "${env:HOME as Text}"
 
-let bashLib = "${home}/.local/src/github.com/trskop/command-wrapper/bash/lib.sh"
-
 let config = env:XDG_CONFIG_HOME as Text ? "${home}/.config"
 
 let lib = "${home}/.local/lib"
@@ -24,22 +22,25 @@ let dhallConfigFileName =
 in    λ(wrapper : Text)
     → λ(subcommand : Text)
     → λ(command : Text)
-    → λ(language : <Bash | Dhall | Haskell>)
+    → λ(language : < Bash | Dhall | Haskell >)
     → merge
-        { Haskell =
-            { targetFile = haskellSubcommandFileName wrapper command
-            , executable = False
-            , template = ./haskell-skel.dhall
-            }
-        , Bash =
-            { targetFile = bashSubcommandFileName wrapper command
-            , executable = True
-            , template = ./bash-skel.dhall bashLib subcommand
-            }
-        , Dhall =
-            { targetFile = dhallConfigFileName wrapper command
-            , executable = False
-            , template = ./dhall-skel.dhall wrapper subcommand
-            }
-        }
-        language
+      { Haskell =
+          { targetFile = haskellSubcommandFileName wrapper command
+          , executable = False
+          , template = ./haskell-skel.dhall ? ./default-haskell-skel.dhall
+          }
+      , Bash =
+          { targetFile = bashSubcommandFileName wrapper command
+          , executable = True
+          , template = ./bash-skel.dhall ? ./default-bash-skel.dhall
+          }
+      , Dhall =
+          { targetFile = dhallConfigFileName wrapper command
+          , executable = False
+          , template =
+              (./dhall-skel.dhall ? ./default-dhall-skel.dhall)
+              wrapper
+              subcommand
+          }
+      }
+      language
