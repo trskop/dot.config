@@ -14,10 +14,10 @@ in    λ(pgpassFile : Optional Text)
     → { command = "psql"
       , arguments =
           commandWrapper.verbosity.fold (List Text)
-            { Silent = λ(_ : {}) → ["--quiet"]
-            , Normal = λ(_ : {}) → [] : List Text
-            , Verbose = λ(_ : {}) → [] : List Text
-            , Annoying = λ(_ : {}) → [] : List Text
+            { Silent = ["--quiet"]
+            , Normal = [] : List Text
+            , Verbose = [] : List Text
+            , Annoying = [] : List Text
             }
             verbosity
           # [ "--host=${connect.hostname}"
@@ -51,25 +51,23 @@ in    λ(pgpassFile : Optional Text)
           # commandWrapper.verbosity.fold
               (List CommandWrapper.EnvironmentVariable)
               { Silent =
-                  λ(_ : {}) → [] : List CommandWrapper.EnvironmentVariable
+                  [] : List CommandWrapper.EnvironmentVariable
 
               , Normal =
                   -- Alternative is to set `VERBOSITY=default`.
-                  λ(_ : {}) → [] : List CommandWrapper.EnvironmentVariable
+                  [] : List CommandWrapper.EnvironmentVariable
 
               , Verbose =
-                    λ(_ : {})
-                  → [ { name = "VERBOSITY"
-                      , value = "verbose"
-                      }
-                    ]
+                  [ { name = "VERBOSITY"
+                    , value = "verbose"
+                    }
+                  ]
 
               , Annoying =
-                    λ(_ : {})
-                  → [ { name = "VERBOSITY"
-                      , value = "verbose"
-                      }
-                    ]
+                  [ { name = "VERBOSITY"
+                    , value = "verbose"
+                    }
+                  ]
               }
               verbosity
       , searchPath = True

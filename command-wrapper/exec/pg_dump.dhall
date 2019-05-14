@@ -12,10 +12,10 @@ in    λ(connect : ConnectToDatabase)
     → { command = "pg_dump"
       , arguments =
           commandWrapper.verbosity.fold (List Text)
-            { Silent = λ(_ : {}) → [] : List Text
-            , Normal = λ(_ : {}) → [] : List Text
-            , Verbose = λ(_ : {}) → ["--verbose"]
-            , Annoying = λ(_ : {}) → ["--verbose"]
+            { Silent = [] : List Text
+            , Normal = [] : List Text
+            , Verbose = ["--verbose"]
+            , Annoying = ["--verbose"]
             }
             verbosity
           # [ "--host=${connect.hostname}"

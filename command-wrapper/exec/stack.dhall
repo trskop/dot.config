@@ -3,10 +3,10 @@ let CommandWrapper = ../lib/Types.dhall
 let commandWrapper = ../lib/lib.dhall
 
 let verbosityOption = commandWrapper.verbosity.fold (List Text)
-      { Silent = λ(_ : {}) → ["--silent"]
-      , Normal = λ(_ : {}) → [] : List Text
-      , Verbose = λ(_ : {}) → ["--verbosity=info"]
-      , Annoying = λ(_ : {}) → ["--verbosity=debug"]
+      { Silent = ["--silent"]
+      , Normal = [] : List Text
+      , Verbose = ["--verbosity=info"]
+      , Annoying = ["--verbosity=debug"]
       }
 
 let colorOption =

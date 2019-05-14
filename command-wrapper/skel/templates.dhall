@@ -24,25 +24,22 @@ let dhallConfigFileName =
 in    λ(wrapper : Text)
     → λ(subcommand : Text)
     → λ(command : Text)
-    → λ(language : <Bash : {} | Dhall : {} | Haskell : {}>)
+    → λ(language : <Bash | Dhall | Haskell>)
     → merge
         { Haskell =
-              λ(_ : {})
-            → { targetFile = haskellSubcommandFileName wrapper command
-              , executable = False
-              , template = ./haskell-skel.dhall
-              }
+            { targetFile = haskellSubcommandFileName wrapper command
+            , executable = False
+            , template = ./haskell-skel.dhall
+            }
         , Bash =
-              λ(_ : {})
-            → { targetFile = bashSubcommandFileName wrapper command
-              , executable = True
-              , template = ./bash-skel.dhall bashLib subcommand
-              }
+            { targetFile = bashSubcommandFileName wrapper command
+            , executable = True
+            , template = ./bash-skel.dhall bashLib subcommand
+            }
         , Dhall =
-              λ(_ : {})
-            → { targetFile = dhallConfigFileName wrapper command
-              , executable = False
-              , template = ./dhall-skel.dhall wrapper subcommand
-              }
+            { targetFile = dhallConfigFileName wrapper command
+            , executable = False
+            , template = ./dhall-skel.dhall wrapper subcommand
+            }
         }
         language

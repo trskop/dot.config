@@ -6,14 +6,14 @@ let backup = ./this/backup-common.dhall # (./this/backup-local.dhall ? empty)
 let system-info = ./this/system-info.dhall
 
 let UpdateAction =
-      < UpdateSystem : {}
-      | InstallPackages : {}
-      | UpdateUserEnvironment : {}
+      < UpdateSystem
+      | InstallPackages
+      | UpdateUserEnvironment
       >
 
 in  { defaults =
         -- Empty list is the same thing as specifying all values.
-        { update = [UpdateAction.UpdateUserEnvironment {=}] : List UpdateAction
+        { update = [UpdateAction.UpdateUserEnvironment] : List UpdateAction
         }
 
     , system =

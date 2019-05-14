@@ -3,10 +3,10 @@ let CommandWrapper = ../lib/Types.dhall
 let commandWrapper = ../lib/lib.dhall
 
 let verbosityToText = commandWrapper.verbosity.fold Text
-      { Silent = λ(_ : {}) → "silent"
-      , Normal = λ(_ : {}) → "normal"
-      , Verbose = λ(_ : {}) → "verbose"
-      , Annoying = λ(_ : {}) → "annoying"
+      { Silent = "silent"
+      , Normal = "normal"
+      , Verbose = "verbose"
+      , Annoying = "annoying"
       }
 
 in  -- Debugging commands:

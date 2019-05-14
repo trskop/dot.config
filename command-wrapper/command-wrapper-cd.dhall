@@ -21,13 +21,11 @@ let customise =
             , terminalEmulator =
                 let terminalEmulator =
                       { DebianLinux =
-                            λ(_ : {})
-                          → λ(directory : Text)
+                            λ(directory : Text)
                           → commandWrapper.terminalEmulator.kitty (Some directory)
 
                       , BuntishLinux =
-                            λ(_ : {})
-                          → defaults.terminalEmulator
+                          defaults.terminalEmulator
                       }
 
                 in  merge terminalEmulator (../yx/this/system-info.dhall).os
