@@ -19,7 +19,7 @@ function printHelp() {
     local -r commandHelp="${COMMAND_WRAPPER_NAME} help ${COMMAND_WRAPPER_SUBCOMMAND}"
 
     cat <<EOF
-Inteligent wrapper for 'apt'.
+Inteligent wrapper for 'apt' package manager.
 
 Usage:
 

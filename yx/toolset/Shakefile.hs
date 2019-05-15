@@ -115,6 +115,8 @@ shakeMain Directories{..} opts = shakeArgs opts $ do
         yxNewBin = yxLibexecDir </> "yx-new"
         yxPathBin = yxLibexecDir </> "yx-path"
         yxThisBin = yxLibexecDir </> "yx-this"
+
+        yxAptScript = yxLibexecDir </> "yx-apt"
         yxJmpScript = yxLibexecDir </> "yx-jmp"
 
         -- Standard `man` command should be able to pick this up.  Try
@@ -128,8 +130,10 @@ shakeMain Directories{..} opts = shakeArgs opts $ do
         , yxNewBin
         , yxPathBin
         , yxThisBin
+        , yxAptScript
         , yxJmpScript
         , man1Dir </> "yx.1.gz"
+        , man1Dir </> "yx-apt.1.gz"
         , man1Dir </> "yx-env.1.gz"
         , man1Dir </> "yx-jmp.1.gz"
         , man1Dir </> "yx-new.1.gz"
