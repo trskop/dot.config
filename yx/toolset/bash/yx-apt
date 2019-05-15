@@ -98,7 +98,7 @@ function completion() {
     fi
 
     local -r -a wrapperOptions=(
-        --help -h --init-config
+        --help -h --init-config --init-packages
     )
 
     local -r -a aptCommands=(
@@ -213,6 +213,12 @@ EOF
 }
 
 function initialisePackagesFileIfItDoesNotExist() {
+    if [[ ! -e "${COMMAND_WRAPPER_CONFIG}" ]]; then
+        die 1 "'%s': Configuration file is missing. To generate default config please run '%s'." \
+            "${COMMAND_WRAPPER_CONFIG}" \
+            "${COMMAND_WRAPPER_NAME} ${COMMAND_WRAPPER_SUBCOMMAND} --init-config"
+    fi
+
     eval "$(
         dhall-to-bash --declare packagesFile <<< "(${COMMAND_WRAPPER_CONFIG}).packagesFile"
     )"
@@ -371,6 +377,10 @@ function callApt() {
                 eval "$(
                     dhall-to-bash --declare 'packages' <<< "(${packagesFile}).${pkgSet}"
                 )"
+
+                if (( ! ${#packages[@]} )); then
+                    die 1 "Empty list of packages, not calling 'apt'."
+                fi
             fi
             ;;
 
@@ -386,6 +396,7 @@ function callApt() {
 
     # TODO: Filterout package names from "$@" to avoid installing something
     # outside of audit file.
+    notice "Executing: '${aptCommand[*]} $* ${packages[*]}'"
     exec_ "${aptCommand[@]}" "$@" "${packages[@]}"
 }
 
