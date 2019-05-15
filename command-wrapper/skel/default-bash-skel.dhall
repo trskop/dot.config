@@ -194,9 +194,9 @@ function main() {
         #    "''${COMMAND_WRAPPER_CONFIG}"
     fi
 
-    info "'%s': Loading configuration file." "''${COMMAND_WRAPPER_CONFIG}"
+    out "'%s': Loading configuration file." "''${COMMAND_WRAPPER_CONFIG}"
     eval "$(declareCfg "''${COMMAND_WRAPPER_CONFIG}" 'config')"
-    info "'%s': Configuration file loaded." "''${COMMAND_WRAPPER_CONFIG}"
+    out "'%s': Configuration file loaded." "''${COMMAND_WRAPPER_CONFIG}"
 
     # TODO: Implement me!  Here is the place where the real functionality
     # should be.
