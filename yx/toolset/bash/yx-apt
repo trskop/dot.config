@@ -1,0 +1,392 @@
+#!/usr/bin/env bash
+
+set -e
+
+if [[ "${COMMAND_WRAPPER_VERBOSITY:-}" == 'annoying' ]]; then
+    # This will cause Bash to print commands before executing them.
+    set -x
+fi
+
+# shellcheck source=/dev/null
+source <(
+    COMMAND_WRAPPER_INVOKE_AS="${COMMAND_WRAPPER_NAME}" \
+        "${COMMAND_WRAPPER_EXE}" completion --library --shell=bash
+)
+
+# Print help message to standard output.
+function printHelp() {
+    local -r command="${COMMAND_WRAPPER_NAME} ${COMMAND_WRAPPER_SUBCOMMAND}"
+    local -r commandHelp="${COMMAND_WRAPPER_NAME} help ${COMMAND_WRAPPER_SUBCOMMAND}"
+
+    cat <<EOF
+Inteligent wrapper for 'apt'.
+
+Usage:
+
+  ${command} [APT_OPTIONS] [APT_COMMAND]
+  ${command} {--init-config|--init-packages}
+  ${command} {--help|-h}
+  ${commandHelp}
+
+Options:
+
+  --init-config
+      Create default configuration file if it doesn't exist.  Parent
+      directories are created as well.
+
+  --init-packages
+      Create packages file.  A configuration file that contains what packages
+      should be installed/removed.
+
+  --help, -h
+      Print short help message and exit.  Same as: ${commandHelp}
+
+Apt help:
+
+$(apt help | sed 's/^/  /')
+EOF
+}
+
+# Print Dhall expression that describes how this subcommand should be invoked
+# when performing command line completion.  See
+# `command-wrapper-subcommand-protocol(7)` for more details on how this works.
+function completionInfo() {
+    cat <<"EOF"
+  λ(_ : < Bash | Fish | Zsh >)
+→ λ(index : Natural)
+→ λ(words : List Text)
+→ [ "--completion", "--index=${Natural/show index}", "--" ] # words
+EOF
+}
+
+# Perform command line completion.
+#
+# Usage:
+#
+#   completion [--index=INDEX] [[--] WORD [...]]
+#
+# Bash itself provides `compgen` builtin command that can do a lot of standard
+# command line completion functions.  See `bash(1)` or `help compgen` for more
+# details.
+function completion() {
+    local index=-1
+    local -a words=
+
+    local arg
+    while (( $# )); do
+        arg="$1"; shift
+        case "${arg}" in
+            --index=*)
+                index="${arg#*=}"
+                ;;
+            --)
+                words=("$@")
+                break
+                ;;
+            -*)
+                die 1 "'%s': Unknown completion option." "${arg}"
+                ;;
+            *)
+                words=("${arg}" "$@")
+                break
+                ;;
+        esac
+    done
+
+    if (( ! ${#words[@]} )); then
+        words=("")
+    fi
+
+    local -r -a wrapperOptions=(
+        --help -h --init-config
+    )
+
+    local -r -a aptCommands=(
+        autoclean build-dep clean dist-upgrade edit-sources help list policy
+        rdepends search showsrc update autoremove changelog depends download
+        full-upgrade install moo purge remove show source upgrade
+    )
+
+    compgen -W "${wrapperOptions[*]} ${aptCommands[*]}" -- "${words[${index}]}"
+}
+
+# Read configuration (Dhall) file and declare Bash variables based on what's in
+# it.
+#
+# Usage:
+#
+#   declareCfg CONFIG_FILE APT_ACTION
+function declareCfg() {
+    local -r config="$1"; shift
+    local -r action="$1"; shift
+
+    for field in 'editor' 'packagesFile'; do
+        dhall-to-bash --declare "${field}" <<< "(${config}).${field}"
+        echo
+    done
+
+    dhall-to-bash --declare 'aptCommand' <<EOF
+let Action =
+      < autoclean | autoremove | build-dep | changelog | clean | depends
+      | dist-upgrade | download | edit-sourceshelp | full-upgrade | install
+      | list | moo | policy | purge | rdepends | remove | search | show
+      | showsrc | source | update | upgrade
+      >
+in  (${config}).aptCommand Action.${action} ([] : List Text)
+EOF
+    echo
+}
+
+# Create configuration file if it doesn't exist.
+#
+# Usage:
+#   initialiseConfigIfItDoesNotExist
+#
+# Uses environment variables from subcommand protocol.
+function initialiseConfigIfItDoesNotExist() {
+    if [[ -e "${COMMAND_WRAPPER_CONFIG}" ]]; then
+        die 1 "'%s': Configuration file already exists, refusing to overwrite it." \
+            "${COMMAND_WRAPPER_CONFIG}"
+    fi
+
+    local configDir
+    configDir="$(dirname "${COMMAND_WRAPPER_CONFIG}")"
+    if [[ ! -e "${configDir}" ]]; then
+        out "'%s': Directory created." "${configDir}"
+        mkdir -p "${configDir}"
+    fi
+
+    out "'%s': Generating default configuration file." \
+        "${COMMAND_WRAPPER_CONFIG}"
+
+    local -r packagesFile="${XDG_CONFIG_HOME:-${HOME}/.config}/${COMMAND_WRAPPER_NAME}/${COMMAND_WRAPPER_SUBCOMMAND}/packages.dhall"
+
+    dhall format > "${COMMAND_WRAPPER_CONFIG}" <<EOF
+let Action =
+      < autoclean | autoremove | build-dep | changelog | clean | depends
+      | dist-upgrade | download | edit-sourceshelp | full-upgrade | install
+      | list | moo | policy | purge | rdepends | remove | search | show
+      | showsrc | source | update | upgrade
+      >
+
+let apt =
+        \\(arguments : List Text)
+      -> ["apt"] # arguments
+
+let sudoApt =
+        \\(arguments : List Text)
+      -> ["sudo"] # apt arguments
+
+in  { packagesFile = "${packagesFile}"
+    , editor = [env:VISUAL as Text ? env:EDITOR as Text ? "nvim"]
+    , aptCommand =
+          \\(action : Action)
+        -> \\(arguments : List Text)
+        -> merge
+            { autoclean = sudoApt
+            , autoremove = sudoApt
+            , build-dep = sudoApt
+            , changelog = apt
+            , clean = sudoApt
+            , depends = apt
+            , dist-upgrade = sudoApt
+            , download = apt
+            , edit-sourceshelp = sudoApt
+            , full-upgrade = sudoApt
+            , install = sudoApt
+            , list = apt
+            , moo = apt
+            , policy = apt
+            , purge = sudoApt
+            , rdepends = apt
+            , remove = sudoApt
+            , search = apt
+            , show = apt
+            , showsrc = apt
+            , source = apt
+            , update = sudoApt
+            , upgrade = sudoApt
+            }
+            action arguments
+    }
+EOF
+}
+
+function initialisePackagesFileIfItDoesNotExist() {
+    eval "$(
+        dhall-to-bash --declare packagesFile <<< "(${COMMAND_WRAPPER_CONFIG}).packagesFile"
+    )"
+
+    if [[ -e "${packagesFile}" ]]; then
+        die 1 "'%s': Packages file already exists, refusing to overwrite." \
+            "${packagesFile}"
+    fi
+
+    local configDir
+    configDir="$(dirname "${packagesFile}")"
+    if [[ ! -e "${configDir}" ]]; then
+        out "'%s': Directory created." "${configDir}"
+        mkdir -p "${configDir}"
+    fi
+
+    out "'%s': Generating empty packages file." "${packagesFile}"
+
+    cat > "${packagesFile}" <<EOF
+{ install =
+    [
+    ] : List Text
+, purge =
+    [
+    ] : List Text
+}
+EOF
+}
+
+function main() {
+    # This function makes sure that this subcommand was executed using
+    # expected calling convention.  If it wasn't it will terminate this
+    # script with appropriate error message.  It is hard to guarantee
+    # anything in case of it being executed in any other way.  Mentioned
+    # calling convention is described in a dedicated manual page:
+    #
+    #   command-wrapper-subcommand-protocol(7)
+    dieIfExecutedOutsideOfCommandWrapperEnvironment
+
+    local -a aptArguments=()
+    local aptAction=
+
+    # It is upto subcommand to decide what command linen options should be
+    # supported, and how they should be parsed, but each subcommand has to
+    # support following:
+    #
+    # * --help, -h
+    # * --completion-info
+    #
+    # See Command Wrapper's Subcommand Protocol for more information.  It is
+    # available in the form of command-wrapper-subcommand-protocol(7) manual
+    # page.
+    local arg
+    while (( $# )); do
+        arg="$1"; shift
+        case "${arg}" in
+            # Supporting '--help' is required by the Subcommand Protocol.
+            -h|--help)
+                printHelp
+                exit 0
+                ;;
+
+            # Supporting '--completion-info' is required by the Subcommand
+            # Protocol.
+            --completion-info)
+                completionInfo
+                exit 0
+                ;;
+
+            # Implementation of command line completion.  It is upto individual
+            # subcommands to decide how this should be implemented, however
+            # the implementation of '--completion-info' has to print Dhall
+            # expression that is consistent with the choosen approach.
+            --completion)
+                completion "$@"
+                exit 0
+                ;;
+
+            --init-config)
+                initialiseConfigIfItDoesNotExist
+                exit 0
+                ;;
+
+            --init-packages)
+                initialisePackagesFileIfItDoesNotExist
+                exit 0
+                ;;
+
+            # We are assuming that all other options/arguments are for 'apt'.
+
+            -*)
+                aptArguments+=("${arg}")
+                ;;
+            *)
+                aptArguments+=("${arg}")
+                if [[ -z "${aptAction}" ]]; then
+                    if [[ "${arg}" = 'help' ]]; then
+                        printHelp
+                        exit 0
+                    fi
+                    aptAction="${arg}"
+                fi
+                ;;
+        esac
+    done
+
+    if [[ -z "${aptAction}" ]]; then
+        die 1 "'APT_ACTION' wasn't specified.  See '%s' for help." \
+            "${COMMAND_WRAPPER_NAME} help ${COMMAND_WRAPPER_SUBCOMMAND}"
+    fi
+
+    if [[ ! -e "${COMMAND_WRAPPER_CONFIG}" ]]; then
+        die 1 "'%s': Configuration file is missing. To generate default config please run '%s'." \
+            "${COMMAND_WRAPPER_CONFIG}" \
+            "${COMMAND_WRAPPER_NAME} ${COMMAND_WRAPPER_SUBCOMMAND} --init-config"
+    fi
+
+    callApt "${aptAction}" "${aptArguments[@]}"
+}
+
+function callApt() {
+    local -r action="$1"; shift
+
+    local packagesFile
+    local -a editor aptCommand
+    local -a aptCommand
+    local -a packages
+
+    info "'%s': Loading configuration file." "${COMMAND_WRAPPER_CONFIG}"
+    # shellcheck source=/dev/null
+    source <(declareCfg "${COMMAND_WRAPPER_CONFIG}" "${action}")
+
+    if [[ ! -e "${packagesFile}" ]]; then
+        die 1 "'%s': Packages file doesn't exist.  To generate an empty one please run '%s'." \
+            "${packagesFile}" \
+            "${COMMAND_WRAPPER_NAME} ${COMMAND_WRAPPER_SUBCOMMAND} --init-packages"
+    fi
+
+    case "${action}" in
+        'install'|'purge'|'remove')
+            local hashBefore hashAfter
+            hashBefore=$(dhall hash < "${packagesFile}")
+            "${editor[@]}" "${packagesFile}"
+            hashAfter=$(dhall hash < "${packagesFile}")
+
+            if [[ "${hashBefore}" == "${hashAfter}" ]]; then
+                out "'%s': File hadn't been changed, not running 'apt'." \
+                    "${packagesFile}"
+                exit 0
+            else
+                case "${action}" in
+                    install) local -r pkgSet='install';;
+                    *) local -r pkgSet='install';;
+                esac
+
+                eval "$(
+                    dhall-to-bash --declare 'packages' <<< "(${packagesFile}).${pkgSet}"
+                )"
+            fi
+            ;;
+
+        autoclean|build-dep|clean|dist-upgrade|edit-sources|help|list|policy)
+            ;;
+        rdepends|search|showsrc|update|autoremove|changelog|depends|download)
+            ;;
+        full-upgrade|moo|show|source|upgrade)
+            ;;
+        *)
+            die 1 "'%s': Unrecognised 'apt' action." "${action}"
+    esac
+
+    # TODO: Filterout package names from "$@" to avoid installing something
+    # outside of audit file.
+    exec_ "${aptCommand[@]}" "$@" "${packages[@]}"
+}
+
+main "$@"
