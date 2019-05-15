@@ -172,7 +172,9 @@ install Directories{..} opts = shakeArgs opts $ do
         nixTarget = mkNixTarget nixParams
 
     want
-        [ home </> ".ghc/ghci.conf"
+        [ home </> ".bashrc"
+
+        , home </> ".ghc/ghci.conf"
         , home </> ".haskeline"
         , home </> ".selected_editor"
         , home </> ".Xresources"
@@ -205,6 +207,9 @@ install Directories{..} opts = shakeArgs opts $ do
 
         , nixTarget
         ]
+
+    (home </> ".bashrc") %> \out ->
+        symlink (srcDir </> "bash" </> ("dot" <> takeFileName out)) out
 
     -- TODO: Refactor so that "~/.ghc" is actually a symbolic link to:
     --
