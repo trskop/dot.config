@@ -19,7 +19,10 @@ let customise =
       → commandWrapper.toolsetConfig.addSubcommandAliases
           habit.aliases
           habit.helpMessage
-          defaults
+          ( defaults
+              //  { description = Some "Toolset for work."
+                  }
+          )
         : CommandWrapper.DefaultConfig
 
 in  commandWrapper.toolsetConfig.mkConfig context customise
