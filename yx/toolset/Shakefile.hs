@@ -166,7 +166,7 @@ shakeMain Directories{..} opts = shakeArgs opts $ do
         cmd_ "pandoc --standalone --to=man" ["--output=" <> tempOut, src]
         cmd_ "gzip --force -9" [tempOut]
 
-    [yxJmpScript] &%> \outs ->
+    [yxAptScript, yxJmpScript] &%> \outs ->
         forM_ outs $ \out ->
             cmd_ "ln -sf"
                 [ projectRoot </> "bash" </> takeFileName out
