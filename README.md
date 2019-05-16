@@ -1,6 +1,10 @@
 User configuration files (dot–files)
 ====================================
 
+* Bash, most notablly `~/.bashrc`, see [`bash/dot.bashrc`](bash/dot.bashrc).
+
+* Bat configuration, see [`bat/README.md`](bat/README.md)
+
 * CommandWrapper configuration:
     * Default CommandWrapper configuration and configuration of stock
       subcommands: [`command-wrapper/README.md`](command-wrapper/README.md)
@@ -15,16 +19,23 @@ User configuration files (dot–files)
 * Haskeline configuration, see [`haskeline/README.md`](haskeline/README.md) for
   more information.
 
+* Haskell Stack, see [`stack/README.md`](stack/README.md).
+
+* Kitty terminal emulator configuration, see [`kitty/README.md`
+  ](kitty/README.md).
+
+* Neovim configuration, see [`nvim/README.md`](nvim/README.md) for more
+  information.
+
 * PostgreSQL interactive terminal (`psql`) configuration, see [`psql/README.md`
   ](psql/README.md) for more information.
 
 * Readline configuration, see [`readline/README.md`](readline/README.md) for more
   information.
 
-* Tmux configuration, see [`tmux/README.md`](tmux/README.md) for more
-  information.
+* Ripgrep configuration, see [`ripgrep/README.md`](ripgrep/README.md).
 
-* Neovim configuration, see [`nvim/README.md`](nvim/README.md) for more
+* Tmux configuration, see [`tmux/README.md`](tmux/README.md) for more
   information.
 
 * `~/.Xresources`, see [`Xresources`](Xresources) for details.
@@ -71,23 +82,6 @@ Now we need to install everything:
 ~/.config/dot.config.init.hs
 ~/.config/yx/toolset/install
 yx this -Uusi
-cat > .bashrc <<EOF
-# shellcheck shell=bash
-
-# ~/.bashrc: executed by bash(1) for non-login shells.
-#
-# See /usr/share/doc/bash/examples/startup-files (in the package bash-doc) for
-# examples.
-
-# If not running interactively, don't do anything.
-case $- in
-    *i*) ;;
-      *) return;;
-esac
-
-# shellcheck source=/dev/null
-[[ -x "${HOME}/.local/bin/genbashrc" ]] && source <("${HOME}/.local/bin/genbashrc")
-EOF
 ```
 
 
