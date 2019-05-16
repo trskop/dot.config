@@ -47,6 +47,8 @@ in
   , "cifs-utils"  -- Utilities for managing mounts of SMB/CIFS (Common
                   -- Internet File System) filesystems.
 
+  , "cgroup-tools"  -- Tools to control and monitor control groups.
+
   -- }}} System ---------------------------------------------------------------
   -- {{{ Editors --------------------------------------------------------------
 
