@@ -226,6 +226,10 @@ if dein#load_state('~/.cache/dein.vim')
   " Interesting article: http://nicknovitski.com/vim-nix-syntax
   call dein#add('LnL7/vim-nix')
 
+  " Direnv integration that correctly loads Direnv environment, and provides
+  " syntax highlighting for `.envrc` files.
+  call dein#add('direnv/direnv.vim')
+
   " }}} Plugin -- Dein.vim -- Plugins to Install ------------------------------
 
   " Required:
