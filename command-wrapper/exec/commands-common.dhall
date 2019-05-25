@@ -1,15 +1,17 @@
-let CommandWrapper = ../lib/Types.dhall
+let CommandWrapper = ../Types.dhall
 
-let docker = ./docker.dhall
+let commandWrapper = ../library.dhall
 
-let noExtraEnvironment = [] : List CommandWrapper.EnvironmentVariable
+let docker = commandWrapper.config.exec.docker
 
-let headAndTail = ./head-and-tail.dhall
+let emptyEnvironment = commandWrapper.command.emptyEnvironment
+
+let headAndTail = commandWrapper.utils.List.head-and-tail
 
 in  -- {{{ Docker -------------------------------------------------------------
 
     [ { name = "docker.prune"
-      , command = docker.prune docker.defaultGlobalOptions noExtraEnvironment
+      , command = docker.prune docker.defaultGlobalOptions emptyEnvironment
       }
 
     , { name = "docker.shell"
@@ -38,7 +40,7 @@ in  -- {{{ Docker -------------------------------------------------------------
                         , workingDirectory = None Text
                         }
                   )
-                  noExtraEnvironment
+                  emptyEnvironment
                   verbosity
                   colourOutput
                   args.tail

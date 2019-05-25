@@ -1,4 +1,4 @@
-let CommandWrapper = ./lib/Types.dhall
+let CommandWrapper = ./Types.dhall
 
 let empty = [] : List CommandWrapper.ExecNamedCommand
 

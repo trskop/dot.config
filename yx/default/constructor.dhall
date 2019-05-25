@@ -1,14 +1,9 @@
-let CommandWrapper = ../../command-wrapper/lib/Types.dhall
+let CommandWrapper = ../../command-wrapper/Types.dhall
 
-let commandWrapper = ../../command-wrapper/lib/lib.dhall
-
-let context =
-      { home = "${env:HOME as Text}"
-      , toolset = "yx"
-      }
+let commandWrapper = ../../command-wrapper/library.dhall
 
 let empty =
-      { aliases = [] : List CommandWrapper.SubcommandAlias
+      { aliases = commandWrapper.config.toolset.emptyAliases
       , helpMessage = ""
       }
 
@@ -38,16 +33,19 @@ let yx =
         )
         ( ./aliases-local.dhall ? empty)
 
-let customise =
-        λ(defaults : CommandWrapper.DefaultConfig)
-      → commandWrapper.toolsetConfig.addSubcommandAliases
-          yx.aliases
-          "${helpMessage}${yx.helpMessage}"
-          ( defaults
-              //  { description =
-                      Some "Y repeate X; set of personalised command line tools."
-                  }
-          )
-        : CommandWrapper.DefaultConfig
+let defaults = commandWrapper.config.toolset.defaults
 
-in  commandWrapper.toolsetConfig.mkConfig context customise
+in    commandWrapper.config.toolset.addSubcommandAliases
+        yx.aliases
+        "${helpMessage}${yx.helpMessage}"
+        ( defaults
+            //  { description =
+                    Some "Y repeate X; set of personalised command line tools."
+
+                , searchPath =
+                    commandWrapper.config.toolset.defaultSearchPath
+                      (env:HOME as Text)
+                      "yx"
+                }
+        )
+    : CommandWrapper.ToolsetConfig

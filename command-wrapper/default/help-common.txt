@@ -1,0 +1,10 @@
+
+Global Subcommands:
+
+  help       (internal, aliases: h, man)
+  config     (internal, aliases: cfg, dhall, dhall-repl)
+  version    (internal)
+  completion (internal)
+  cd         (external)
+  exec       (external)
+  skel       (external)

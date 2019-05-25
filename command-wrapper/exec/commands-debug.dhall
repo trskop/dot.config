@@ -1,6 +1,6 @@
-let CommandWrapper = ../lib/Types.dhall
+let CommandWrapper = ../Types.dhall
 
-let commandWrapper = ../lib/lib.dhall
+let commandWrapper = ../library.dhall
 
 let verbosityToText = commandWrapper.verbosity.fold Text
       { Silent = "silent"

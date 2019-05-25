@@ -1,35 +1,39 @@
-let CommandWrapper = ./lib/Types.dhall
+let CommandWrapper = ./Types.dhall
 
-let commandWrapper = ./lib/lib.dhall
+let commandWrapper = ./library.dhall
 
 let commonDirectories =
       ./cd/directories-common.dhall : List Text
 
-let empty = [] : List Text
+let emptyDirectories = commandWrapper.config.cd.emptyDirectories
 
 let directories =
-      (./cd/directories-local.dhall ? empty) # (./cd/directories.dhall ? empty)
+        (./cd/directories-local.dhall ? emptyDirectories)
+      # (./cd/directories.dhall ? emptyDirectories)
 
-let customise =
-        λ(defaults : CommandWrapper.CdConfig)
-      → defaults
-        //  { directories =
-                defaults.directories # commonDirectories # directories
+let defaults = commandWrapper.config.cd.defaults
 
-            , menuTool = (./cd/finder.dhall).fzf
+in  defaults
+    //  { directories =
+            defaults.directories # commonDirectories # directories
 
-            , terminalEmulator =
-                let terminalEmulator =
-                      { DebianLinux =
-                            λ(directory : Text)
-                          → commandWrapper.terminalEmulator.kitty (Some directory)
-
-                      , BuntishLinux =
-                          defaults.terminalEmulator
+        , menuTool =
+              λ(query : Optional Text)
+            → let fzf = commandWrapper.config.cd.menuTools.fzf query
+              in  fzf
+                  //  { arguments = ["--height=40%"] # fzf.arguments
                       }
 
-                in  merge terminalEmulator (../yx/this/system-info.dhall).os
+        , terminalEmulator =
+            let terminalEmulator =
+                  { DebianLinux =
+                        λ(directory : Text)
+                      → commandWrapper.terminalEmulator.kitty (Some directory)
 
-            } : CommandWrapper.CdConfig
+                  , BuntishLinux =
+                      defaults.terminalEmulator
+                  }
 
-in commandWrapper.mkCdConfig customise
+            in  merge terminalEmulator (../yx/this/system-info.dhall).os
+
+        } : CommandWrapper.CdConfig

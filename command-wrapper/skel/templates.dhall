@@ -1,3 +1,5 @@
+let commandWrapper = ../library.dhall
+
 let home = "${env:HOME as Text}"
 
 let config = env:XDG_CONFIG_HOME as Text ? "${home}/.config"
@@ -27,18 +29,24 @@ in    λ(wrapper : Text)
       { Haskell =
           { targetFile = haskellSubcommandFileName wrapper command
           , executable = False
-          , template = ./haskell-skel.dhall ? ./default-haskell-skel.dhall
+          , template =
+                ./haskell-skel.dhall
+              ? commandWrapper.config.skel.default-haskell-skel
           }
       , Bash =
           { targetFile = bashSubcommandFileName wrapper command
           , executable = True
-          , template = ./bash-skel.dhall ? ./default-bash-skel.dhall
+          , template =
+                ./bash-skel.dhall
+              ? commandWrapper.config.skel.default-bash-skel
           }
       , Dhall =
           { targetFile = dhallConfigFileName wrapper command
           , executable = False
           , template =
-              (./dhall-skel.dhall ? ./default-dhall-skel.dhall)
+              ( ./dhall-skel.dhall
+              ? commandWrapper.config.skel.default-dhall-skel
+              )
               wrapper
               subcommand
           }
