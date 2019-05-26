@@ -2,20 +2,17 @@ let CommandWrapper = ./Types.dhall
 
 let commandWrapper = ./library.dhall
 
-let commonDirectories =
-      ./cd/directories-common.dhall : List Text
-
 let emptyDirectories = commandWrapper.config.cd.emptyDirectories
 
-let directories =
-        (./cd/directories-local.dhall ? emptyDirectories)
+let directories : List Text =
+        ./cd/directories-common.dhall
+      # (./cd/directories-local.dhall ? emptyDirectories)
       # (./cd/directories.dhall ? emptyDirectories)
 
 let defaults = commandWrapper.config.cd.defaults
 
 in  defaults
-    //  { directories =
-            defaults.directories # commonDirectories # directories
+    //  { directories = defaults.directories # directories
 
         , menuTool =
               λ(query : Optional Text)
