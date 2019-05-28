@@ -284,11 +284,12 @@ install Directories{..} opts = shakeArgs opts $ do
         cmd_ "git -C" [directory] "pull"
         cmd_ (Cwd directory) "./install"
 
-    (commandWrapperDir </> "*.dhall") %> \out -> do
+    [commandWrapperDir </> "default.dhall", commandWrapperDir </> "command-wrapper-*.dhall"]
+      |%> \out -> do
         need
             [ commandWrapperLibDir </> "command-wrapper"
-            , commandWrapperDir </> "lib/lib.dhall"
-            , commandWrapperDir </> "lib/Types.dhall"
+            , commandWrapperDir </> "library.dhall"
+            , commandWrapperDir </> "Types.dhall"
             ]
         let subdir = takeBaseName out `dropPrefix` "command-wrapper-"
             dir = commandWrapperDir </> subdir
@@ -305,8 +306,8 @@ install Directories{..} opts = shakeArgs opts $ do
     yxRules YxRulesParams
         { configDir = yxDir
         , configLib =
-            [ commandWrapperDir </> "lib/lib.dhall"
-            , commandWrapperDir </> "lib/Types.dhall"
+            [ commandWrapperDir </> "library.dhall"
+            , commandWrapperDir </> "Types.dhall"
             ]
         , libDir = yxLibDir
         , binDir
@@ -387,7 +388,7 @@ data YxRulesParams = YxRulesParams
 -- | CommandWrapper toolset `yx` is used for personal tools.
 yxRules :: YxRulesParams -> Rules ()
 yxRules YxRulesParams{..} = do
-    (configDir </> "*.dhall") %> \out -> do
+    [configDir </> "default.dhall", configDir </> "yx-*.dhall"] |%> \out -> do
         need [commandWrapperLibDir </> "command-wrapper"]
         let subdir = takeBaseName out `dropPrefix` "yx-"
             dir = configDir </> subdir
