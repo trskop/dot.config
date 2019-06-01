@@ -11,10 +11,19 @@ let headAndTail = commandWrapper.utils.List.head-and-tail
 in  -- {{{ Docker -------------------------------------------------------------
 
     [ { name = "docker.prune"
+      , description = None Text
       , command = docker.prune docker.defaultGlobalOptions emptyEnvironment
+      , completion =
+          None
+          (   CommandWrapper.Shell
+            → Natural
+            → List Text
+            → CommandWrapper.ExecCommand
+          )
       }
 
     , { name = "docker.shell"
+      , description = None Text
       , command =
           λ(verbosity : CommandWrapper.Verbosity)
         → λ(colourOutput : CommandWrapper.ColourOutput)
@@ -51,6 +60,14 @@ in  -- {{{ Docker -------------------------------------------------------------
                 , searchPath = True
                 , workingDirectory = None Text
                 } : CommandWrapper.ExecCommand
+
+      , completion =
+          None
+          (   CommandWrapper.Shell
+            → Natural
+            → List Text
+            → CommandWrapper.ExecCommand
+          )
       }
 
     -- }}} Docker -------------------------------------------------------------

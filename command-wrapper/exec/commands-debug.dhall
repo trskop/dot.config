@@ -11,6 +11,7 @@ let verbosityToText = commandWrapper.verbosity.fold Text
 
 in  -- Debugging commands:
     [ { name = "echo"
+      , description = None Text
       , command =
             λ(verbosity : CommandWrapper.Verbosity)
           → λ(colourOutput : CommandWrapper.ColourOutput)
@@ -21,9 +22,19 @@ in  -- Debugging commands:
             , searchPath = True
             , workingDirectory = None Text
             } : CommandWrapper.ExecCommand
+
+      , completion =
+          None
+          (   CommandWrapper.Shell
+            → Natural
+            → List Text
+            → CommandWrapper.ExecCommand
+          )
+
       } : CommandWrapper.ExecNamedCommand
 
     , { name = "debug"
+      , description = None Text
       , command =
             λ(verbosity : CommandWrapper.Verbosity)
           → λ(colourOutput : CommandWrapper.ColourOutput)
@@ -38,5 +49,13 @@ in  -- Debugging commands:
             , searchPath = True
             , workingDirectory = None Text
             } : CommandWrapper.ExecCommand
+
+      , completion =
+          None
+          (   CommandWrapper.Shell
+            → Natural
+            → List Text
+            → CommandWrapper.ExecCommand
+          )
       } : CommandWrapper.ExecNamedCommand
     ]
