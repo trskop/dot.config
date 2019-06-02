@@ -11,7 +11,7 @@ let headAndTail = commandWrapper.utils.List.head-and-tail
 in  -- {{{ Docker -------------------------------------------------------------
 
     [ { name = "docker.prune"
-      , description = None Text
+      , description = Some "Remove unused images and volumes."
       , command = docker.prune docker.defaultGlobalOptions emptyEnvironment
       , completion =
           None

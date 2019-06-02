@@ -11,7 +11,7 @@ let verbosityToText = commandWrapper.verbosity.fold Text
 
 in  -- Debugging commands:
     [ { name = "echo"
-      , description = None Text
+      , description = Some "Call echo command (not the shell builtin)."
       , command =
             λ(verbosity : CommandWrapper.Verbosity)
           → λ(colourOutput : CommandWrapper.ColourOutput)
@@ -34,7 +34,11 @@ in  -- Debugging commands:
       } : CommandWrapper.ExecNamedCommand
 
     , { name = "debug"
-      , description = None Text
+      , description =
+          Some
+          (     "Call echo command (not the shell builtin); print verbosity"
+            ++  " and colour settings allong with arguments."
+          )
       , command =
             λ(verbosity : CommandWrapper.Verbosity)
           → λ(colourOutput : CommandWrapper.ColourOutput)
