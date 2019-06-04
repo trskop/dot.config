@@ -81,6 +81,10 @@ Options:
       will try to open file in remote Neovim instead of starting a new editor
       process.
 
+  --lines=[-]NUM, --lines [-]NUM, -n [-]NUM
+      Parse input upto NUM lines; with the leading '-' it counts the lines from
+      the end, i.e. parses all lines except the last NUM lines.
+
   --help, -h
       Print short help message and exit.  Same as: ${commandHelp}
 
@@ -149,6 +153,7 @@ function completion() {
 --root-dir= --root-dir
 --syntax --syntax=plain --syntax=ghc --syntax=psc --syntax=grep
   --syntax=grep-with-line-numbers
+--lines=
 --help -h"
 
     compgen -W "${options}" -- "${words[${index}]}"
@@ -249,6 +254,8 @@ function main() {
 
     local allowNeovimRemote=1
 
+    local lines='-'
+
     local arg
     while (( $# )); do
         arg="$1"; shift
@@ -328,6 +335,15 @@ function main() {
             --no-neovim-remote)
                 allowNeovimRemote=1
                 ;;
+            --lines|-n)
+                if (( ! $# )); then
+                    die 1 "'%s': Missing argument NUM." "${arg}"
+                fi
+                lines="$1"; shift
+                ;;
+            --lines=*)
+                lines="${arg#*=}"
+                ;;
             -*)
                 die 1 "'%s': Unknown option." "${arg}"
                 ;;
@@ -361,9 +377,10 @@ function main() {
 
     if (( doGitAction )); then
         runGitAction "${allowNeovimRemote}" "${rootDir}" "${gitAction}" \
-            "${gitCommit}" "${gitActionArguments[@]}"
+            "${gitCommit}" "${lines}" "${gitActionArguments[@]}"
     elif [[ -n "${inputFile}" ]]; then
-        readFile "${allowNeovimRemote}" "${rootDir}" "${syntax}" "${inputFile}"
+        readFile "${allowNeovimRemote}" "${rootDir}" "${syntax}" "${lines}" \
+            "${inputFile}"
     else
         # TODO: This logic should probably be in a function.
         case "${expectTerminal}" in
@@ -373,10 +390,10 @@ function main() {
                     die 3 "Not running in a neither Kitty nor Tmux, see yx-jmp(1)."
                 elif [[ -n "${TMUX}" && -n "${TMUX_PANE}" ]]; then
                     tmuxScrollback "${allowNeovimRemote}" "${rootDir}" \
-                        "${syntax}"
+                        "${syntax}" "${lines}"
                 elif [[ -n "${KITTY_WINDOW_ID}" || "${TERM}" == 'xterm-kitty' ]]; then
                     kittyScrollback "${allowNeovimRemote}" "${rootDir}" \
-                        "${syntax}"
+                        "${syntax}" "${lines}"
                 else
                     die 3 "Not running in a neither Kitty nor Tmux, see yx-jmp(1)."
                 fi
@@ -390,7 +407,8 @@ function main() {
                     die 3 "Not running in a Kitty terminal emulator, see yx-jmp(1)."
                 fi
 
-                kittyScrollback "${allowNeovimRemote}" "${rootDir}" "${syntax}"
+                kittyScrollback "${allowNeovimRemote}" "${rootDir}" \
+                    "${syntax}" "${lines}"
                 ;;
             tmux)
                 if [[ -z "${TMUX}" || -z "${TMUX_PANE}" ]]; then
@@ -401,7 +419,8 @@ function main() {
                     die 3 "Not running in a Kitty terminal emulator, see yx-jmp(1)."
                 fi
 
-                tmuxScrollback "${allowNeovimRemote}" "${rootDir}" "${syntax}"
+                tmuxScrollback "${allowNeovimRemote}" "${rootDir}" \
+                    "${syntax}" "${lines}"
                 ;;
         esac
     fi
@@ -409,12 +428,14 @@ function main() {
 
 # Usage:
 #
-#   runGitAction ROOT_DIR {status|commit|grep} {COMMIT|''} [EXTRA_ARGUMENT ...]
+#   runGitAction ROOT_DIR {status|commit|grep} {COMMIT|''} {LINES|-}
+#      [EXTRA_ARGUMENT ...]
 function runGitAction() {
     local -r -i allowNeovimRemote="$1"; shift
     local -r rootDir="$1"; shift
     local -r action="$1"; shift
     local -r commit="$1"; shift
+    local -r lines="$1"; shift
 
     # Extra arguments passed to Git subcommand.  Only used in certain cases.
     local -ra arguments=("$@")
@@ -433,7 +454,8 @@ function runGitAction() {
             gitCommit "${allowNeovimRemote}" "${rootDir}" "${commit}"
             ;;
         'grep')
-            gitGrep "${allowNeovimRemote}" "${rootDir}" "${arguments[@]}"
+            gitGrep "${allowNeovimRemote}" "${rootDir}" "${lines}" \
+                "${arguments[@]}"
             ;;
         *)
             die 4 "'%s': Unknown internal Git action; probably a bug." \
@@ -488,21 +510,25 @@ function gitCommit() {
 
 # Usage:
 #
-#   gitGrep ROOT_DIR [ARGUMENT ...]
+#   gitGrep ALLOW_NEOVIM_REMOTE ROOT_DIR {LINES|-} [ARGUMENT ...]
 function gitGrep() {
     local -r -i allowNeovimRemote="$1"; shift
     local -r rootDir="$1"; shift
+    local -r lines="$1"; shift
 
     git grep "$@" \
-    | readFile "${allowNeovimRemote}" "${rootDir}" 'grep-with-line-numbers' -
+    | readFile "${allowNeovimRemote}" "${rootDir}" 'grep-with-line-numbers' \
+        "${lines}" -
 }
 
 # Usage:
 #
-#   parseInput SYNTAX [FILE]
+#   parseInput SYNTAX {LINES|-} [FILE]
 function parseInput() {
     local -r syntax="$1"; shift
+    local -r lines="$1"; shift
     local substitution='s/(.*)/\1 +0/'
+    local -r -a files=("$@")
 
     case "${syntax}" in
       ghc)
@@ -521,16 +547,25 @@ function parseInput() {
         ;;
     esac
 
-    sed -rn "${substitution};T;p" -- "$@"
+    function limited() {
+        if [[ "${lines}" = '-' ]]; then
+            "$@" -- "${files[@]}"
+        else
+            head --lines="${lines}" -- "${files[@]}" | "$@"
+        fi
+    }
+
+    limited sed -rn "${substitution};T;p"
 }
 
 # Usage:
 #
-#   tmuxScrollback ROOT_DIR SYNTAX
+#   tmuxScrollback ALLOW_NEOVIM_REMOTE ROOT_DIR SYNTAX {LINES|-}
 function tmuxScrollback() {
     local -r -i allowNeovimRemote="$1"; shift
     local -r rootDir="$1"; shift
     local -r syntax="$1"; shift
+    local -r lines="$1"; shift
 
     eval "$(declareCfg)"
 
@@ -539,7 +574,7 @@ function tmuxScrollback() {
     # - Detect that the imput is empty and notify user instead of starting
     #   "${menuCommand[@]}".
     tmux capture-pane -S - -b scroll-buffer \; show-buffer -b scroll-buffer \; delete-buffer -b scroll-buffer \
-    | parseInput "${syntax}" \
+    | parseInput "${syntax}" "${lines}" \
     | uniq \
     | "${menuCommand[@]}" \
     | startEditor "${allowNeovimRemote}" "${rootDir}"
@@ -547,11 +582,12 @@ function tmuxScrollback() {
 
 # Usage:
 #
-#   kittyScrollback ROOT_DIR SYNTAX
+#   kittyScrollback ALLOW_NEOVIM_REMOTE ROOT_DIR SYNTAX {LINES|-}
 function kittyScrollback() {
     local -r -i allowNeovimRemote="$1"; shift
     local -r rootDir="$1"; shift
     local -r syntax="$1"; shift
+    local -r lines="$1"; shift
 
     eval "$(declareCfg)"
 
@@ -579,7 +615,7 @@ function kittyScrollback() {
     #
     # - Detect that the imput is empty and notify user instead of starting
     #   "${menuCommand[@]}".
-    parseInput "${syntax}" "${temp}" \
+    parseInput "${syntax}" "${lines}" "${temp}" \
     | uniq \
     | "${menuCommand[@]}" \
     | startEditor "${allowNeovimRemote}" "${rootDir}"
@@ -587,20 +623,21 @@ function kittyScrollback() {
 
 # Usage:
 #
-#   readFile ROOT_DIR SYNTAX {FILE|-}
+#   readFile ALLOW_NEOVIM_REMOTE ROOT_DIR SYNTAX {LINES|-} {FILE|-}
 function readFile() {
     local -r -i allowNeovimRemote="$1"; shift
     local -r rootDir="$1"; shift
     local -r syntax="$1"; shift
+    local -r lines="$1"; shift
     local -r inputFile="$1"; shift
 
     eval "$(declareCfg)"
 
     {
         if [[ "${inputFile}" = '-' ]]; then
-            parseInput "${syntax}"
+            parseInput "${syntax}" "${lines}"
         else
-            parseInput "${syntax}" "${inputFile}"
+            parseInput "${syntax}" "${lines}" "${inputFile}"
         fi
     } \
     | uniq \

@@ -52,17 +52,17 @@ For documentation of *GLOBAL_OPTIONS* see `command-wrapper(1)` manual page.
 :   Use heuristic to decide if running in Tmux or Kitty.  This is the default
     mode, when no other mode-changing option is specified.
 
-\--tmux, -t
+\--tmux, **-t**
 :   Look for files to open in Tmux scrollback buffer.
 
-\--kitty, -k
+\--kitty, **-k**
 :   Look for files to open in Kitty terminal emulator scrollback buffer.
 
-\--git-status, -g
+\--git-status, **-g**
 :   Use `git status` command as a source instead of scrollback buffer.  This is
     Useful if you are working on set of files that weren't yet commited.
 
-\--git-commit [*COMMIT*], -G [*COMMIT*]
+\--git-commit [*COMMIT*], **-G** [*COMMIT*]
 :   Use list of files changed as part of a *COMMIT* as a source instead of Tmux
     scrollback buffer.  Defaults to 'HEAD' if *COMMIT* is not specified.
     Especially useful if you like to have a set of WIP (work in progres)
@@ -75,14 +75,14 @@ For documentation of *GLOBAL_OPTIONS* see `command-wrapper(1)` manual page.
     git grep GIT_GREP_ARGUMENTS | yx jmp -f - --syntax=grep-with-line-numbers
     ```
 
-\--file={*FILE*|-}, \--file {*FILE*|-}, -f {*FILE*|-}
+\--file={*FILE*|-}, **\--file** {*FILE*|-}, **-f** {*FILE*|-}
 :   Read list of files from *FILE* or `stdin`.
 
-\--root-dir=*DIR*, \--root-dir *DIR*
+\--root-dir=*DIR*, **\--root-dir** *DIR*
 :   When executing editor use this directory as a parent dir for the file that
     is being edited.
 
-\--syntax=*SYNTAX*, \--syntax *SYNTAX*
+\--syntax=*SYNTAX*, **\--syntax** *SYNTAX*
 :   Select *SYNTAX* of input from which filenames will be parsed.  Possible
     values for *SYNTAX* are:
 
@@ -96,10 +96,14 @@ For documentation of *GLOBAL_OPTIONS* see `command-wrapper(1)` manual page.
 
     This optinon is ignored when one of `--git-*` options was specified.
 
-\--[no-]neovim-remote
+\--\[no-]neovim-remote
 :   Allow/disable Neovim remote control functionality when `NVIM_LISTEN_ADDRESS`
     environment variable is set.  When enabled 'yx jmp' will try to open file
     in remote Neovim instead of starting a new editor process.
+
+\--lines=\[-]*NUM*, **\--lines** \[-]*NUM*, **-n** \[-]*NUM*
+:   Parse input upto *NUM* lines; with the leading '-' it counts the lines from
+    the end, i.e. parses all lines except the last *NUM* lines.
 
 \--help, -h
 :   Print short help message and exit.  Same as: `yx help jmp`.
@@ -174,13 +178,13 @@ mentioned there applies to this subcommand as well.
     ](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html)
     for more information on rationale behind this.
 
-`TMUX`, `TMUX_PANE`
+`TMUX`, **`TMUX_PANE`**
 :   Allows `yx jmp` to determine if it's running inside Tmux.
 
-`KITTY_WINDOW_ID`, `TERM`
+`KITTY_WINDOW_ID`, **`TERM`**
 :   Allows `yx jmp` to determine if it's running inside Kitty terminal emulator.
 
-`VIM`, `VIMRUNTIME`
+`VIM`, **`VIMRUNTIME`**
 :   Allows `yx jmp` to determine if it's running inside Vim/Neovim terminal.
     Even if Vim/Neovim is running inside Tmux or Kitty we are unable to access
     scrollback buffer when running inside Vim/Neovim terminal.
