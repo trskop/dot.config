@@ -8,7 +8,15 @@ let List/map =
 
 let toAlias =
         λ(x : CommandWrapper.ExecNamedCommand)
-      → { alias = x.name, command = "exec", arguments = [ x.name ] }
+      → { alias =
+            x.name
+        , description =
+            x.description
+        , command =
+            "exec"
+        , arguments =
+            [ x.name ]
+        }
 
 in  List/map
     CommandWrapper.ExecNamedCommand
