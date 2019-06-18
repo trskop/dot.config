@@ -10,22 +10,13 @@ let headAndTail = commandWrapper.utils.List.head-and-tail
 
 in  -- {{{ Docker -------------------------------------------------------------
 
-    [ { name = "docker.prune"
-      , description = Some "Remove unused images and volumes."
-      , command = docker.prune docker.defaultGlobalOptions emptyEnvironment
-      , completion =
-          None
-          (   CommandWrapper.Shell
-            → Natural
-            → List Text
-            → CommandWrapper.ExecCommand
-          )
-      }
+    [ commandWrapper.config.exec.namedCommand "docker.prune"
+      (docker.prune docker.defaultGlobalOptions emptyEnvironment)
+      //  { description = Some "Remove unused images and volumes."
+          }
 
-    , { name = "docker.shell"
-      , description = None Text
-      , command =
-          λ(verbosity : CommandWrapper.Verbosity)
+    , commandWrapper.config.exec.namedCommand "docker.shell"
+        ( λ(verbosity : CommandWrapper.Verbosity)
         → λ(colourOutput : CommandWrapper.ColourOutput)
         → λ(arguments : List Text)
         → let args = headAndTail Text arguments
@@ -56,19 +47,11 @@ in  -- {{{ Docker -------------------------------------------------------------
                 )
                 { command = "echo"
                 , arguments = ["ERROR: Missing arugment: container name"]
-                , environment = [] : List CommandWrapper.EnvironmentVariable
+                , environment = emptyEnvironment
                 , searchPath = True
                 , workingDirectory = None Text
                 } : CommandWrapper.ExecCommand
-
-      , completion =
-          None
-          (   CommandWrapper.Shell
-            → Natural
-            → List Text
-            → CommandWrapper.ExecCommand
-          )
-      }
+        )
 
     -- }}} Docker -------------------------------------------------------------
     ] : List CommandWrapper.ExecNamedCommand
