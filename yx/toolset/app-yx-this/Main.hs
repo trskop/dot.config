@@ -166,7 +166,6 @@ main = do
     notYetImplemented params =
         dieWith params stderr 125 "Bug: This should not happen at the moment."
 
-
 readConfig :: Params -> mode a -> IO (Either String (Endo (Maybe Config)))
 readConfig params _ = Right . Endo . const <$> Config.read params
 
