@@ -1,4 +1,7 @@
-#!/usr/bin/env bash
+#!/bin/bash
+# ^ Seems that Bash inside Nix is restricted in some way.  Therefore, we need
+# to enforce usage of host Bash for command line completion functions to be
+# available.
 
 set -euo pipefail
 
@@ -12,10 +15,12 @@ function findBazelCompletion() {
         '/usr/share'
     )
 
+
     local completionFile
     for shareDir in "${shareDirectories[@]}"; do
         completionFile="${shareDir}/bash-completion/completions/bazel"
         if completionFile="$(readlink -e "${completionFile}")"; then
+            # echo : "${completionFile}" 1>&2
             cat "${completionFile}"
             return 0
         fi
@@ -86,6 +91,14 @@ function main() {
 
     # Debugging:
     #echo : "index=${index}" 'words=(' "${words[@]}" ')' 1>&2
+
+    function complete() {
+        :
+    }
+
+    function compgen() {
+        command compgen "$@"
+    }
 
     # shellcheck source=/dev/null
     source <(findBazelCompletion 'bazel')
