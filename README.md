@@ -55,7 +55,7 @@ sudo apt install haskell-stack curl libtinfo-dev zlib1g-dev
 ```
 
 We are expecting that there are some files already present in your `~/.config/`
-directory.  This installation process will leave them untached, but you may
+directory.  This installation process will leave them untouched, but you may
 need to resolve issues with files that exist both locally and in the
 repository.
 
