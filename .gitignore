@@ -52,6 +52,7 @@
 /command-wrapper/exec/commands-local.dhall
 /command-wrapper/skel/*-skel.dhall
 !/command-wrapper/skel/default-*-skel.dhall
+!/habit/command-wrapper-*.dhall
 /habit/default/aliases.dhall
 /habit/default/help-msg.txt
 /habit/pgpass.conf
