@@ -1,7 +1,4 @@
-#!/bin/bash
-# ^ Seems that Bash inside Nix is restricted in some way.  Therefore, we need
-# to enforce usage of host Bash for command line completion functions to be
-# available.
+#!/usr/bin/env bash
 
 set -euo pipefail
 
@@ -14,7 +11,6 @@ function findBazelCompletion() {
         '/usr/local/share'
         '/usr/share'
     )
-
 
     local completionFile
     for shareDir in "${shareDirectories[@]}"; do
