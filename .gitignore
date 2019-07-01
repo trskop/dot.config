@@ -55,6 +55,8 @@
 !/habit/command-wrapper-*.dhall
 /habit/default/aliases.dhall
 /habit/default/help-msg.txt
+/habit/exec/commands.dhall
+/habit/exec/commands-local.dhall
 /habit/pgpass.conf
 /habit/pgpass.d/*
 !/habit/pgpass.d/.gitkeep
