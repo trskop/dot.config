@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+# Cannot be used due to sourced 'bash_completion'.
+#set -euo pipefail
 
 function findCompletion() {
     local cmdName="$1"; shift
@@ -8,7 +9,7 @@ function findCompletion() {
 
     local -a shareDirectories=()
     shareDirectories=(
-        # E.g. /nix/store/${hash}-bazel-${version}/share
+        # E.g. /nix/store/${hash}-docker-compose-${version}/share
         "$(dirname "$(command -v "${cmd}")")/../share"
         "${HOME}/.nix-profile/share"
         '/usr/local/share'
@@ -31,7 +32,7 @@ function findCompletion() {
 
 function usage() {
     cat <<EOF
-Completion for Bazel with Command Wrapper style UI.
+Completion for docker-compose with Command Wrapper style UI.
 
 Usage:
 
@@ -67,7 +68,7 @@ function main() {
         esac
     done
 
-    if ! command -v 'bazel' &>/dev/null; then
+    if ! command -v 'docker-compose' &>/dev/null; then
         # TODO: Consider using default shell completion.
         exit 0
     fi
@@ -75,9 +76,6 @@ function main() {
     if (( index >= ${#words[@]} )); then
         words+=('')
     fi
-
-    # Debugging:
-    : index="${index}" 'words=(' "${words[@]}" ')'
 
     function concat() {
         echo "$@"
@@ -93,6 +91,9 @@ function main() {
     local COMP_CWORD="${index}"
     local -a COMPREPLY
 
+    # Debugging:
+    : index="${index}" 'words=(' "${words[@]}" ')'
+
     function complete() {
         :
     }
@@ -102,9 +103,12 @@ function main() {
     }
 
     # shellcheck source=/dev/null
-    source <(findCompletion 'bazel' 'bazel')
+    source /usr/share/bash-completion/bash_completion
 
-    _bazel__complete
+    # shellcheck source=/dev/null
+    source <(findCompletion 'docker-compose' 'docker-compose')
+
+    _docker_compose
 
     for reply in "${COMPREPLY[@]}"; do
         echo "${reply% }"
