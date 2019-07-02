@@ -1,31 +1,31 @@
 let CommandWrapper = ../Types.dhall
 
 in    [ { alias = "h"
-        , description = Some "Short hand for \"help\"."
+        , description = Some "Shorthand for \"help\"."
         , arguments = [] : List Text
         , command = "help"
         }
 
       , { alias = "man"
-        , description = Some "Short hand for \"help --man\"."
+        , description = Some "Shorthand for \"help --man\"."
         , command = "help"
         , arguments = [ "--man" ]
         }
 
       , { alias = "cfg"
-        , description = Some "Short hand for \"config\"."
+        , description = Some "Shorthand for \"config\"."
         , command = "config"
         , arguments = [] : List Text
         }
 
       , { alias = "dhall"
-        , description = Some "Short hand for \"config --dhall\"."
+        , description = Some "Shorthand for \"config --dhall\"."
         , command = "config"
         , arguments = [ "--dhall" ]
         }
 
       , { alias = "dhall-repl"
-        , description = Some "Short hand for \"config --dhall-repl\"."
+        , description = Some "Shorthand for \"config --dhall-repl\"."
         , command = "config"
         , arguments = ["--dhall-repl"]
         }
