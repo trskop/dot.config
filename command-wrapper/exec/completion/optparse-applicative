@@ -1,4 +1,4 @@
-let CommandWrapper = ../Types.dhall
+let CommandWrapper = ../../Types.dhall
 
 let List/map =
       https://prelude.dhall-lang.org/List/map
@@ -40,3 +40,5 @@ in    λ(command : Text)
       , workingDirectory =
           None Text
       }
+
+-- vim: filetype=dhall
