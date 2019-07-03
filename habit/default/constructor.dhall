@@ -7,19 +7,21 @@ let habitDefaults =
       , helpMessage = ""
       }
 
+let execAliases = ./exec-aliases.dhall
+
 let habit = ./aliases.dhall ? habitDefaults
 
 let defaults = commandWrapper.config.toolset.defaults
 
-in  commandWrapper.config.toolset.addSubcommandAliases
-      habit.aliases
+in    commandWrapper.config.toolset.addSubcommandAliases
+      (habit.aliases # execAliases)
       habit.helpMessage
-        ( defaults
-            //  { description = Some "Toolset for work."
-                , searchPath =
-                    commandWrapper.config.toolset.defaultSearchPath
-                    (env:HOME as Text)
-                    "habit"
-                }
-        )
+      (   defaults
+        //  { description = Some "Toolset for work."
+            , searchPath =
+                commandWrapper.config.toolset.defaultSearchPath
+                (env:HOME as Text)
+                "habit"
+            }
+      )
     : CommandWrapper.ToolsetConfig
