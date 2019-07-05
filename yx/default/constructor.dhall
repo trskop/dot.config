@@ -27,11 +27,16 @@ YX Subcommands:
 
 let yx =
       join
+      ( join
         ( join
-            (./aliases.dhall ? empty)
-            (./aliases-common.dhall ? empty)
+          (./aliases.dhall ? empty)
+          (./aliases-common.dhall ? empty)
         )
-        ( ./aliases-local.dhall ? empty)
+        (./aliases-local.dhall ? empty)
+      )
+      { aliases = ./exec-aliases.dhall
+      , helpMessage = ""
+      }
 
 let defaults = commandWrapper.config.toolset.defaults
 
