@@ -118,6 +118,7 @@ shakeMain Directories{..} opts = shakeArgs opts $ do
 
         yxAptScript = yxLibexecDir </> "yx-apt"
         yxJmpScript = yxLibexecDir </> "yx-jmp"
+        yxXpdfScript = yxLibexecDir </> "yx-xpdf"
 
         -- Standard `man` command should be able to pick this up.  Try
         -- `manpath` after installation to be sure.
@@ -132,6 +133,7 @@ shakeMain Directories{..} opts = shakeArgs opts $ do
         , yxThisBin
         , yxAptScript
         , yxJmpScript
+        , yxXpdfScript
         , man1Dir </> "yx.1.gz"
         , man1Dir </> "yx-apt.1.gz"
         , man1Dir </> "yx-env.1.gz"
@@ -139,6 +141,7 @@ shakeMain Directories{..} opts = shakeArgs opts $ do
         , man1Dir </> "yx-new.1.gz"
         , man1Dir </> "yx-path.1.gz"
         , man1Dir </> "yx-this.1.gz"
+        , man1Dir </> "yx-xpdf.1.gz"
         ]
 
     hasThisRepoChanged <- addOracle (thisGitRepo projectRoot)
@@ -166,7 +169,7 @@ shakeMain Directories{..} opts = shakeArgs opts $ do
         cmd_ "pandoc --standalone --to=man" ["--output=" <> tempOut, src]
         cmd_ "gzip --force -9" [tempOut]
 
-    [yxAptScript, yxJmpScript] &%> \outs ->
+    [yxAptScript, yxJmpScript, yxXpdfScript] &%> \outs ->
         forM_ outs $ \out ->
             cmd_ "ln -sf"
                 [ projectRoot </> "bash" </> takeFileName out

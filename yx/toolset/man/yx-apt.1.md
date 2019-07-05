@@ -12,11 +12,11 @@
 
 yx \[GLOBAL\_OPTIONS] apt \[*APT_OPTIONS*] \[*APT_COMMAND*]
 
-yx \[GLOBAL\_OPTIONS] jmp {\--init-config|--init-packages}
+yx \[GLOBAL\_OPTIONS] apt {\--init-config|--init-packages}
 
-yx \[GLOBAL\_OPTIONS] jmp {\--help|-h}
+yx \[GLOBAL\_OPTIONS] apt {\--help|-h}
 
-yx \[GLOBAL\_OPTIONS] help jmp
+yx \[GLOBAL\_OPTIONS] help apt
 
 
 # DESCRIPTION
