@@ -97,10 +97,15 @@ EOF
 # `command-wrapper-subcommand-protocol(7)` for more details on how this works.
 function completionInfo() {
     cat <<"EOF"
-  λ(_ : <Bash | Fish | Zsh >)
+  λ(shell : < Bash | Fish | Zsh >)
 → λ(index : Natural)
 → λ(words : List Text)
-→ [ "--completion", "--index=${Natural/show index}", "--" ] # words
+→   [ "--completion"
+    , "--index=${Natural/show index}"
+    , "--shell=${merge {Bash = "bash", Fish = "fish", Zsh = "zsh"} shell}"
+    , "--"
+    ]
+  # words
 EOF
 }
 
@@ -108,7 +113,7 @@ EOF
 #
 # Usage:
 #
-#   completion [--index=INDEX] [[--] WORD [...]]
+#   completion [--index=INDEX] [--shell=SHELL] [[--] WORD [...]]
 #
 # Bash itself provides `compgen` builtin command that can do a lot of standard
 # command line completion functions.  See `bash(1)` or `help compgen` for more
@@ -123,6 +128,9 @@ function completion() {
         case "${arg}" in
             --index=*)
                 index="${arg#*=}"
+                ;;
+            --shell=*)
+                # Ignored.
                 ;;
             --)
                 words=("$@")
@@ -143,20 +151,22 @@ function completion() {
     fi
 
     # TODO: This completion is quite naive.
-    local -r options="--auto
---tmux -t
---kitty -k
---git-status -g
---git-commit -G
---git-grep
---file= --file -f
---root-dir= --root-dir
---syntax --syntax=plain --syntax=ghc --syntax=psc --syntax=grep
-  --syntax=grep-with-line-numbers
---lines=
---help -h"
+    local -r -a options=(
+        '--auto'
+        '--tmux' '-t'
+        '--kitty' '-k'
+        '--git-status' '-g'
+        '--git-commit' '-G'
+        '--git-grep'
+        '--file=' '--file' '-f'
+        '--root-dir=' '--root-dir'
+        '--syntax' '--syntax=plain' '--syntax=ghc' '--syntax=psc'
+            '--syntax=grep' '--syntax=grep-with-line-numbers'
+        '--lines='
+        '--help' '-h'
+    )
 
-    compgen -W "${options}" -- "${words[${index}]}"
+    compgen -W "${options[*]}" -- "${words[${index}]}"
 }
 
 function declareCfg() {
