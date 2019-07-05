@@ -198,11 +198,13 @@ function sensiblePager() {
 function sensiblePdfViewer() {
     local -a -r knownCommands=(
         'evince'
+        'atril'
         'gv'
         'pdftotext'
     )
     local -A -r hasGui=(
         ['evince']=1
+        ['atril']=1
         ['gv']=1
         ['pdftotext']=0
     )
@@ -232,6 +234,7 @@ function main() {
     #   command-wrapper-subcommand-protocol(7)
     dieIfExecutedOutsideOfCommandWrapperEnvironment
 
+    local -a atrilOptions=()
     local -a evinceOptions=()
     local -a gvOptions=()
     local -a pdftotextOptions=()
@@ -276,6 +279,7 @@ function main() {
                 ;;
 
             --fullscreen|-fullscreen)
+                atrilOptions+=('--fullscreen')
                 evinceOptions+=('--fullscreen')
                 gvOptions+=('--fullscreen')
                 # Doesn't make sense for pdftotext, ignored.
@@ -292,19 +296,22 @@ function main() {
 
                 if (( ! haveFile )); then
                     haveFile=1
-                    evinceOptions+=("$arg")
+                    atrilOptions+=("${arg}")
+                    evinceOptions+=("${arg}")
                     gvOptions+=("${arg}")
                     pdftotextOptions+=("${arg}")
                 else
                     havePosition=1
                     case "$arg" in
                       +*)
+                        atrilOptions+=("--page-label=${arg#+}")
                         evinceOptions+=("--page-label=${arg#+}")
                         gvOptions+=("--page=${arg#+}")
                         # Doesn't make sense for pdftotext, ignored.
                         ;;
                       *)
                         if grep -q -E '^[0-9]+$' <<< "${arg}"; then
+                            atrilOptions+=("--page-index=$arg")
                             evinceOptions+=("--page-index=$arg")
                             gvOptions+=("--page=$arg")
                         else
