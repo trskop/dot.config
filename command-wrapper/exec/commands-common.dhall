@@ -2,11 +2,13 @@ let CommandWrapper = ../Types.dhall
 
 let commandWrapper = ../library.dhall
 
-let docker = commandWrapper.config.exec.docker
+let exec = ./library.dhall
+
+let docker = exec.docker
 
 let emptyEnvironment = commandWrapper.command.emptyEnvironment
 
-let headAndTail = commandWrapper.utils.List.head-and-tail
+let List/head-and-tail = commandWrapper.utils.List.head-and-tail
 
 in  -- {{{ Docker -------------------------------------------------------------
 
@@ -19,17 +21,17 @@ in  -- {{{ Docker -------------------------------------------------------------
         ( λ(verbosity : CommandWrapper.Verbosity)
         → λ(colourOutput : CommandWrapper.ColourOutput)
         → λ(arguments : List Text)
-        → let args = headAndTail Text arguments
+        → let args = List/head-and-tail Text arguments
           in  Optional/fold Text args.head CommandWrapper.ExecCommand
                 ( λ(container : Text)
                 → docker.exec container
                   docker.defaultGlobalOptions
-                  docker.execInteractiveCommand
+                  docker.interactiveExecOptions
                   ( λ(environment : List CommandWrapper.EnvironmentVariable)
                   → λ(verbosity : CommandWrapper.Verbosity)
                   → λ(colourOutput : CommandWrapper.ColourOutput)
                   → λ(arguments : List Text)
-                  → let cmd = headAndTail Text arguments
+                  → let cmd = List/head-and-tail Text arguments
                     in  { command =
                            Optional/fold Text cmd.head Text
                              (λ(exe : Text) → exe)
