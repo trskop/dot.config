@@ -210,6 +210,7 @@ options = asum
             ( systemFlag
             <|> installFlag
             <|> userFlag
+            <|> nixFlag
             )
 
     , editFlag
@@ -244,6 +245,13 @@ userFlag = Options.flag' (addUpdateWhat UpdateUserEnvironment) $ mconcat
     [ Options.short 'u'
     , Options.long "user"
     , Options.help "Update user environment"
+    ]
+
+nixFlag :: Options.Parser (Endo (Mode config))
+nixFlag = Options.flag' (addUpdateWhat UpdateNixEnvironment) $ mconcat
+    [ Options.short 'n'
+    , Options.long "nix"
+    , Options.help "Update nix environment"
     ]
 
 addUpdateWhat :: UpdateWhat -> Endo (Mode config)

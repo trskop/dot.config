@@ -9,6 +9,7 @@ let UpdateAction =
       < UpdateSystem
       | InstallPackages
       | UpdateUserEnvironment
+      | UpdateNixEnvironment
       >
 
 in  { defaults =

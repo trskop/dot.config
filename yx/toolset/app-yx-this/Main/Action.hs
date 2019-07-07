@@ -55,7 +55,11 @@ updateAction params config what' = do
         $ installPackages purgePackages (bootstrapPackages <> packages)
 
     when (Set.member UpdateUserEnvironment what)
-        $ updateUserEnvironment params nix
+        $ updateUserEnvironment params
+
+    when (Set.member UpdateNixEnvironment what)
+        $ updateNixEnvironment params nix
+
   where
     Config
         { defaults = Defaults
@@ -112,8 +116,8 @@ installPackages purge install = do
     printf (": sudo apt install " % w % "\n") install
     callProcess "sudo" (["apt", "install"] <> fmap Text.unpack install)
 
-updateUserEnvironment :: Params -> NixConfig -> IO ()
-updateUserEnvironment Params{colour, verbosity} NixConfig{packages} = do
+updateUserEnvironment :: Params -> IO ()
+updateUserEnvironment Params{colour, verbosity} = do
     useColours <- liftIO (shouldUseColours IO.stdout colour)
     let shakeOptions =
             ( if useColours
@@ -135,6 +139,8 @@ updateUserEnvironment Params{colour, verbosity} NixConfig{packages} = do
     printf (": " % w % " " % w % "\n") yxInstall shakeOptions
     callProcess yxInstall shakeOptions
 
+updateNixEnvironment :: Params -> NixConfig -> IO ()
+updateNixEnvironment Params{} NixConfig{packages} = do
     let nixEnv = "nix-env"
 
         nixEnvOptions =

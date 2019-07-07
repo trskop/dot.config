@@ -85,6 +85,7 @@ data UpdateWhat
     = UpdateSystem
     | InstallPackages
     | UpdateUserEnvironment
+    | UpdateNixEnvironment
   deriving stock (Bounded, Enum, Eq, Generic, Ord, Show)
   deriving anyclass (Dhall.Inject, Dhall.Interpret)
 
