@@ -91,3 +91,9 @@ executables:
   yx-new:
     source-dirs: app-yx-new
     main: Main.hs
+
+  yx-remarkable:
+    source-dirs: app-yx-remarkable
+    main: Main.hs
+    dependencies:
+      - bytestring

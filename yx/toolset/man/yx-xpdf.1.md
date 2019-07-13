@@ -1,6 +1,6 @@
 % YX-XPDF(1) YX Toolset 0.1.0 | YX Toolset
 % Peter Trsko
-% 4th July 2019
+% 13th July 2019
 
 
 # NAME
@@ -33,7 +33,7 @@ For documentation of *GLOBAL_OPTIONS* see `command-wrapper(1)` manual page.
 :   Open PDF viewer in fullscreen mode if it's supported.
 
 \--help, -h, -?, -help
-:   Print short help message and exit.  Same as: `yx help apt`.
+:   Print short help message and exit.  Same as: `yx help xpdf`.
 
 
 # EXIT STATUS
@@ -60,10 +60,8 @@ mentioned there applies to this subcommand as well.
 
 # SEE ALSO
 
-yx-apt(1), yx-env(1), yx-jmp(1), yx-new(1), yx-path(1), yx-this(1), yx(1),
-command-wrapper(1)
-
-apt(8), apt-get(8), apt-cache(8)
+yx-apt(1), yx-env(1), yx-jmp(1), yx-new(1), yx-path(1), yx-remarkable(1),
+yx-this(1), yx(1), command-wrapper(1)
 
 * [XDG Base Directory Specification
   ](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html)

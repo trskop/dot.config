@@ -114,6 +114,7 @@ shakeMain Directories{..} opts = shakeArgs opts $ do
         yxEnvBin = yxLibexecDir </> "yx-env"
         yxNewBin = yxLibexecDir </> "yx-new"
         yxPathBin = yxLibexecDir </> "yx-path"
+        yxRemarkableBin = yxLibexecDir </> "yx-remarkable"
         yxThisBin = yxLibexecDir </> "yx-this"
 
         yxAptScript = yxLibexecDir </> "yx-apt"
@@ -130,6 +131,7 @@ shakeMain Directories{..} opts = shakeArgs opts $ do
         [ yxEnvBin
         , yxNewBin
         , yxPathBin
+        , yxRemarkableBin
         , yxThisBin
         , yxAptScript
         , yxJmpScript
@@ -140,6 +142,7 @@ shakeMain Directories{..} opts = shakeArgs opts $ do
         , man1Dir </> "yx-jmp.1.gz"
         , man1Dir </> "yx-new.1.gz"
         , man1Dir </> "yx-path.1.gz"
+        , man1Dir </> "yx-remarkable.1.gz"
         , man1Dir </> "yx-this.1.gz"
         , man1Dir </> "yx-xpdf.1.gz"
         ]
