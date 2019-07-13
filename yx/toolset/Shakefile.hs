@@ -62,13 +62,15 @@ type instance RuleResult ThisGitRepo = String
 thisGitRepo :: FilePath -> ThisGitRepo -> Action String
 thisGitRepo directory ThisGitRepo{} = do
     Stdout status <- cmd "git status -s --"
-        [ "stack.yaml"
-        , "package.yaml"
+        [ "Shakefile.hs"
         , "app-yx-env/"
         , "app-yx-new/"
         , "app-yx-path/"
+        , "app-yx-remarkable/"
         , "app-yx-this/"
         , "man/"
+        , "package.yaml"
+        , "stack.yaml"
         ]
 
     if null @[] @Char status

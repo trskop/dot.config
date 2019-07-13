@@ -17,6 +17,8 @@ module Main.Config.App
   where
 
 import Control.Monad (unless)
+import Data.Proxy (Proxy(..))
+import Data.String (fromString)
 import GHC.Generics (Generic)
 
 import CommandWrapper.Internal.Dhall
@@ -41,43 +43,71 @@ import qualified Dhall
     , inputFile
     , maybe
     )
-import System.Directory (doesFileExist)
+import System.Directory (doesFileExist, getHomeDirectory)
+import System.FilePath ((</>))
 
 
-newtype ConnectToRemarkable
-  = ConnectToRemarkable (ConnectTo "remarkable" ByteString (Maybe Word))
+newtype ConnectToRemarkableViaSsh
+    = ConnectToRemarkableViaSsh
+        (ConnectTo "remarkable-ssh" ByteString (Maybe Word))
   deriving stock (Generic, Show)
 
-instance Dhall.Interpret ConnectToRemarkable where
-    autoWith :: Dhall.InterpretOptions -> Dhall.Type ConnectToRemarkable
-    autoWith Dhall.InterpretOptions{fieldModifier} = ConnectToRemarkable
-        <$> interpretHostAndPort interpretStrictByteString
-                (Dhall.maybe interpretWord)
-      where
-        interpretHostAndPort
-            :: Dhall.Type ByteString
-            -> Dhall.Type (Maybe Word)
-            -> Dhall.Type (ConnectTo "remarkable" ByteString (Maybe Word))
-        interpretHostAndPort =
-            HostAndPort.interpretDhall \case
-                HostField -> fieldModifier "host"
-                PortField -> fieldModifier "port"
+instance Dhall.Interpret ConnectToRemarkableViaSsh where
+    autoWith :: Dhall.InterpretOptions -> Dhall.Type ConnectToRemarkableViaSsh
+    autoWith opts = ConnectToRemarkableViaSsh
+        <$> interpretHostAndPort (Proxy @"remarkable-ssh") opts
+                interpretStrictByteString (Dhall.maybe interpretWord)
+
+newtype ConnectToRemarkableViaWebUi
+    = ConnectToRemarkableViaWebUi
+        (ConnectTo "remarkable-web-ui" ByteString (Maybe Word))
+  deriving stock (Generic, Show)
+
+instance Dhall.Interpret ConnectToRemarkableViaWebUi where
+    autoWith
+        :: Dhall.InterpretOptions
+        -> Dhall.Type ConnectToRemarkableViaWebUi
+    autoWith opts = ConnectToRemarkableViaWebUi
+        <$> interpretHostAndPort (Proxy @"remarkable-web-ui") opts
+                interpretStrictByteString (Dhall.maybe interpretWord)
+
+interpretHostAndPort
+    :: forall (tag :: k) host port
+    .  Proxy tag
+    -> Dhall.InterpretOptions
+    -> Dhall.Type host
+    -> Dhall.Type port
+    -> Dhall.Type (ConnectTo tag host port)
+interpretHostAndPort Proxy Dhall.InterpretOptions{fieldModifier} =
+    HostAndPort.interpretDhall \case
+        HostField -> fieldModifier "host"
+        PortField -> fieldModifier "port"
 
 data Config = Config
-    { connection :: ConnectToRemarkable
+    { ssh :: ConnectToRemarkableViaSsh
+    , webUi :: ConnectToRemarkableViaWebUi
     , toolsPath :: [Text]
+    , syncDir :: Text
     }
   deriving stock (Generic, Show)
   deriving anyclass (Dhall.Interpret)
 
-defaultConfig :: Config
-defaultConfig = Config
-    { connection = ConnectToRemarkable ConnectTo
-        { connectHost = "10.11.99.1"
-        , connectPort = Nothing -- Default SSH port.
+defaultConfig :: IO Config
+defaultConfig = do
+    home <- getHomeDirectory
+
+    pure Config
+        { ssh = ConnectToRemarkableViaSsh ConnectTo
+            { connectHost = "10.11.99.1"
+            , connectPort = Nothing -- Default SSH port.
+            }
+        , webUi = ConnectToRemarkableViaWebUi ConnectTo
+            { connectHost = "10.11.99.1"
+            , connectPort = Nothing -- Default 9000.
+            }
+        , toolsPath = []
+        , syncDir = fromString (home </> "Documents" </> "reMarkable")
         }
-    , toolsPath = []
-    }
 
 readConfig :: (forall a. FilePath -> IO a) -> FilePath -> IO Config
 readConfig die configFile = do

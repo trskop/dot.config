@@ -10,7 +10,9 @@
 
 # USAGE
 
-yx \[GLOBAL\_OPTIONS] remarkable *TODO*
+yx \[GLOBAL\_OPTIONS] remarkable sync
+
+yx \[GLOBAL\_OPTIONS] remarkable {ls|tree|mkdir|rmdir} *DIRECTORY*
 
 yx \[GLOBAL\_OPTIONS] remarkable {\--help|-h}
 

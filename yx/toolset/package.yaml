@@ -24,10 +24,12 @@ default-extensions:
   - FlexibleContexts
   - FlexibleInstances
   - InstanceSigs
+  - KindSignatures
   - LambdaCase
   - MultiWayIf
   - NamedFieldPuns
   - OverloadedStrings
+  - PolyKinds
   - RankNTypes
   - RecordWildCards
   - ScopedTypeVariables

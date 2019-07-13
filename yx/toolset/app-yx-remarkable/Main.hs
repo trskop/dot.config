@@ -5,6 +5,7 @@
 module Main (main)
   where
 
+import Data.Foldable (asum)
 import Data.Function (const)
 import Data.String (fromString)
 import GHC.Generics (Generic)
@@ -27,6 +28,11 @@ import Main.Config.App (Config, readConfig)
 
 data Mode
     = DefaultMode
+    | SyncMode
+    | ListMode
+    | TreeMode
+    | MkdirMode
+    | RmdirMode
     | CompletionInfo
   deriving stock (Generic, Show)
 
@@ -48,9 +54,21 @@ main = do
     description = "Better UI for existing reMarkable tools."
 
 parseOptions :: Turtle.Parser Mode
-parseOptions = pure DefaultMode
+parseOptions = asum
+    [ Turtle.subcommand "sync" "Sync" (pure SyncMode)
+    , Turtle.subcommand "ls" "List" (pure ListMode)
+    , Turtle.subcommand "tree" "Print directory tree" (pure TreeMode)
+    , Turtle.subcommand "mkdir" "Create directory" (pure MkdirMode)
+    , Turtle.subcommand "rmdir" "Remove directory" (pure RmdirMode)
+    , pure DefaultMode
+    ]
 
 realMain :: Params -> Config -> Mode -> IO ()
 realMain params _config = \case
     DefaultMode -> dieWith params stderr 125 "Not yet implemented!"
+    SyncMode -> dieWith params stderr 125 "Not yet implemented!"
+    ListMode -> dieWith params stderr 125 "Not yet implemented!"
+    TreeMode -> dieWith params stderr 125 "Not yet implemented!"
+    MkdirMode -> dieWith params stderr 125 "Not yet implemented!"
+    RmdirMode -> dieWith params stderr 125 "Not yet implemented!"
     CompletionInfo -> printOptparseCompletionInfoExpression stdout
