@@ -25,13 +25,17 @@ extra-deps:
 # - neat-interpolation-0.3.2.4  # dhall-bash
 
   - git: https://github.com/trskop/host-and-port.git
-    commit: f4639d63f5c2e4c4faef94f5214111625af2a85d
+    commit: f8cbf6c84e859bd5020685ac677ff04937a866d6
+
   - git: https://github.com/trskop/mainplate.git
     commit: 118acdb919e7bd7aaa07e7554a2d1eabde86acf5
+
   - git: https://github.com/trskop/open-in-editor.git
     commit: eec72c9c99fd8bd89866bdd85a23343a4a6fbae8
+
   - git: https://github.com/trskop/command-wrapper.git
-    commit: aeb374e79da834125b84cdfac11a632d7c4f695e
+    commit: baa52b3970400e6858a7ab3bf965742e8d819f77
+
   - git: https://github.com/trskop/genbashrc.git
     commit: 17e21a21a57d03107fd8d29f9719efb68c16ac3f
 

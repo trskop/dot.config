@@ -15,13 +15,15 @@ extra-source-files:
   - dhall/*.dhall
 
 default-extensions:
-  - DeriveFunctor
+  - BlockArguments
   - DeriveAnyClass
+  - DeriveFunctor
   - DeriveGeneric
   - DerivingStrategies
   - DuplicateRecordFields
   - FlexibleContexts
   - FlexibleInstances
+  - InstanceSigs
   - LambdaCase
   - MultiWayIf
   - NamedFieldPuns
