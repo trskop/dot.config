@@ -26,10 +26,10 @@ packages:
   original:
     hackage: verbosity-0.3.0.0
 - completed:
-    hackage: dhall-1.24.0@sha256:1e0e0be836164cee6725f80f81ac2726b2de0acf6efdf622cf05e90323f0a911,30595
+    hackage: dhall-1.24.0@sha256:326896b819e9c099ae5b1de5954e577e44e325c287aad6ac77006611d4c60fac,31232
     pantry-tree:
       size: 142551
-      sha256: 9f1db02fb9cfa05e446731b5c800565acb877b6670913f1e00d493454a7cbb82
+      sha256: 55b3d15eef3d919d4eed222d33fc6a29e13f5ba659691027290ba9f2ff83ec05
   original:
     hackage: dhall-1.24.0
 - completed:
@@ -40,17 +40,17 @@ packages:
   original:
     hackage: dhall-bash-1.0.21
 - completed:
-    hackage: dhall-json-1.3.0@sha256:90bf9dd0a51c0a640762f092f6f5a6185b4d23c5e68be9808e43079eaafd012d,4728
+    hackage: dhall-json-1.3.0@sha256:7afae1a51b3081b2788497fada89004c2305616357dab9a2c727a6f7c7753d80,4887
     pantry-tree:
       size: 878
-      sha256: 94406cbffd901f276b99e3b10854d80f347ffcafe2673b824ea26397888ff143
+      sha256: 2fa3f800d259b496a5abd78694ddbfa42b2efe75e1954aa9b7fcf9f9d12103e8
   original:
     hackage: dhall-json-1.3.0
 - completed:
-    hackage: dhall-text-1.0.18@sha256:1fd1ff67935bd8083e866f53d4b57e61d2f2a41804ce46a4de20f2b697c2e0fe,1025
+    hackage: dhall-text-1.0.18@sha256:472792157c26ff463abb645de7638f189ed6d6afaf662c07a145b13acde1d6b7,1073
     pantry-tree:
       size: 256
-      sha256: 2bb2591acc32ff6bb14e32c3f53284ede085a30a8393da2df4c8cab48f2d95a6
+      sha256: e0bec08bd57eab4751a2fefb8ca6ff0972f1bb77a910931b9c49b5a670f0d45c
   original:
     hackage: dhall-text-1.0.18
 - completed:

@@ -150,7 +150,7 @@ shakeMain Directories{..} opts = shakeArgs opts $ do
         ]
 
     hasThisRepoChanged <- addOracle (thisGitRepo projectRoot)
-    [yxEnvBin, yxNewBin, yxPathBin, yxThisBin] &%> \outs -> do
+    [yxEnvBin, yxNewBin, yxPathBin, yxRemarkableBin, yxThisBin] &%> \outs -> do
         _ <- hasThisRepoChanged (ThisGitRepo ())
 
         let dst = takeDirectory (head outs)
