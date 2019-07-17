@@ -1,6 +1,6 @@
 let lib =
       ~/.local/src/github.com/trskop/command-wrapper/dhall/Exec/package.dhall
-      sha256:5de94cb0d93f16618ca492456e8240cf154b8a7229c063e453407788e145f585
+      sha256:6acc7297e36111a4b70eac52d9a357c0d1934e8c3086758dcf2d2837292e5fd6
 
 in    lib
     //  { completion =
