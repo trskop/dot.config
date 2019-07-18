@@ -1,15 +1,2 @@
-let lib =
-      ~/.local/src/github.com/trskop/command-wrapper/dhall/Exec/package.dhall
-      sha256:6acc7297e36111a4b70eac52d9a357c0d1934e8c3086758dcf2d2837292e5fd6
-
-in    lib
-    //  { completion =
-              lib.completion
-            //  { bazel =
-                    ./completion/bazel
-                , docker-compose =
-                    ./completion/docker-compose
-                , yarn =
-                    ./completion/yarn
-                }
-        }
+~/.local/src/github.com/trskop/command-wrapper/dhall/Exec/package.dhall
+sha256:7f92e61970d1fdde16d35ded181c69a8de972fe7c9c3a8d42e5a902c2f10a419
