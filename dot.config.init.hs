@@ -198,7 +198,7 @@ install Directories{..} opts = shakeArgs opts $ do
         , yxLibDir </> "yx-jmp"
 
         , habitDir </> "default.dhall"
-        , habitDir </> "pgpass.conf"
+--      , habitDir </> "pgpass.conf"
 
         , binDir </> "fzf"
 
