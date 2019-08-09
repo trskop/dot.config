@@ -301,7 +301,11 @@ install Directories{..} opts = shakeArgs opts $ do
         -- Stack may give access to a different version based on resolver in
         -- this script, that is the reason for absolute path to the executable.
         cmd_ (Stdin src) (FileStdout out)
-            [dotLocalDir </> "bin" </> "dhall", "freeze", "--all"]
+            [ commandWrapperLibDir </> "command-wrapper"
+            , "config"
+            , "--dhall-freeze"
+            , "--no-remote-only"
+            ]
 
     yxRules YxRulesParams
         { configDir = yxDir
@@ -404,7 +408,11 @@ yxRules YxRulesParams{..} = do
         -- Stack may give access to a different version based on resolver in
         -- this script, that is the reason for absolute path to the executable.
         cmd_ (Stdin src) (FileStdout out)
-            [dotLocalDir </> "bin" </> "dhall", "freeze", "--all"]
+            [ commandWrapperLibDir </> "command-wrapper"
+            , "config"
+            , "--dhall-freeze"
+            , "--no-remote-only"
+            ]
 
     (libDir </> "yx-jmp") %> \out ->
         let src = configDir </> "toolset" </> "bash" </> "yx-jmp"
@@ -437,7 +445,11 @@ habitRules HabitRulesParamams{..} = do
         -- Stack may give access to a different version based on resolver in
         -- this script, that is the reason for absolute path to the executable.
         cmd_ (Stdin src) (FileStdout out)
-            [dotLocalDir </> "bin" </> "dhall", "freeze", "--all"]
+            [ commandWrapperLibDir </> "command-wrapper"
+            , "config"
+            , "--dhall-freeze"
+            , "--no-remote-only"
+            ]
 
     -- See `psql(1)` for more details about `pgpass` file.
     (configDir </> "pgpass.conf") %> \out -> do
