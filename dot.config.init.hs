@@ -300,11 +300,12 @@ install Directories{..} opts = shakeArgs opts $ do
         -- We need to make sure that correct version of dhall command is used.
         -- Stack may give access to a different version based on resolver in
         -- this script, that is the reason for absolute path to the executable.
-        cmd_ (Stdin src) (FileStdout out)
+        cmd_ (Stdin src)
             [ commandWrapperLibDir </> "command-wrapper"
             , "config"
             , "--dhall-freeze"
             , "--no-remote-only"
+            , "--output=" <> out
             ]
 
     yxRules YxRulesParams
