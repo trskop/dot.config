@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 
-set -e
+set -eo pipefail
+
+if (( BASH_VERSINFO[0] > 4 || ( BASH_VERSINFO[0] == 4 && BASH_VERSINFO[1] >= 4 ) )); then
+    # Treat unset variables and parameters as an error when expanding.  This
+    # wasn't very reliable in older Bash versions, hence the version check.
+    set -u
+fi
 
 if [[ "${COMMAND_WRAPPER_VERBOSITY:-}" == 'annoying' ]]; then
     # This will cause Bash to print commands before executing them.
@@ -51,17 +57,7 @@ EOF
 # when performing command line completion.  See
 # `command-wrapper-subcommand-protocol(7)` for more details on how this works.
 function completionInfo() {
-    cat <<"EOF"
-  λ(shell : < Bash | Fish | Zsh >)
-→ λ(index : Natural)
-→ λ(words : List Text)
-→   [ "--completion"
-    , "--index=${Natural/show index}"
-    , "--shell=${merge {Bash = "bash", Fish = "fish", Zsh = "zsh"} shell}"
-    , "--"
-    ]
-  # words
-EOF
+    stdCompletionInfo
 }
 
 # Perform command line completion.
@@ -129,11 +125,11 @@ function declareCfg() {
     local -r action="$1"; shift
 
     for field in 'editor' 'packagesFile'; do
-        dhall-to-bash --declare "${field}" <<< "(${config}).${field}"
+        dhall-to-bash --declare="${field}" --expression="(${config}).${field}"
         echo
     done
 
-    dhall-to-bash --declare 'aptCommand' <<EOF
+    dhall-to-bash --declare='aptCommand' <<EOF
 let Action =
       < autoclean | autoremove | build-dep | changelog | clean | depends
       | dist-upgrade | download | edit-sourceshelp | full-upgrade | install
@@ -167,9 +163,10 @@ function initialiseConfigIfItDoesNotExist() {
     out "'%s': Generating default configuration file." \
         "${COMMAND_WRAPPER_CONFIG}"
 
+    # TODO: This should be configurable to avoid hardcoded value.
     local -r packagesFile="${XDG_CONFIG_HOME:-${HOME}/.config}/${COMMAND_WRAPPER_NAME}/${COMMAND_WRAPPER_SUBCOMMAND}/packages.dhall"
 
-    dhall format > "${COMMAND_WRAPPER_CONFIG}" <<EOF
+    dhall-format > "${COMMAND_WRAPPER_CONFIG}" <<EOF
 let Action =
       < autoclean | autoremove | build-dep | changelog | clean | depends
       | dist-upgrade | download | edit-sourceshelp | full-upgrade | install
@@ -228,7 +225,9 @@ function initialisePackagesFileIfItDoesNotExist() {
     fi
 
     eval "$(
-        dhall-to-bash --declare packagesFile <<< "(${COMMAND_WRAPPER_CONFIG}).packagesFile"
+        dhall-to-bash \
+            --declare=packagesFile \
+            --expression="(${COMMAND_WRAPPER_CONFIG}).packagesFile"
     )"
 
     if [[ -e "${packagesFile}" ]]; then
@@ -368,9 +367,9 @@ function callApt() {
     case "${action}" in
         'install'|'purge'|'remove')
             local hashBefore hashAfter
-            hashBefore=$(dhall hash < "${packagesFile}")
+            hashBefore=$(dhall-hash < "${packagesFile}")
             "${editor[@]}" "${packagesFile}"
-            hashAfter=$(dhall hash < "${packagesFile}")
+            hashAfter=$(dhall-hash < "${packagesFile}")
 
             if [[ "${hashBefore}" == "${hashAfter}" ]]; then
                 out "'%s': File hadn't been changed, not running 'apt'." \
@@ -383,7 +382,9 @@ function callApt() {
                 esac
 
                 eval "$(
-                    dhall-to-bash --declare 'packages' <<< "(${packagesFile}).${pkgSet}"
+                    dhall-to-bash \
+                        --declare='packages' \
+                        --expression="(${packagesFile}).${pkgSet}"
                 )"
 
                 if (( ! ${#packages[@]} )); then

@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 
-set -e
+set -eo pipefail
 
-if [[ "${COMMAND_WRAPPER_VERBOSITY:-}" == 'annoying' ]]; then
-    set -x
+if (( BASH_VERSINFO[0] > 4 || ( BASH_VERSINFO[0] == 4 && BASH_VERSINFO[1] >= 4 ) )); then
+    # Treat unset variables and parameters as an error when expanding.  This
+    # wasn't very reliable in older Bash versions, hence the version check.
+    set -u
 fi
 
 # shellcheck source=/dev/null
@@ -96,17 +98,7 @@ EOF
 # when performing command line completion.  See
 # `command-wrapper-subcommand-protocol(7)` for more details on how this works.
 function completionInfo() {
-    cat <<"EOF"
-  λ(shell : < Bash | Fish | Zsh >)
-→ λ(index : Natural)
-→ λ(words : List Text)
-→   [ "--completion"
-    , "--index=${Natural/show index}"
-    , "--shell=${merge {Bash = "bash", Fish = "fish", Zsh = "zsh"} shell}"
-    , "--"
-    ]
-  # words
-EOF
+    stdCompletionInfo
 }
 
 # Perform command line completion.
@@ -395,13 +387,13 @@ function main() {
         # TODO: This logic should probably be in a function.
         case "${expectTerminal}" in
             auto)
-                if [[ -n "${VIM}" && -n "${VIMRUNTIME}" ]]; then
+                if [[ -n "${VIM:-}" && -n "${VIMRUNTIME:-}" ]]; then
                     # Running inside Vim/Neovim terminal
                     die 3 "Not running in a neither Kitty nor Tmux, see yx-jmp(1)."
-                elif [[ -n "${TMUX}" && -n "${TMUX_PANE}" ]]; then
+                elif [[ -n "${TMUX:-}" && -n "${TMUX_PANE:-}" ]]; then
                     tmuxScrollback "${allowNeovimRemote}" "${rootDir}" \
                         "${syntax}" "${lines}"
-                elif [[ -n "${KITTY_WINDOW_ID}" || "${TERM}" == 'xterm-kitty' ]]; then
+                elif [[ -n "${KITTY_WINDOW_ID:-}" || "${TERM:-}" == 'xterm-kitty' ]]; then
                     kittyScrollback "${allowNeovimRemote}" "${rootDir}" \
                         "${syntax}" "${lines}"
                 else
@@ -409,10 +401,10 @@ function main() {
                 fi
                 ;;
             kitty)
-                if [[ -z "${KITTY_WINDOW_ID}" && "${TERM}" != 'xterm-kitty' ]]; then
+                if [[ -z "${KITTY_WINDOW_ID:-}" && "${TERM:-}" != 'xterm-kitty' ]]; then
                     die 3 "Not running in a Kitty terminal emulator, see yx-jmp(1)."
                 fi
-                if [[ -n "${VIM}" && -n "${VIMRUNTIME}" ]]; then
+                if [[ -n "${VIM:-}" && -n "${VIMRUNTIME:-}" ]]; then
                     # Running inside Vim/Neovim terminal
                     die 3 "Not running in a Kitty terminal emulator, see yx-jmp(1)."
                 fi
@@ -421,10 +413,10 @@ function main() {
                     "${syntax}" "${lines}"
                 ;;
             tmux)
-                if [[ -z "${TMUX}" || -z "${TMUX_PANE}" ]]; then
+                if [[ -z "${TMUX:-}" || -z "${TMUX_PANE:-}" ]]; then
                     die 3 "Not running in a Tmux pane, see yx-jmp(1)."
                 fi
-                if [[ -n "${VIM}" && -n "${VIMRUNTIME}" ]]; then
+                if [[ -n "${VIM:-}" && -n "${VIMRUNTIME:-}" ]]; then
                     # Running inside Vim/Neovim terminal
                     die 3 "Not running in a Kitty terminal emulator, see yx-jmp(1)."
                 fi
