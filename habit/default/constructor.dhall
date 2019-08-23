@@ -13,7 +13,7 @@ let habit = ./aliases.dhall ? habitDefaults
 
 let defaults = commandWrapper.config.toolset.defaults
 
-let extraSearchPath = (../config.dhall).searchPath ? [] : List Text
+let extraSearchPath = (../config.dhall).searchPath ? ([] : List Text)
 
 in    commandWrapper.config.toolset.addSubcommandAliases
       (habit.aliases # execAliases)
