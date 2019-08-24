@@ -17,6 +17,7 @@ module Main.Dhall
   where
 
 import Control.Exception (Exception, throwIO)
+import Control.Monad ((>=>))
 import Data.Foldable (asum, traverse_)
 import Data.Functor ((<&>))
 import Data.List.NonEmpty (NonEmpty((:|)))
@@ -27,6 +28,7 @@ import Numeric.Natural (Natural)
 
 import Control.Monad.State.Strict (evalStateT)
 import Control.Monad.Except (liftEither, runExcept, withExcept)
+import Data.Either.Validation (validationToEither)
 import Data.Text (Text)
 import qualified Data.Text.IO as Text (putStrLn, readFile)
 import Data.Text.Prettyprint.Doc (pretty)
@@ -53,6 +55,7 @@ import qualified Dhall.Core as Dhall
         )
     , Import
     , normalize
+    , throws
     )
 import qualified Dhall.Import as Dhall (emptyStatus, loadWith)
 import qualified Dhall.Map (fromList)
@@ -133,8 +136,8 @@ printPlain paths expression possiblyConfigExpression =
         "Error: Expected Text, Optional Text, Natural, Integer, or List of\
         \ them as result."
 
-    dieWithUnexpectedType t =
-        die ("Error: Expected " <> t <> " as result.")
+--  dieWithUnexpectedType t =
+--      die ("Error: Expected " <> t <> " as result.")
 
     Dhall.Type{extract = extractText} = Dhall.auto @Text
     Dhall.Type{extract = extractMaybeText} = Dhall.auto @(Maybe Text)
@@ -149,36 +152,30 @@ printPlain paths expression possiblyConfigExpression =
         -> IO ()
 
     printText =
-        maybe (dieWithUnexpectedType "Text") Text.putStrLn . extractText
+        (throws . extractText) >=> Text.putStrLn
 
     printOptionalText =
-        maybe (dieWithUnexpectedType "Optional Text") (traverse_ Text.putStrLn)
-        . extractMaybeText
+        (throws . extractMaybeText) >=> traverse_ Text.putStrLn
 
     printNatural =
-        maybe (dieWithUnexpectedType "Natural") (Text.putStrLn . showing)
-        . extractNatural
+        (throws . extractNatural) >=> (Text.putStrLn . showing)
 
     printInteger =
-        maybe (dieWithUnexpectedType "Integer") (Text.putStrLn . showing)
-        . extractInteger
+        (throws . extractInteger) >=> (Text.putStrLn . showing)
 
     printTextList =
-        maybe (dieWithUnexpectedType "List Text") (mapM_ Text.putStrLn)
-        . extractTextList
+        (throws . extractTextList) >=> mapM_ Text.putStrLn
 
     printNaturalList =
-        maybe (dieWithUnexpectedType "List Natural")
-            (mapM_ $ Text.putStrLn . showing)
-        . extractNaturalList
+        (throws . extractNaturalList) >=> mapM_ (Text.putStrLn . showing)
 
     printIntegerList =
-        maybe (dieWithUnexpectedType "List Integer")
-            (mapM_ $ Text.putStrLn . showing)
-        . extractIntegerList
+        (throws . extractIntegerList) >=> mapM_ (Text.putStrLn . showing)
 
     showing :: Show a => a -> Text
     showing = fromString . show
+
+    throws = Dhall.throws . validationToEither
 
 -- | Parse Dhall expression and resolve imports.
 --

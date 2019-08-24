@@ -28,6 +28,7 @@ import Data.String (fromString)
 import GHC.Generics (Generic)
 
 import Control.Monad.State.Strict (evalStateT)
+import Data.Either.Validation (validationToEither)
 import Data.Text (Text)
 import qualified Data.Text.IO as Text (readFile)
 import qualified Dhall
@@ -60,6 +61,7 @@ import qualified Dhall.Core as Dhall
     , ImportMode(Code)
     , ImportType(Missing)
     , normalize
+    , throws
     )
 import qualified Dhall.Import as Dhall (emptyStatus, hashExpression, loadWith)
 import qualified Dhall.Map (fromList)
@@ -112,17 +114,15 @@ readEnvConfig configFile = do
         then do
             configContent <- Text.readFile configFile
             expression <- parseDhallExpression configFile configContent
-            case Dhall.extract Dhall.auto expression of
-                v@(Just _) ->
-                    pure $ (mkHash expression, ) <$> v
+            v <- throws (Dhall.extract Dhall.auto expression)
+            pure $ Just (mkHash expression, v)
 
-                Nothing ->
-                    -- TODO: Use custom exception here.
-                    error "Failed to convert Dhall value into Haskell value."
-
-        else pure Nothing
+        else
+            pure Nothing
   where
     mkHash = fromString . show . Dhall.hashExpression Dhall.V_5_0_0
+
+    throws = Dhall.throws . validationToEither
 
 parseDhallExpression :: FilePath -> Text -> IO (Dhall.Expr Dhall.Src Dhall.X)
 parseDhallExpression sourcePath = parseConfig >=> typeCheckAndNormalize

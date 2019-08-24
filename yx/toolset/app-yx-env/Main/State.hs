@@ -27,6 +27,7 @@ import GHC.Generics (Generic)
 import System.IO (Handle)
 
 import Control.Monad.State.Strict (evalStateT)
+import Data.Either.Validation (validationToEither)
 import Data.Text (Text)
 import qualified Data.Text.IO as Text (readFile)
 import qualified Dhall
@@ -53,6 +54,7 @@ import qualified Dhall.Core as Dhall
         )
     , Import
     , normalize
+    , throws
     )
 import qualified Dhall.Import as Dhall (emptyStatus, loadWith)
 import qualified Dhall.Parser as Dhall (Src, exprFromText)
@@ -122,15 +124,11 @@ readState stateFile = do
         then do
             stateContent <- Text.readFile stateFile
             expression <- parseDhallExpression stateFile stateContent
-            case Dhall.extract Dhall.auto expression of
-                Just v ->
-                    pure v
-                Nothing ->
-                    -- TODO: Use custom exception here.
-                    error "Failed to convert Dhall value into Haskell value."
-
+            throws (Dhall.extract Dhall.auto expression)
         else
             pure emptyState
+  where
+    throws = Dhall.throws . validationToEither
 
 parseDhallExpression
     :: FilePath

@@ -26,33 +26,33 @@ packages:
   original:
     hackage: verbosity-0.3.0.0
 - completed:
-    hackage: dhall-1.24.0@sha256:326896b819e9c099ae5b1de5954e577e44e325c287aad6ac77006611d4c60fac,31232
+    hackage: dhall-1.25.0@sha256:1c6724d963bf3428ddf0336f916e3f9bc429bf81ed2e27a8855dbbee11d89fe2,40352
     pantry-tree:
-      size: 142551
-      sha256: 55b3d15eef3d919d4eed222d33fc6a29e13f5ba659691027290ba9f2ff83ec05
+      size: 225143
+      sha256: 0ed1fb4d2bc400d71e9445199f5af8985ba8e1faad029b416745aa4ac5c8f20d
   original:
-    hackage: dhall-1.24.0
+    hackage: dhall-1.25.0
 - completed:
-    hackage: dhall-bash-1.0.21@sha256:9192e599466c32c56a793f09b6efd4184c91c51948907c3133a4ae6f2d01fd7a,1740
+    hackage: dhall-bash-1.0.22@sha256:7b0d3a10fdf7ba31d87ea3fef3e97447b6ecb69cb19a22afa2fbf90d2f58cae8,1740
     pantry-tree:
       size: 266
-      sha256: efcf9a9991b6c7fe6c5651eb3641c10f5669150d1175b3837daf57c668290861
+      sha256: c57963e2f954fdc706db7f929a4d222bc9987af943a3c264e3779ca4b46e9270
   original:
-    hackage: dhall-bash-1.0.21
+    hackage: dhall-bash-1.0.22
 - completed:
-    hackage: dhall-json-1.3.0@sha256:7afae1a51b3081b2788497fada89004c2305616357dab9a2c727a6f7c7753d80,4887
+    hackage: dhall-json-1.4.0@sha256:74f6422e7b84d32f9965b604e09bc1eb10dc4b9693f735be30a5fb1e4dd61478,5240
     pantry-tree:
-      size: 878
-      sha256: 2fa3f800d259b496a5abd78694ddbfa42b2efe75e1954aa9b7fcf9f9d12103e8
+      size: 2261
+      sha256: fee6d6d1be4a2e1ef1ce1986a89f71a5ef95fb55e519db475e1f3ac9e76b9662
   original:
-    hackage: dhall-json-1.3.0
+    hackage: dhall-json-1.4.0
 - completed:
-    hackage: dhall-text-1.0.18@sha256:472792157c26ff463abb645de7638f189ed6d6afaf662c07a145b13acde1d6b7,1073
+    hackage: lock-file-0.7.0.0@sha256:3ad84b5e454145e1d928063b56abb96db24a99a21b493989520e58fa0ab37b00,4484
     pantry-tree:
-      size: 256
-      sha256: e0bec08bd57eab4751a2fefb8ca6ff0972f1bb77a910931b9c49b5a670f0d45c
+      size: 718
+      sha256: 3634593ce191e82793ea0e060598ab3cf67f2ef2fe1d65345dc9335ad529d25f
   original:
-    hackage: dhall-text-1.0.18
+    hackage: lock-file-0.7.0.0
 - completed:
     cabal-file:
       size: 2311
@@ -97,18 +97,18 @@ packages:
     commit: eec72c9c99fd8bd89866bdd85a23343a4a6fbae8
 - completed:
     cabal-file:
-      size: 9935
-      sha256: a5bce169644ffc8296596768b5aec7676ef374ed3521a85aefe82a369af33646
+      size: 10245
+      sha256: 3e0db81f55ccae72e025e9f056502256054cb39db07e4cc61bcddd21de75557f
     name: command-wrapper
     version: 0.1.0.0
     git: https://github.com/trskop/command-wrapper.git
     pantry-tree:
-      size: 12325
-      sha256: af38bfffb14aadfa80453fab5a73396115e4c77230d6f9c346136543355eba52
-    commit: baa52b3970400e6858a7ab3bf965742e8d819f77
+      size: 15310
+      sha256: b9ae7a7d8b08ee4586f094bad77703ce5b5070f85a566a680a5074e2ac049c03
+    commit: 237047b6f8a1b7f873d2ed124585cc7ba04374c3
   original:
     git: https://github.com/trskop/command-wrapper.git
-    commit: baa52b3970400e6858a7ab3bf965742e8d819f77
+    commit: 237047b6f8a1b7f873d2ed124585cc7ba04374c3
 - completed:
     cabal-file:
       size: 2042

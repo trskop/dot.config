@@ -11,10 +11,9 @@ extra-deps:
   - fuzzy-0.1.0.0
   - verbosity-0.3.0.0
 
-  - dhall-1.24.0
-  - dhall-bash-1.0.21
-  - dhall-json-1.3.0
-  - dhall-text-1.0.18
+  - dhall-1.25.0
+  - dhall-bash-1.0.22
+  - dhall-json-1.4.0
 
 # Keeping the following in case of new Dhall release:
   # Dhall dependencies:
@@ -23,6 +22,8 @@ extra-deps:
 # - megaparsec-7.0.4
 # - repline-0.2.0.0
 # - neat-interpolation-0.3.2.4  # dhall-bash
+
+  - lock-file-0.7.0.0
 
   - git: https://github.com/trskop/host-and-port.git
     commit: f8cbf6c84e859bd5020685ac677ff04937a866d6
@@ -34,7 +35,7 @@ extra-deps:
     commit: eec72c9c99fd8bd89866bdd85a23343a4a6fbae8
 
   - git: https://github.com/trskop/command-wrapper.git
-    commit: baa52b3970400e6858a7ab3bf965742e8d819f77
+    commit: 237047b6f8a1b7f873d2ed124585cc7ba04374c3
 
   - git: https://github.com/trskop/genbashrc.git
     commit: 17e21a21a57d03107fd8d29f9719efb68c16ac3f
