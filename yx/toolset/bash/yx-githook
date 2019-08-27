@@ -1,0 +1,558 @@
+#!/usr/bin/env bash
+
+# Copyright (c) 2019, Peter Trsko <peter.trsko@gmail.com>
+#
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#
+#     * Redistributions in binary form must reproduce the above
+#       copyright notice, this list of conditions and the following
+#       disclaimer in the documentation and/or other materials provided
+#       with the distribution.
+#
+#     * Neither the name of Peter Trsko nor the names of other
+#       contributors may be used to endorse or promote products derived
+#       from this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+# OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+set -eo pipefail
+
+if (( BASH_VERSINFO[0] > 4 || ( BASH_VERSINFO[0] == 4 && BASH_VERSINFO[1] >= 4 ) )); then
+    # Treat unset variables and parameters as an error when expanding.  This
+    # wasn't very reliable in older Bash versions, hence the version check.
+    set -u
+fi
+
+if [[ "${COMMAND_WRAPPER_VERBOSITY:-}" == 'annoying' ]]; then
+    # This will cause Bash to print commands before executing them.
+    set -x
+fi
+
+# shellcheck source=/dev/null
+source <(
+    COMMAND_WRAPPER_INVOKE_AS="${COMMAND_WRAPPER_NAME}" "${COMMAND_WRAPPER_EXE}" \
+        completion --library --shell=bash
+)
+
+# Print help message to standard output.
+function printHelp() {
+    local -r command="${COMMAND_WRAPPER_NAME} ${COMMAND_WRAPPER_SUBCOMMAND}"
+    local -r commandHelp="${COMMAND_WRAPPER_NAME} help ${COMMAND_WRAPPER_SUBCOMMAND}"
+
+    cat <<EOF
+Wrapper for executing gitkooks(5).
+
+Usage:
+
+  ${command} --hook=HOOK [ARGUMENT ...]
+  ${command} --print-default-config
+  ${command} {--help|-h}
+  ${commandHelp}
+
+Options:
+
+  --hook=HOOK
+      Run HOOK with specified ARGUMENTs.
+
+  --print-default-config
+      Print default configuration file that does nothing.
+
+  --help, -h
+      Print short help message and exit.  Same as: ${commandHelp}
+EOF
+}
+
+# Print Dhall expression that describes how this subcommand should be invoked
+# when performing command line completion.  See
+# `command-wrapper-subcommand-protocol(7)` for more details on how this works.
+function completionInfo() {
+    stdCompletionInfo
+}
+
+# Perform command line completion.
+#
+# Usage:
+#
+#   completion [--index=INDEX] [--shell=SHELL] [[--] WORD [...]]
+#
+# Bash itself provides `compgen` builtin command that can do a lot of standard
+# command line completion functions.  See `bash(1)` or `help compgen` for more
+# details.
+function completion() {
+    local index=-1
+    local -a words=
+
+    local arg
+    while (( $# )); do
+        arg="$1"; shift
+        case "${arg}" in
+            --index=*)
+                index="${arg#*=}"
+                ;;
+            --shell=*)
+                # Ignored.
+                ;;
+            --)
+                words=("$@")
+                break
+                ;;
+            -*)
+                die 1 "'%s': Unknown completion option." "${arg}"
+                ;;
+            *)
+                words=("${arg}" "$@")
+                break
+                ;;
+        esac
+    done
+
+    if (( ! ${#words[@]} )); then
+        words=("")
+    fi
+
+    local -r currentWord="${words[${index}]}"
+
+    local -i hadDashDash=0
+    local -a previousWords=()
+    if (( index )); then
+        previousWords=("${words[@]:0:$((index - 1))}")
+    fi
+
+    for opt in "${previousWords[@]}"; do
+        if [[ "${opt}" = '--' ]]; then
+            hadDashDash=1
+            break
+        fi
+    done
+
+    local -r -a options=(
+        --help -h
+        '--hook=commit-msg'
+        '--hook=post-commit'
+        '--hook=pre-commit'
+        '--hook=prepare-commit-msg'
+        --print-default-config
+    )
+
+    if (( ! hadDashDash )) && [[ "${currentWord}" == -* ]]; then
+        compgen -W "${options[*]}" -- "${currentWord}"
+    else
+        # File completion.
+        compgen -f -- "${currentWord}"
+    fi
+}
+
+declare -r messageSource='< Message | Template | Merge | Squash | Commit : Text >'
+
+function genConfig() {
+    dhall-format <<EOF
+-- Configuration file for \`yx-githook(1)\`.  Example of dummy
+-- 'prepare-commit-msg' githook:
+--
+-- ...
+-- in      default
+--     //  { prepare-commit-msg =
+--             Some
+--             (   λ(commitMessageFile : Text)
+--               → λ(messageSource : Optional MessageSource)
+--               → λ(verbosity : CommandWrapper.Verbosity)
+--               → λ(colourOutput : CommandWrapper.ColourOutput)
+--               → λ(arguments : List Text)
+--               → { command =
+--                     "true"
+--                 , arguments =
+--                     [] : List Text
+--                 , environment =
+--                     [] : List CommandWrapper.EnvironmentVariable
+--                 , searchPath =
+--                     True
+--                 , workingDirectory =
+--                     None Text
+--                 }
+--             )
+--         }
+--
+-- Arguments of individual githooks and their function is documented in
+-- \`githooks(5)\`.
+
+let CommandWrapper = ~/.config/command-wrapper/Types.dhall
+
+let MessageSource = ${messageSource}
+
+let Config
+    : Type
+    = { prepare-commit-msg :
+          Optional
+          (   ∀(commitMessageFile : Text)
+            → ∀(messageSource : Optional MessageSource)
+            → ∀(verbosity : CommandWrapper.Verbosity)
+            → ∀(colourOutput : CommandWrapper.ColourOutput)
+            → ∀(arguments : List Text)
+            → CommandWrapper.ExecCommand
+          )
+      , pre-commit :
+          Optional
+          (   ∀(verbosity : CommandWrapper.Verbosity)
+            → ∀(colourOutput : CommandWrapper.ColourOutput)
+            → ∀(arguments : List Text)
+            → CommandWrapper.ExecCommand
+          )
+      , post-commit :
+          Optional
+          (   ∀(verbosity : CommandWrapper.Verbosity)
+            → ∀(colourOutput : CommandWrapper.ColourOutput)
+            → ∀(arguments : List Text)
+            → CommandWrapper.ExecCommand
+          )
+      , commit-msg :
+          Optional
+          (   ∀(commitMessageFile : Text)
+            → ∀(verbosity : CommandWrapper.Verbosity)
+            → ∀(colourOutput : CommandWrapper.ColourOutput)
+            → ∀(arguments : List Text)
+            → CommandWrapper.ExecCommand
+          )
+      }
+
+let default
+      : Config
+      = { prepare-commit-msg =
+            None
+            (   ∀(commitMessageFile : Text)
+              → ∀(messageSource : Optional MessageSource)
+              → ∀(verbosity : CommandWrapper.Verbosity)
+              → ∀(colourOutput : CommandWrapper.ColourOutput)
+              → ∀(arguments : List Text)
+              → CommandWrapper.ExecCommand
+            )
+        , pre-commit =
+            None
+            (   ∀(verbosity : CommandWrapper.Verbosity)
+              → ∀(colourOutput : CommandWrapper.ColourOutput)
+              → ∀(arguments : List Text)
+              → CommandWrapper.ExecCommand
+            )
+        , post-commit =
+            None
+            (   ∀(verbosity : CommandWrapper.Verbosity)
+              → ∀(colourOutput : CommandWrapper.ColourOutput)
+              → ∀(arguments : List Text)
+              → CommandWrapper.ExecCommand
+            )
+        , commit-msg =
+            None
+            (   ∀(commitMessageFile : Text)
+              → ∀(verbosity : CommandWrapper.Verbosity)
+              → ∀(colourOutput : CommandWrapper.ColourOutput)
+              → ∀(arguments : List Text)
+              → CommandWrapper.ExecCommand
+            )
+        }
+
+in      default
+    //  {=}
+EOF
+}
+
+# Usage:
+#
+#   hookWithNoArguments HOOK
+hookWithNoArguments() {
+    local -r hook="$1"; shift
+
+    if (( $# > 0 )); then
+        die 1 "'%s': Too many arguments for this hook type." "${hook}"
+    fi
+
+    toolset exec --expression="
+let CommandWrapper = ~/.config/command-wrapper/Types.dhall
+
+let Optional/from =
+      (~/.config/command-wrapper/library.dhall).utils.Optional.from
+
+in  Optional/from
+    (   CommandWrapper.Verbosity
+      → CommandWrapper.ColourOutput
+      → List Text
+      → CommandWrapper.ExecCommand
+    )
+    (   λ(_ : CommandWrapper.Verbosity)
+      → λ(_ : CommandWrapper.ColourOutput)
+      → λ(_ : List Text)
+      → { command =
+            \"true\"
+        , arguments =
+            [] : List Text
+        , environment =
+            [] : List CommandWrapper.EnvironmentVariable
+        , searchPath =
+            True
+        , workingDirectory =
+            None Text
+        }
+    )
+    (${COMMAND_WRAPPER_CONFIG}).${hook}
+    "
+}
+
+# Usage:
+#
+#   hookPrepareCommitMsg FILE [message|template|merge|squash|commit SHA1]
+function hookPrepareCommitMsg() {
+    local -r hook='prepare-commit-msg'
+
+    if (( $# < 1 )); then
+        die 1 "'%s': Too few arguments for this hook type." "${hook}"
+    elif (( $# > 3 )); then
+        die 1 "'%s': '%s': Too many arguments for this hook type." \
+            "${hook}" "$3"
+    fi
+
+    local -r commitMsgFile="$1"; shift
+
+    if [[ ! -e "${commitMsgFile}" ]]; then
+        die 1 "'%s': Commit message file doesn't exist."
+    fi
+
+    if (( $# > 0 )); then
+        case "$1" in
+            'message')
+                local -r mode="Some ${messageSource}.Message"; shift
+                ;;
+            'template')
+                local -r mode="Some ${messageSource}.Template"; shift
+                ;;
+            'merge')
+                local -r mode="Some ${messageSource}.Merge"; shift
+                ;;
+            'squash')
+                local -r mode="Some ${messageSource}.Squash"; shift
+                ;;
+            'commit')
+                if [[ -z "$2" ]]; then
+                    die 1 "'%s': Missing commit SHA1." "${hook}"
+                else
+                    # TODO: We should verify that SHA1 is valid.
+                    shift
+                fi
+                local -r mode="Some (${messageSource}.Commit \"$1\")"; shift
+                ;;
+            *)
+                die 1 "'%s': '%s': Unknown message source." "$1"
+        esac
+    else
+        local -r mode="None ${messageSource}"
+    fi
+
+    toolset exec --expression="
+let CommandWrapper = ~/.config/command-wrapper/Types.dhall
+
+let Optional/from =
+      (~/.config/command-wrapper/library.dhall).utils.Optional.from
+
+let MessageSource = ${messageSource}
+
+in  Optional/from
+    (   Text
+      → Optional MessageSource
+      → CommandWrapper.Verbosity
+      → CommandWrapper.ColourOutput
+      → List Text
+      → CommandWrapper.ExecCommand
+    )
+    (   λ(_ : Text)
+      → λ(_ : Optional MessageSource)
+      → λ(_ : CommandWrapper.Verbosity)
+      → λ(_ : CommandWrapper.ColourOutput)
+      → λ(_ : List Text)
+      → { command =
+            \"true\"
+        , arguments =
+            [] : List Text
+        , environment =
+            [] : List CommandWrapper.EnvironmentVariable
+        , searchPath =
+            True
+        , workingDirectory =
+            None Text
+        }
+    )
+    (${COMMAND_WRAPPER_CONFIG}).${hook}
+    \"${commitMsgFile}\"
+    (${mode})
+    "
+}
+
+# Usage:
+#
+#   hookCommitMsg FILE
+function hookCommitMsg() {
+    local -r hook='commit-msg'
+
+    if (( $# < 1 )); then
+        die 1 "'%s': Too few arguments for this hook type." "${hook}"
+    elif (( $# > 1 )); then
+        die 1 "'%s': '%s': Too many arguments for this hook type." \
+            "${hook}" "$2"
+    fi
+
+    local -r commitMsgFile="$1"; shift
+
+    if [[ ! -e "${commitMsgFile}" ]]; then
+        die 1 "'%s': Commit message file doesn't exist." "${commitMsgFile}"
+    fi
+
+    toolset exec --expression="
+let CommandWrapper = ~/.config/command-wrapper/Types.dhall
+
+let Optional/from =
+      (~/.config/command-wrapper/library.dhall).utils.Optional.from
+
+in  Optional/from
+    (   Text
+      → CommandWrapper.Verbosity
+      → CommandWrapper.ColourOutput
+      → List Text
+      → CommandWrapper.ExecCommand
+    )
+    (   λ(_ : Text)
+      → λ(_ : CommandWrapper.Verbosity)
+      → λ(_ : CommandWrapper.ColourOutput)
+      → λ(_ : List Text)
+      → { command =
+            \"true\"
+        , arguments =
+            [] : List Text
+        , environment =
+            [] : List CommandWrapper.EnvironmentVariable
+        , searchPath =
+            True
+        , workingDirectory =
+            None Text
+        }
+    )
+    (${COMMAND_WRAPPER_CONFIG}).${hook}
+    \"${commitMsgFile}\"
+    "
+}
+
+function main() {
+    # This function makes sure that this subcommand was executed using
+    # expected calling convention.  If it wasn't it will terminate this
+    # script with appropriate error message.  It is hard to guarantee
+    # anything in case of it being executed in any other way.  Mentioned
+    # calling convention is described in a dedicated manual page:
+    #
+    #   command-wrapper-subcommand-protocol(7)
+    dieIfExecutedOutsideOfCommandWrapperEnvironment
+
+    local doGenConfig=0
+    local hook=
+    local -a hookArguments=()
+
+    # It is upto subcommand to decide what command linen options should be
+    # supported, and how they should be parsed, but each subcommand has to
+    # support following:
+    #
+    # * --help, -h
+    # * --completion-info
+    #
+    # See Command Wrapper's Subcommand Protocol for more information.  It is
+    # available in the form of command-wrapper-subcommand-protocol(7) manual
+    # page.
+    local arg
+    while (( $# )); do
+        arg="$1"; shift
+        case "${arg}" in
+            # Supporting '--help' is required by the Subcommand Protocol.
+            -h|--help)
+                printHelp
+                exit 0
+                ;;
+
+            # Supporting '--completion-info' is required by the Subcommand
+            # Protocol.
+            --completion-info)
+                completionInfo
+                exit 0
+                ;;
+
+            # Implementation of command line completion.  It is upto individual
+            # subcommands to decide how this should be implemented, however
+            # the implementation of '--completion-info' has to print Dhall
+            # expression that is consistent with the choosen approach.
+            --completion)
+                completion "$@"
+                exit 0
+                ;;
+
+            --hook)
+                hook="$1"; shift
+                hookArguments=("$@")
+                break
+                ;;
+
+            --hook=*)
+                hook="${arg#*=}"
+                hookArguments=("$@")
+                break
+                ;;
+
+            --print-default-config)
+                doGenConfig=1
+                ;;
+
+            -*)
+                die 1 "'%s': Unknown option." "${arg}"
+                ;;
+
+            *)
+                die 1 "'%s': Too many arguments." "${arg}"
+                ;;
+        esac
+    done
+
+    if (( doGenConfig )); then
+        genConfig
+    elif [[ -z "${hook}" ]]; then
+        die 1 "Missing option: Either '%s' or '%s' must be specified." \
+            '--hook=HOOK' '--print-default-config'
+    else
+        case "${hook}" in
+            'pre-commit')
+                hookWithNoArguments "${hook}" "${hookArguments[@]}"
+                ;;
+            'post-commit')
+                hookWithNoArguments "${hook}" "${hookArguments[@]}"
+                ;;
+            'prepare-commit-msg')
+                hookPrepareCommitMsg "${hookArguments[@]}"
+                ;;
+            'commit-msg')
+                hookCommitMsg "${hookArguments[@]}"
+                ;;
+            *)
+                die 1 "'%s': '%s': Unsupported hook type." \
+                    "--hook=${hook}" "${hook}"
+                ;;
+        esac
+    fi
+}
+
+main "$@"

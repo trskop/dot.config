@@ -120,6 +120,7 @@ shakeMain Directories{..} opts = shakeArgs opts $ do
         yxThisBin = yxLibexecDir </> "yx-this"
 
         yxAptScript = yxLibexecDir </> "yx-apt"
+        yxGithookScript = yxLibexecDir </> "yx-githook"
         yxJmpScript = yxLibexecDir </> "yx-jmp"
         yxXpdfScript = yxLibexecDir </> "yx-xpdf"
 
@@ -130,17 +131,19 @@ shakeMain Directories{..} opts = shakeArgs opts $ do
         man7Dir = manDir </> "man7"
 
     want
-        [ yxEnvBin
+        [ yxAptScript
+        , yxEnvBin
+        , yxGithookScript
+        , yxJmpScript
         , yxNewBin
         , yxPathBin
         , yxRemarkableBin
         , yxThisBin
-        , yxAptScript
-        , yxJmpScript
         , yxXpdfScript
         , man1Dir </> "yx.1.gz"
         , man1Dir </> "yx-apt.1.gz"
         , man1Dir </> "yx-env.1.gz"
+        , man1Dir </> "yx-githook.1.gz"
         , man1Dir </> "yx-jmp.1.gz"
         , man1Dir </> "yx-new.1.gz"
         , man1Dir </> "yx-path.1.gz"
@@ -174,7 +177,7 @@ shakeMain Directories{..} opts = shakeArgs opts $ do
         cmd_ "pandoc --standalone --to=man" ["--output=" <> tempOut, src]
         cmd_ "gzip --force -9" [tempOut]
 
-    [yxAptScript, yxJmpScript, yxXpdfScript] &%> \outs ->
+    [yxAptScript, yxGithookScript, yxJmpScript, yxXpdfScript] &%> \outs ->
         forM_ outs $ \out ->
             cmd_ "ln -sf"
                 [ projectRoot </> "bash" </> takeFileName out
