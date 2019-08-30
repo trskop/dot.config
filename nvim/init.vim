@@ -230,6 +230,9 @@ if dein#load_state('~/.cache/dein.vim')
   " syntax highlighting for `.envrc` files.
   call dein#add('direnv/direnv.vim')
 
+  " LookML syntax highlighting. <https://github.com/thalesmello/lkml.vim>
+  call dein#add('thalesmello/lkml.vim')
+
   " }}} Plugin -- Dein.vim -- Plugins to Install ------------------------------
 
   " Required:
