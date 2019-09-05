@@ -11,17 +11,17 @@ let execAliases = ./exec-aliases.dhall
 
 let habit = ./aliases.dhall ? habitDefaults
 
-let defaults = commandWrapper.config.toolset.defaults
-
-let extraSearchPath = (../config.dhall).searchPath ? ([] : List Text)
+let defaults =
+      (../config.dhall).add-monorepo-settings (../config.dhall).options
+      commandWrapper.config.toolset.defaults
 
 in    commandWrapper.config.toolset.addSubcommandAliases
       (habit.aliases # execAliases)
       habit.helpMessage
-      (   defaults
+      (     defaults
         //  { description = Some "Toolset for work."
             , searchPath =
-                  extraSearchPath
+                  defaults.searchPath
                 # commandWrapper.config.toolset.defaultSearchPath
                   env:HOME as Text
                   "habit"
