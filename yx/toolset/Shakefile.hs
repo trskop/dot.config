@@ -37,6 +37,7 @@ module Main (main)
 
 import Control.Monad (unless)
 import Data.Foldable (forM_)
+import Data.Functor ((<&>))
 import System.Exit (die)
 
 import Data.Time.Clock.POSIX (getCurrentTime)
@@ -68,6 +69,7 @@ thisGitRepo directory ThisGitRepo{} = do
         , "app-yx-path/"
         , "app-yx-remarkable/"
         , "app-yx-this/"
+        , "bash/"
         , "man/"
         , "package.yaml"
         , "stack.yaml"
@@ -112,6 +114,12 @@ shakeMain :: Directories -> ShakeOptions -> IO ()
 shakeMain Directories{..} opts = shakeArgs opts $ do
     let yxLibexecDir = localDir </> "lib" </> "yx"
 
+        -- Standard `man` command should be able to pick this up.  Try
+        -- `manpath` after installation to be sure.
+        manDir = dataDir </> "man"
+        man1Dir = manDir </> "man1"
+        man7Dir = manDir </> "man7"
+
         -- TODO: Time to read `package.yaml`?
         yxEnvBin = yxLibexecDir </> "yx-env"
         yxNewBin = yxLibexecDir </> "yx-new"
@@ -119,37 +127,29 @@ shakeMain Directories{..} opts = shakeArgs opts $ do
         yxRemarkableBin = yxLibexecDir </> "yx-remarkable"
         yxThisBin = yxLibexecDir </> "yx-this"
 
-        yxAptScript = yxLibexecDir </> "yx-apt"
-        yxGithookScript = yxLibexecDir </> "yx-githook"
-        yxJmpScript = yxLibexecDir </> "yx-jmp"
-        yxXpdfScript = yxLibexecDir </> "yx-xpdf"
+        scriptNames = ("yx-" <>)
+            <$> [ "apt"
+                , "download"
+                , "githook"
+                , "jmp"
+                , "xpdf"
+                ]
 
-        -- Standard `man` command should be able to pick this up.  Try
-        -- `manpath` after installation to be sure.
-        manDir = dataDir </> "man"
-        man1Dir = manDir </> "man1"
-        man7Dir = manDir </> "man7"
+        scriptTargets = (yxLibexecDir </>) <$> scriptNames
+
+        scriptManTargets = scriptNames <&> \baseName ->
+            man1Dir </> baseName <.> "1.gz"
+
+    want scriptTargets
+    want scriptManTargets
 
     want
-        [ yxAptScript
-        , yxEnvBin
-        , yxGithookScript
-        , yxJmpScript
-        , yxNewBin
-        , yxPathBin
-        , yxRemarkableBin
-        , yxThisBin
-        , yxXpdfScript
-        , man1Dir </> "yx.1.gz"
-        , man1Dir </> "yx-apt.1.gz"
+        [ man1Dir </> "yx.1.gz"
         , man1Dir </> "yx-env.1.gz"
-        , man1Dir </> "yx-githook.1.gz"
-        , man1Dir </> "yx-jmp.1.gz"
         , man1Dir </> "yx-new.1.gz"
         , man1Dir </> "yx-path.1.gz"
         , man1Dir </> "yx-remarkable.1.gz"
         , man1Dir </> "yx-this.1.gz"
-        , man1Dir </> "yx-xpdf.1.gz"
         ]
 
     hasThisRepoChanged <- addOracle (thisGitRepo projectRoot)
@@ -177,7 +177,7 @@ shakeMain Directories{..} opts = shakeArgs opts $ do
         cmd_ "pandoc --standalone --to=man" ["--output=" <> tempOut, src]
         cmd_ "gzip --force -9" [tempOut]
 
-    [yxAptScript, yxGithookScript, yxJmpScript, yxXpdfScript] &%> \outs ->
+    scriptTargets &%> \outs ->
         forM_ outs $ \out ->
             cmd_ "ln -sf"
                 [ projectRoot </> "bash" </> takeFileName out
