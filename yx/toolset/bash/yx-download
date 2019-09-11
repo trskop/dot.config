@@ -382,11 +382,17 @@ function configDownload()
 
     local URL=''
     local OUT_FILE=''
+    # shellcheck disable=SC2034
     local MD5SUM=''
+    # shellcheck disable=SC2034
     local SHA1SUM=''
+    # shellcheck disable=SC2034
     local SHA224SUM=''
+    # shellcheck disable=SC2034
     local SHA256SUM=''
+    # shellcheck disable=SC2034
     local SHA384SUM=''
+    # shellcheck disable=SC2034
     local SHA512SUM=''
 
     if [[ -f "${dwlFile}" && -r "${dwlFile}" ]]; then

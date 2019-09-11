@@ -1,6 +1,6 @@
 % YX-DOWNLOAD(1) YX Toolset 0.1.0 | YX Toolset
 % Peter Trsko
-% 9th September 2019
+% 11th September 2019
 
 
 # NAME
@@ -12,7 +12,7 @@ downloading files.
 # USAGE
 
 yx \[GLOBAL\_OPTIONS] download \[*OPTIONS*]
-\[--output=*FILE*|\--output *FILE*|-o *FILE*] *URL*
+\[\--output=*FILE*|\--output *FILE*|-o *FILE*] *URL*
 
 yx \[GLOBAL\_OPTIONS] download {\--help|-h}
 
@@ -32,44 +32,42 @@ URL from which the file was downloaded.
 For documentation of *GLOBAL_OPTIONS* see `command-wrapper(1)` manual page.
 
 \--config=*FILE*, \--config *FILE*, -c *FILE*
-    Download file based on configuration *FILE*. It has to contain at least one
+:   Download file based on configuration *FILE*. It has to contain at least one
     entry "URL=<url>".
 
 \--output=*FILE*, \--output *FILE*, -o *FILE*
-    Use *FILE* as output file name. If output file name is not specified, then it
+:   Use *FILE* as output file name. If output file name is not specified, then it
     is derived from URL.
 
 \--no-checksum
-    When downloading file based on specified URL then don't compute checksums.
+:   When downloading file based on specified URL then don't compute checksums.
     In case of download based on configuration file, with checksums specified,
     don't check them after successful download.
 
-\--checksum
-    (Turned on by default.)
-    When downloading file based on specified URL then compute checksums.
+\--checksum (Enabled by default.)
+:   When downloading file based on specified URL then compute checksums.
     In case of download based on configuration file, with checksums specified,
     check them after successful download.
 
 \--check=*FILE*
-    Same as specifying `--checksum', `--no-download' and `--config=`*FILE*
+:   Same as specifying `--checksum', `--no-download' and `--config=`*FILE*
     together.
 
 \--sha1=*CHECKSUM*, \--sha256=*CHECKSUM*, \--sha512=*CHECKSUM*, \--md5=*CHECKSUM*
-    Check if downloaded file matches CHECKSUM when downloaded. These options
+:   Check if downloaded file matches CHECKSUM when downloaded. These options
     are ignored when downloading file based on configuration file where these
     can be entered.
 
 \--http-proxy=\[http://]*HOST*\[:*PORT*]
-    Use specified HTTP proxy server by exporting http_proxy environment
+:   Use specified HTTP proxy server by exporting http_proxy environment
     variable for wget/curl. Warning: this script doesn't check if HOST and PORT
     are syntactically valid values.
 
-\--download, -d
-    (Turned on by default.)
-    Download file specified by URL or using `.download' file.
+\--download, -d (Enabled by default.)
+:   Download file specified by URL or using `.download' file.
 
 \--no-download, -n
-    Don't download, but create `.download' file or if that is provided then
+:   Don't download, but create `.download' file or if that is provided then
     just verify checksum(s).
 
 \--help, -h
@@ -83,7 +81,8 @@ manual page section *EXIT STATUS*.  Any *EXIT STATUS* codes specific to this
 subcommand will be listed below.
 
 3
-:   **TODO**
+:   Output file already exists.  This applies to both, the file being
+    downloaded as well as metadata file, which has `.download` extension.
 
 
 # FILES
