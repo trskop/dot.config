@@ -42,6 +42,9 @@ import qualified Dhall.Core as Dhall
     ( Binding
         ( Binding
         , annotation
+        , bindingSrc0
+        , bindingSrc1
+        , bindingSrc2
         , value
         , variable
         )
@@ -72,7 +75,7 @@ data File = File
     -- ^ This is so that we can detect changes in the file.  If file is a Dhall
     -- config then we are using Dhall-specific content-aware hash algorithm.
     }
-  deriving stock (Eq, Generic)
+  deriving stock (Eq, Generic, Show)
   deriving anyclass (Dhall.Inject, Dhall.Interpret)
 
 data ActionState = ActionState
@@ -103,7 +106,7 @@ data State = State
     , changes :: [SetOrUnsetEnvVar]
 --  , actions :: ActionState  -- TODO
     }
-  deriving stock (Eq, Generic)
+  deriving stock (Eq, Generic, Show)
   deriving anyclass (Dhall.Inject, Dhall.Interpret)
 
 emptyState :: State
@@ -174,18 +177,26 @@ mkFullExpressionAndTypeCheck configExpression = do
         -> Dhall.Expr Dhall.Src Dhall.X
     mkFullExpression expr =
         Dhall.Let
-            [ Dhall.Binding
+            Dhall.Binding
                 { Dhall.variable = "State"
-                , Dhall.annotation = Just (Dhall.Const Dhall.Type)
+                , Dhall.annotation = Just (Nothing, Dhall.Const Dhall.Type)
                 , Dhall.value = Dhall.expected (Dhall.auto @State)
+                , Dhall.bindingSrc0 = Nothing
+                , Dhall.bindingSrc1 = Nothing
+                , Dhall.bindingSrc2 = Nothing
                 }
-            , Dhall.Binding
-                { Dhall.variable = "empty"
-                , Dhall.annotation = Just (Dhall.Var "State")
-                , Dhall.value = emptyStateExpr `Dhall.Annot` Dhall.Var "State"
-                }
-            ]
-            (expr `Dhall.Annot` Dhall.Var "State")
+            ( Dhall.Let
+                Dhall.Binding
+                    { Dhall.variable = "empty"
+                    , Dhall.annotation = Just (Nothing, Dhall.Var "State")
+                    , Dhall.value =
+                        emptyStateExpr `Dhall.Annot` Dhall.Var "State"
+                    , Dhall.bindingSrc0 = Nothing
+                    , Dhall.bindingSrc1 = Nothing
+                    , Dhall.bindingSrc2 = Nothing
+                    }
+                (expr `Dhall.Annot` Dhall.Var "State")
+            )
 
     emptyStateExpr = Dhall.embed Dhall.inject emptyState
 

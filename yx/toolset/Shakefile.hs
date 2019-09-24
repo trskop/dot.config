@@ -127,6 +127,14 @@ shakeMain Directories{..} opts = shakeArgs opts $ do
         yxRemarkableBin = yxLibexecDir </> "yx-remarkable"
         yxThisBin = yxLibexecDir </> "yx-this"
 
+        binTargets =
+            [ yxEnvBin
+            , yxNewBin
+            , yxPathBin
+            , yxRemarkableBin
+            , yxThisBin
+            ]
+
         scriptNames = ("yx-" <>)
             <$> [ "apt"
                 , "download"
@@ -140,6 +148,7 @@ shakeMain Directories{..} opts = shakeArgs opts $ do
         scriptManTargets = scriptNames <&> \baseName ->
             man1Dir </> baseName <.> "1.gz"
 
+    want binTargets
     want scriptTargets
     want scriptManTargets
 
@@ -153,7 +162,7 @@ shakeMain Directories{..} opts = shakeArgs opts $ do
         ]
 
     hasThisRepoChanged <- addOracle (thisGitRepo projectRoot)
-    [yxEnvBin, yxNewBin, yxPathBin, yxRemarkableBin, yxThisBin] &%> \outs -> do
+    binTargets &%> \outs -> do
         _ <- hasThisRepoChanged (ThisGitRepo ())
 
         let dst = takeDirectory (head outs)

@@ -37,11 +37,13 @@ import qualified Dhall
     , Type(expected, extract)
     , auto
     )
-import qualified Dhall.Binary as Dhall (StandardVersion(V_5_0_0))
 import qualified Dhall.Core as Dhall
     ( Binding
         ( Binding
         , annotation
+        , bindingSrc0
+        , bindingSrc1
+        , bindingSrc2
         , value
         , variable
         )
@@ -120,7 +122,7 @@ readEnvConfig configFile = do
         else
             pure Nothing
   where
-    mkHash = fromString . show . Dhall.hashExpression Dhall.V_5_0_0
+    mkHash = fromString . show . Dhall.hashExpression
 
     throws = Dhall.throws . validationToEither
 
@@ -162,58 +164,48 @@ mkFullExpression
 mkFullExpression expr =
     -- TODO: Move these definitions into a library that can be imported.
     -- Locally bound values prohibit env configs to import one another.
-    Dhall.Let
-        [ Dhall.Binding
-            { Dhall.variable = "Variable"
-            , Dhall.annotation = Just (Dhall.Const Dhall.Type)
-            , Dhall.value =
-                allowImports $ Dhall.expected (Dhall.auto @EnvironmentVariable)
-            }
-        , Dhall.Binding
-            { Dhall.variable = "Action"
-            , Dhall.annotation = Just (Dhall.Const Dhall.Type)
-            , Dhall.value =
-                allowImports $ Dhall.expected (Dhall.auto @ReversibleAction)
-            }
-        , Dhall.Binding
-            { Dhall.variable = "Actions"
-            , Dhall.annotation = Just (Dhall.Const Dhall.Type)
-            , Dhall.value =
-                allowImports $ Dhall.expected (Dhall.auto @[ReversibleAction])
-            }
-        , Dhall.Binding
-            { Dhall.variable = "VariableOperation"
-            , Dhall.annotation = Just (Dhall.Const Dhall.Type)
-            , Dhall.value =
-                allowImports $ Dhall.expected (Dhall.auto @EnvironmentVariableOperation)
-            }
-        , Dhall.Binding
-            { Dhall.variable = "VariableOperations"
-            , Dhall.annotation = Just (Dhall.Const Dhall.Type)
-            , Dhall.value =
-                allowImports $ Dhall.expected (Dhall.auto @[EnvironmentVariableOperation])
-            }
-        , Dhall.Binding
-            { Dhall.variable = "Env"
-            , Dhall.annotation = Just (Dhall.Const Dhall.Type)
-            , Dhall.value =
-                allowImports $ Dhall.expected (Dhall.auto @Env)
-            }
-        , Dhall.Binding
-            { Dhall.variable = "empty"
-            , Dhall.annotation = Just (Dhall.Var "Env")
-            , Dhall.value = record
-                [ ( "variables"
-                  , Dhall.Lam "dir" Dhall.Text
-                        (emptyListOf "VariableOperation")
-                  )
+    binding "Variable" (Dhall.Const Dhall.Type)
+        ( allowImports $ Dhall.expected (Dhall.auto @EnvironmentVariable)
+        )
+    `let_` binding "Action" (Dhall.Const Dhall.Type)
+        ( allowImports $ Dhall.expected (Dhall.auto @ReversibleAction)
+        )
+    `let_` binding "Actions" (Dhall.Const Dhall.Type)
+        ( allowImports $ Dhall.expected (Dhall.auto @[ReversibleAction])
+        )
+    `let_` binding "VariableOperation" (Dhall.Const Dhall.Type)
+        ( allowImports
+            $ Dhall.expected (Dhall.auto @EnvironmentVariableOperation)
+        )
+    `let_` binding "VariableOperations" (Dhall.Const Dhall.Type)
+        ( allowImports
+            $ Dhall.expected (Dhall.auto @[EnvironmentVariableOperation])
+        )
+    `let_` binding "Env" (Dhall.Const Dhall.Type)
+        ( allowImports $ Dhall.expected (Dhall.auto @Env)
+        )
+    `let_` binding "empty" (Dhall.Var "Env")
+        ( record
+            [ ( "variables"
+              , Dhall.Lam "dir" Dhall.Text
+                    (emptyListOf "VariableOperation")
+              )
 
-                , ("actions", emptyListOf "Action")
-                ]
-            }
-        ]
+            , ("actions", emptyListOf "Action")
+            ]
+        )
+    `let_`
         (expr `Dhall.Annot` Dhall.Var "Env")
   where
+    binding variable ann value = Dhall.Binding
+        { Dhall.variable
+        , Dhall.annotation = Just (Nothing, ann)
+        , Dhall.value
+        , Dhall.bindingSrc0 = Nothing
+        , Dhall.bindingSrc1 = Nothing
+        , Dhall.bindingSrc2 = Nothing
+        }
+
     emptyListOf :: String -> Dhall.Expr s a
     emptyListOf v = Dhall.ListLit (Just . Dhall.Var $ fromString v) mempty
 
@@ -231,3 +223,6 @@ mkFullExpression expr =
                 }
             , importMode = Dhall.Code
             }
+
+    let_ = Dhall.Let
+    infixr 9 `let_`
