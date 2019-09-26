@@ -14,6 +14,7 @@
 \timing
 
 \pset pager always
+\pset format wrapped
 \setenv PAGER less
 \setenv LESS  -iMSx4FX
 
