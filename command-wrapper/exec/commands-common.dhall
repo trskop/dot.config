@@ -1,35 +1,33 @@
-let CommandWrapper = ../Types.dhall
+let CommandWrapper = ../library.dhall
 
-let commandWrapper = ../library.dhall
+let Exec = ./library.dhall
 
-let exec = ./library.dhall
+let docker = Exec.docker
 
-let docker = exec.docker
+let emptyEnvironment = CommandWrapper.Command.emptyEnvironment
 
-let emptyEnvironment = commandWrapper.command.emptyEnvironment
-
-let List/head-and-tail = commandWrapper.utils.List.head-and-tail
+let List/head-and-tail = CommandWrapper.List.head-and-tail
 
 in  -- {{{ Docker -------------------------------------------------------------
 
-    [ commandWrapper.config.exec.namedCommand "docker.prune"
+    [ CommandWrapper.ExecNamedCommand.namedCommand "docker.prune"
       (docker.prune docker.defaultGlobalOptions emptyEnvironment)
       //  { description = Some "Remove unused images and volumes."
           }
 
-    , commandWrapper.config.exec.namedCommand "docker.shell"
-        ( λ(verbosity : CommandWrapper.Verbosity)
-        → λ(colourOutput : CommandWrapper.ColourOutput)
+    , CommandWrapper.ExecNamedCommand.namedCommand "docker.shell"
+        ( λ(verbosity : CommandWrapper.Verbosity.Type)
+        → λ(colourOutput : CommandWrapper.ColourOutput.Type)
         → λ(arguments : List Text)
         → let args = List/head-and-tail Text arguments
-          in  Optional/fold Text args.head CommandWrapper.ExecCommand
+          in  Optional/fold Text args.head CommandWrapper.ExecCommand.Type
                 ( λ(container : Text)
                 → docker.exec container
                   docker.defaultGlobalOptions
                   docker.interactiveExecOptions
-                  ( λ(environment : List CommandWrapper.EnvironmentVariable)
-                  → λ(verbosity : CommandWrapper.Verbosity)
-                  → λ(colourOutput : CommandWrapper.ColourOutput)
+                  ( λ(environment : List CommandWrapper.EnvironmentVariable.Type)
+                  → λ(verbosity : CommandWrapper.Verbosity.Type)
+                  → λ(colourOutput : CommandWrapper.ColourOutput.Type)
                   → λ(arguments : List Text)
                   → let cmd = List/head-and-tail Text arguments
                     in  { command =
@@ -52,8 +50,8 @@ in  -- {{{ Docker -------------------------------------------------------------
                 , environment = emptyEnvironment
                 , searchPath = True
                 , workingDirectory = None Text
-                } : CommandWrapper.ExecCommand
+                } : CommandWrapper.ExecCommand.Type
         )
 
     -- }}} Docker -------------------------------------------------------------
-    ] : List CommandWrapper.ExecNamedCommand
+    ] : List CommandWrapper.ExecNamedCommand.Type

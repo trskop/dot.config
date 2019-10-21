@@ -1,2 +1,18 @@
-~/.local/src/github.com/trskop/command-wrapper/dhall/Exec/package.dhall
-sha256:903ea1089cadf2cc7139ef9961d93eb408ea93fb7bc69a5f08997b7b3c7e4caf
+-- vim: filetype=dhall
+--
+-- To bump Command Wrapper libraries just change that SHA1 of the commit, and
+-- run `habit config --dhall-hash <<< $URL` to get integrity hash.  In
+-- Vim/Neovim this can be done by copying the URL to another line, and then
+-- running following Ex command on it:
+--
+-- ```
+-- :.!habit config --dhall-hash
+-- ```
+--
+-- Other option is to run `habit config --dhall-freeze` on the whole file.  In
+-- Vim/Neovim we can do this using:
+--
+-- ```
+-- :%!habit config --dhall-freeze
+-- ```
+https://raw.githubusercontent.com/trskop/command-wrapper/d59f3ad5fc2cf9d2fc867a9c1a45b13a4049a5c5/dhall/Exec/package.dhall sha256:eeca8bb29b670df1a946b51a8eb6082ed94724b66e96c8898d8174184ab914fe
