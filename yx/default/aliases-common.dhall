@@ -1,5 +1,5 @@
-let CommandWrapper = ../../command-wrapper/Types.dhall
+let CommandWrapper = ../../command-wrapper/library.dhall
 
-in  { aliases = [] : List CommandWrapper.SubcommandAlias
+in  { aliases = [] : List CommandWrapper.SubcommandAlias.Type
     , helpMessage = ""
     }
