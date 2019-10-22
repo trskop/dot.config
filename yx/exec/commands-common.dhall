@@ -1,27 +1,25 @@
-let CommandWrapper = ../../command-wrapper/Types.dhall
-
---let commandWrapper = ../../command-wrapper/library.dhall
+let CommandWrapper = ../../command-wrapper/library.dhall
 
 in  [
 --    { name = "echo"
 --    , description = None Text
 --    , command =
---          λ(verbosity : CommandWrapper.Verbosity)
---        → λ(colourOutput : CommandWrapper.ColourOutput)
+--          λ(verbosity : CommandWrapper.Verbosity.Type)
+--        → λ(colourOutput : CommandWrapper.ColourOutput.Type)
 --        → λ(arguments : List Text)
 --        → { command = "echo"
 --          , arguments = arguments
---          , environment = [] : List CommandWrapper.EnvironmentVariable
+--          , environment = [] : List CommandWrapper.EnvironmentVariable.Type
 --          , searchPath = True
 --          , workingDirectory = None Text
---          } : CommandWrapper.ExecCommand
+--          } : CommandWrapper.ExecCommand.Type
 --    , completion =
 --        None
---        (   CommandWrapper.Shell
+--        (   CommandWrapper.Shell.Type
 --          → Natural
 --          → List Text
---          → CommandWrapper.ExecCommand
+--          → CommandWrapper.ExecCommand.Type
 --        )
---    } : CommandWrapper.ExecNamedCommand
+--    } : CommandWrapper.ExecNamedCommand.Type
 
-    ] : List CommandWrapper.ExecNamedCommand
+    ] : List CommandWrapper.ExecNamedCommand.Type

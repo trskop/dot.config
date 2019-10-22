@@ -15,4 +15,4 @@
 -- ```
 -- :%!habit config --dhall-freeze
 -- ```
-https://raw.githubusercontent.com/trskop/command-wrapper/d59f3ad5fc2cf9d2fc867a9c1a45b13a4049a5c5/dhall/Exec/package.dhall sha256:eeca8bb29b670df1a946b51a8eb6082ed94724b66e96c8898d8174184ab914fe
+https://raw.githubusercontent.com/trskop/command-wrapper/635d48aaa3864db4ecc0ddd3096243b4b5ebed4e/dhall/Exec/package.dhall sha256:eeca8bb29b670df1a946b51a8eb6082ed94724b66e96c8898d8174184ab914fe

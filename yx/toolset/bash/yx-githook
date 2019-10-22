@@ -191,7 +191,7 @@ function genConfig() {
 -- Arguments of individual githooks and their function is documented in
 -- \`githooks(5)\`.
 
-let CommandWrapper = ~/.config/command-wrapper/Types.dhall
+let CommandWrapper = ~/.config/command-wrapper/library.dhall
 
 let MessageSource = ${messageSource}
 
@@ -201,32 +201,32 @@ let Config
           Optional
           (   ∀(commitMessageFile : Text)
             → ∀(messageSource : Optional MessageSource)
-            → ∀(verbosity : CommandWrapper.Verbosity)
-            → ∀(colourOutput : CommandWrapper.ColourOutput)
+            → ∀(verbosity : CommandWrapper.Verbosity.Type)
+            → ∀(colourOutput : CommandWrapper.ColourOutput.Type)
             → ∀(arguments : List Text)
-            → CommandWrapper.ExecCommand
+            → CommandWrapper.ExecCommand.Type
           )
       , pre-commit :
           Optional
-          (   ∀(verbosity : CommandWrapper.Verbosity)
-            → ∀(colourOutput : CommandWrapper.ColourOutput)
+          (   ∀(verbosity : CommandWrapper.Verbosity.Type)
+            → ∀(colourOutput : CommandWrapper.ColourOutput.Type)
             → ∀(arguments : List Text)
-            → CommandWrapper.ExecCommand
+            → CommandWrapper.ExecCommand.Type
           )
       , post-commit :
           Optional
-          (   ∀(verbosity : CommandWrapper.Verbosity)
-            → ∀(colourOutput : CommandWrapper.ColourOutput)
+          (   ∀(verbosity : CommandWrapper.Verbosity.Type)
+            → ∀(colourOutput : CommandWrapper.ColourOutput.Type)
             → ∀(arguments : List Text)
-            → CommandWrapper.ExecCommand
+            → CommandWrapper.ExecCommand.Type
           )
       , commit-msg :
           Optional
           (   ∀(commitMessageFile : Text)
-            → ∀(verbosity : CommandWrapper.Verbosity)
-            → ∀(colourOutput : CommandWrapper.ColourOutput)
+            → ∀(verbosity : CommandWrapper.Verbosity.Type)
+            → ∀(colourOutput : CommandWrapper.ColourOutput.Type)
             → ∀(arguments : List Text)
-            → CommandWrapper.ExecCommand
+            → CommandWrapper.ExecCommand.Type
           )
       }
 
@@ -236,32 +236,32 @@ let default
             None
             (   ∀(commitMessageFile : Text)
               → ∀(messageSource : Optional MessageSource)
-              → ∀(verbosity : CommandWrapper.Verbosity)
-              → ∀(colourOutput : CommandWrapper.ColourOutput)
+              → ∀(verbosity : CommandWrapper.Verbosity.Type)
+              → ∀(colourOutput : CommandWrapper.ColourOutput.Type)
               → ∀(arguments : List Text)
-              → CommandWrapper.ExecCommand
+              → CommandWrapper.ExecCommand.Type
             )
         , pre-commit =
             None
-            (   ∀(verbosity : CommandWrapper.Verbosity)
-              → ∀(colourOutput : CommandWrapper.ColourOutput)
+            (   ∀(verbosity : CommandWrapper.Verbosity.Type)
+              → ∀(colourOutput : CommandWrapper.ColourOutput.Type)
               → ∀(arguments : List Text)
-              → CommandWrapper.ExecCommand
+              → CommandWrapper.ExecCommand.Type
             )
         , post-commit =
             None
-            (   ∀(verbosity : CommandWrapper.Verbosity)
-              → ∀(colourOutput : CommandWrapper.ColourOutput)
+            (   ∀(verbosity : CommandWrapper.Verbosity.Type)
+              → ∀(colourOutput : CommandWrapper.ColourOutput.Type)
               → ∀(arguments : List Text)
-              → CommandWrapper.ExecCommand
+              → CommandWrapper.ExecCommand.Type
             )
         , commit-msg =
             None
             (   ∀(commitMessageFile : Text)
-              → ∀(verbosity : CommandWrapper.Verbosity)
-              → ∀(colourOutput : CommandWrapper.ColourOutput)
+              → ∀(verbosity : CommandWrapper.Verbosity.Type)
+              → ∀(colourOutput : CommandWrapper.ColourOutput.Type)
               → ∀(arguments : List Text)
-              → CommandWrapper.ExecCommand
+              → CommandWrapper.ExecCommand.Type
             )
         }
 
@@ -281,26 +281,25 @@ hookWithNoArguments() {
     fi
 
     toolset exec --expression="
-let CommandWrapper = ~/.config/command-wrapper/Types.dhall
+let CommandWrapper = ~/.config/command-wrapper/library.dhall
 
-let Optional/from =
-      (~/.config/command-wrapper/library.dhall).utils.Optional.from
+let Optional/from = CommandWrapper.Optional.from
 
 in  Optional/from
-    (   CommandWrapper.Verbosity
-      → CommandWrapper.ColourOutput
+    (   CommandWrapper.Verbosity.Type
+      → CommandWrapper.ColourOutput.Type
       → List Text
-      → CommandWrapper.ExecCommand
+      → CommandWrapper.ExecCommand.Type
     )
-    (   λ(_ : CommandWrapper.Verbosity)
-      → λ(_ : CommandWrapper.ColourOutput)
+    (   λ(_ : CommandWrapper.Verbosity.Type)
+      → λ(_ : CommandWrapper.ColourOutput.Type)
       → λ(_ : List Text)
       → { command =
             \"true\"
         , arguments =
             [] : List Text
         , environment =
-            [] : List CommandWrapper.EnvironmentVariable
+            [] : List CommandWrapper.EnvironmentVariable.Type
         , searchPath =
             True
         , workingDirectory =
@@ -361,32 +360,31 @@ function hookPrepareCommitMsg() {
     fi
 
     toolset exec --expression="
-let CommandWrapper = ~/.config/command-wrapper/Types.dhall
+let CommandWrapper = ~/.config/command-wrapper/library.dhall
 
-let Optional/from =
-      (~/.config/command-wrapper/library.dhall).utils.Optional.from
+let Optional/from = CommandWrapper.Optional.from
 
 let MessageSource = ${messageSource}
 
 in  Optional/from
     (   Text
       → Optional MessageSource
-      → CommandWrapper.Verbosity
-      → CommandWrapper.ColourOutput
+      → CommandWrapper.Verbosity.Type
+      → CommandWrapper.ColourOutput.Type
       → List Text
-      → CommandWrapper.ExecCommand
+      → CommandWrapper.ExecCommand.Type
     )
     (   λ(_ : Text)
-      → λ(_ : Optional MessageSource)
-      → λ(_ : CommandWrapper.Verbosity)
-      → λ(_ : CommandWrapper.ColourOutput)
+      → λ(_ : Optional MessageSource.Type)
+      → λ(_ : CommandWrapper.Verbosity.Type)
+      → λ(_ : CommandWrapper.ColourOutput.Type)
       → λ(_ : List Text)
       → { command =
             \"true\"
         , arguments =
             [] : List Text
         , environment =
-            [] : List CommandWrapper.EnvironmentVariable
+            [] : List CommandWrapper.EnvironmentVariable.Type
         , searchPath =
             True
         , workingDirectory =
@@ -419,28 +417,27 @@ function hookCommitMsg() {
     fi
 
     toolset exec --expression="
-let CommandWrapper = ~/.config/command-wrapper/Types.dhall
+let CommandWrapper = ~/.config/command-wrapper/library.dhall
 
-let Optional/from =
-      (~/.config/command-wrapper/library.dhall).utils.Optional.from
+let Optional/from = CommandWrapper.Optional.from
 
 in  Optional/from
     (   Text
-      → CommandWrapper.Verbosity
-      → CommandWrapper.ColourOutput
+      → CommandWrapper.Verbosity.Type
+      → CommandWrapper.ColourOutput.Type
       → List Text
-      → CommandWrapper.ExecCommand
+      → CommandWrapper.ExecCommand.Type
     )
     (   λ(_ : Text)
-      → λ(_ : CommandWrapper.Verbosity)
-      → λ(_ : CommandWrapper.ColourOutput)
+      → λ(_ : CommandWrapper.Verbosity.Type)
+      → λ(_ : CommandWrapper.ColourOutput.Type)
       → λ(_ : List Text)
       → { command =
             \"true\"
         , arguments =
             [] : List Text
         , environment =
-            [] : List CommandWrapper.EnvironmentVariable
+            [] : List CommandWrapper.EnvironmentVariable.Type
         , searchPath =
             True
         , workingDirectory =

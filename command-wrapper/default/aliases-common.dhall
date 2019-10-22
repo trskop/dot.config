@@ -1,4 +1,4 @@
-let CommandWrapper = ../Types.dhall
+let CommandWrapper = ../library.dhall
 
 in    [ { alias = "h"
         , description = Some "Shorthand for \"help\"."
@@ -30,4 +30,4 @@ in    [ { alias = "h"
         , arguments = ["--dhall-repl"]
         }
       ]
-    : List CommandWrapper.SubcommandAlias
+    : List CommandWrapper.SubcommandAlias.Type

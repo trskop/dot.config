@@ -289,7 +289,6 @@ install Directories{..} opts = shakeArgs opts $ do
         need
             [ commandWrapperLibDir </> "command-wrapper"
             , commandWrapperDir </> "library.dhall"
-            , commandWrapperDir </> "Types.dhall"
             ]
         let subdir = takeBaseName out `dropPrefix` "command-wrapper-"
             dir = commandWrapperDir </> subdir
@@ -312,7 +311,6 @@ install Directories{..} opts = shakeArgs opts $ do
         { configDir = yxDir
         , configLib =
             [ commandWrapperDir </> "library.dhall"
-            , commandWrapperDir </> "Types.dhall"
             ]
         , libDir = yxLibDir
         , binDir

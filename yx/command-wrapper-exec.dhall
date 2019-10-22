@@ -1,6 +1,6 @@
-let CommandWrapper = ../command-wrapper/Types.dhall
+let CommandWrapper = ../command-wrapper/library.dhall
 
-let empty = [] : List CommandWrapper.ExecNamedCommand
+let empty = CommandWrapper.ExecNamedCommand.emptyCommands
 
 let global = ../command-wrapper/command-wrapper-exec.dhall
 

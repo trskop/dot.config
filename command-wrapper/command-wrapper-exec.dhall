@@ -1,6 +1,6 @@
-let CommandWrapper = ./Types.dhall
+let CommandWrapper = ./library.dhall
 
-let empty = [] : List CommandWrapper.ExecNamedCommand
+let empty = [] : List CommandWrapper.ExecNamedCommand.Type
 
 in  { commands =
           ./exec/commands-debug.dhall
