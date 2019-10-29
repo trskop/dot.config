@@ -9,36 +9,34 @@ let lib = "${home}/.local/lib"
 in    λ(toolset : Text)
     → λ(subcommand : Text)
     → λ(command : Text)
-    →   CommandWrapper.SkelConfig::{
-        , template =
-              λ(language : CommandWrapper.SkelConfig.SkelLanguage)
-            → merge
-                { Haskell =
-                    { targetFile =
-                        "${config}/${toolset}/toolset/app-${command}/Main.hs"
-                    , executable = False
-                    , template =
-                          ./haskell-skel.dhall
-                        ? CommandWrapper.SkelConfig.template.haskell
-                    }
-                , Bash =
-                    { targetFile = "${lib}/${toolset}/${command}"
-                    , executable = True
-                    , template =
-                          ./bash-skel.dhall
-                        ? CommandWrapper.SkelConfig.template.bash
-                    }
-                , Dhall =
-                    { targetFile = "${config}/${toolset}/${command}.dhall"
-                    , executable = False
-                    , template =
-                        (   ./dhall-skel.dhall
-                          ? CommandWrapper.SkelConfig.template.dhall
-                        )
-                    }
-                }
-                language
-        , editAfterwards = True
-        , defaultLanguage = Some CommandWrapper.SkelConfig.SkelLanguage.Bash
-        }
-      : CommandWrapper.SkelConfig.Type
+    → CommandWrapper.SkelConfig::{
+      , template =
+            λ(language : CommandWrapper.SkelConfig.SkelLanguage)
+          → merge
+              { Haskell =
+                  { targetFile =
+                      "${config}/${toolset}/toolset/app-${command}/Main.hs"
+                  , executable = False
+                  , template =
+                        ./haskell-skel.dhall
+                      ? CommandWrapper.SkelConfig.template.haskell
+                  }
+              , Bash =
+                  { targetFile = "${lib}/${toolset}/${command}"
+                  , executable = True
+                  , template =
+                        ./bash-skel.dhall
+                      ? CommandWrapper.SkelConfig.template.bash
+                  }
+              , Dhall =
+                  { targetFile = "${config}/${toolset}/${command}.dhall"
+                  , executable = False
+                  , template =
+                        ./dhall-skel.dhall
+                      ? CommandWrapper.SkelConfig.template.dhall
+                  }
+              }
+              language
+      , editAfterwards = True
+      , defaultLanguage = Some CommandWrapper.SkelConfig.SkelLanguage.Bash
+      }

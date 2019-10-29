@@ -20,16 +20,17 @@ let join =
         , helpMessage = "${a.helpMessage}${b.helpMessage}"
         }
 
-let helpMessage = ''
+let helpMessage =
+      ''
 
-YX Subcommands:
+      YX Subcommands:
 
-  env
-  jmp
-  new
-  path
-  this
-''
+        env
+        jmp
+        new
+        path
+        this
+      ''
 
 let yx =
       join
@@ -39,23 +40,14 @@ let yx =
         )
         { aliases = ./exec-aliases.dhall, helpMessage = "" }
 
-let defaults =
-      CommandWrapper.ToolsetConfig::{
-      , description =
-          Some "Y repeate X; set of personalised command line tools."
-      }
-
 in    CommandWrapper.ToolsetConfig.addSubcommandAliases
         yx.aliases
         "${helpMessage}${yx.helpMessage}"
-        (     defaults
-          //  { searchPath =
-                    defaults.searchPath
-                  # CommandWrapper.ToolsetConfig.defaultSearchPath
-                      env:HOME as Text
-                      "yx"
-              , manPath =
-                  defaults.manPath # [ "${env:HOME as Text}/.local/man" ]
-              }
-        )
+        CommandWrapper.ToolsetConfig::{
+        , description =
+            Some "Y repeate X; set of personalised command line tools."
+        , searchPath =
+            CommandWrapper.ToolsetConfig.defaultSearchPath env:HOME as Text "yx"
+        , manPath = [ "${env:HOME as Text}/.local/man" ]
+        }
     : CommandWrapper.ToolsetConfig.Type

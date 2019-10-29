@@ -14,19 +14,15 @@ let defaults =
         (../config.dhall).options
         CommandWrapper.ToolsetConfig::{
         , description = Some "Toolset for work."
+        , searchPath =
+            CommandWrapper.ToolsetConfig.defaultSearchPath
+              env:HOME as Text
+              "habit"
+        , manPath = [ "${env:HOME as Text}/.local/man" ]
         }
 
 in    CommandWrapper.ToolsetConfig.addSubcommandAliases
         (habit.aliases # execAliases)
         habit.helpMessage
-        (     defaults
-          //  { searchPath =
-                    defaults.searchPath
-                  # CommandWrapper.ToolsetConfig.defaultSearchPath
-                      env:HOME as Text
-                      "habit"
-              , manPath =
-                  defaults.manPath # [ "${env:HOME as Text}/.local/man" ]
-              }
-        )
+        defaults
     : CommandWrapper.ToolsetConfig.Type

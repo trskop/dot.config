@@ -7,4 +7,4 @@ let commands =
       # (../exec/commands.dhall ? empty)
       # (../exec/commands-local.dhall ? empty)
 
-in CommandWrapper.ExecNamedCommand.namedCommandsToAliases commands
+in  CommandWrapper.ExecNamedCommand.namedCommandsToAliases commands

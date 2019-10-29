@@ -1,25 +1,27 @@
 let CommandWrapper = ../../command-wrapper/library.dhall
 
-in  [
---    { name = "echo"
---    , description = None Text
---    , command =
---          λ(verbosity : CommandWrapper.Verbosity.Type)
---        → λ(colourOutput : CommandWrapper.ColourOutput.Type)
---        → λ(arguments : List Text)
---        → { command = "echo"
---          , arguments = arguments
---          , environment = [] : List CommandWrapper.EnvironmentVariable.Type
---          , searchPath = True
---          , workingDirectory = None Text
---          } : CommandWrapper.ExecCommand.Type
---    , completion =
---        None
---        (   CommandWrapper.Shell.Type
---          → Natural
---          → List Text
---          → CommandWrapper.ExecCommand.Type
---        )
---    } : CommandWrapper.ExecNamedCommand.Type
+let Exec = ../../command-wrapper/exec/library.dhall
 
-    ] : List CommandWrapper.ExecNamedCommand.Type
+let emptyArguments = CommandWrapper.Command.emptyArguments
+
+let emptyEnvironment = CommandWrapper.Command.emptyEnvironment
+
+let toolset = env:COMMAND_WRAPPER_EXE as Text ? "yx"
+
+in  [ CommandWrapper.ExecNamedCommand::{
+      , name = "direnv"
+      , description =
+          Some "Just invoke 'direnv', but with command line completion."
+      , command =
+          Exec.direnv.command (None Text) emptyArguments emptyEnvironment
+      , completion =
+          Some (Exec.direnv.completion toolset (None Text) emptyArguments)
+      }
+    , CommandWrapper.ExecNamedCommand::{
+      , name = "jq"
+      , description = Some "Just invoke 'jq', but with command line completion."
+      , command = Exec.jq.command emptyArguments
+      , completion =
+          Some (Exec.jq.completion toolset (None Text) emptyArguments)
+      }
+    ]
