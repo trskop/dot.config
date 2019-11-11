@@ -51,7 +51,7 @@ data FileTemplate = FileTemplate
     , executable :: Bool
     }
   deriving stock (Generic, Show)
-  deriving anyclass (Dhall.Interpret)
+  deriving anyclass (Dhall.FromDhall)
 
 type Template = [FileTemplate]
 
@@ -60,13 +60,13 @@ data NamedTemplates = NamedTemplates
     , template :: Template
     }
   deriving stock (Generic, Show)
-  deriving anyclass (Dhall.Interpret)
+  deriving anyclass (Dhall.FromDhall)
 
 newtype Config = Config
     { templates :: [NamedTemplates]
     }
   deriving stock (Generic, Show)
-  deriving anyclass (Dhall.Interpret)
+  deriving anyclass (Dhall.FromDhall)
 
 data Mode a
     = New Text (Maybe FilePath) a

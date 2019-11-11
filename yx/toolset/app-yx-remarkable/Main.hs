@@ -20,7 +20,7 @@ import CommandWrapper.Prelude
     , stdout
     , subcommandParams
     )
-import qualified Dhall
+--import qualified Dhall
 import qualified Turtle
 
 import Main.Config.App (Config, readConfig)

@@ -22,9 +22,10 @@ module Main.Config.Env
 
 import Control.Exception (throwIO)
 import Control.Monad ((>=>))
-import Data.Monoid (mempty)
 import Data.Functor ((<$))
+import Data.Monoid (mempty)
 import Data.String (fromString)
+import Data.Void (Void)
 import GHC.Generics (Generic)
 
 import Control.Monad.State.Strict (evalStateT)
@@ -32,8 +33,8 @@ import Data.Either.Validation (validationToEither)
 import Data.Text (Text)
 import qualified Data.Text.IO as Text (readFile)
 import qualified Dhall
-    ( Inject
-    , Interpret
+    ( FromDhall
+    , ToDhall
     , Type(expected, extract)
     , auto
     )
@@ -68,7 +69,7 @@ import qualified Dhall.Core as Dhall
 import qualified Dhall.Import as Dhall (emptyStatus, hashExpression, loadWith)
 import qualified Dhall.Map (fromList)
 import qualified Dhall.Parser as Dhall (Src, exprFromText)
-import qualified Dhall.TypeCheck as Dhall (X, typeOf)
+import qualified Dhall.TypeCheck as Dhall (typeOf)
 import System.Environment.Variable
     ( EnvironmentVariable(..)
     , EnvVarName
@@ -91,7 +92,7 @@ data EnvironmentVariableOperation
         , modify :: Maybe EnvVarValue -> Maybe EnvVarValue
         }
   deriving stock (Generic)
-  deriving anyclass (Dhall.Interpret)
+  deriving anyclass (Dhall.FromDhall)
 
 data ReversibleAction = ReversibleAction
     { name :: Text
@@ -100,14 +101,14 @@ data ReversibleAction = ReversibleAction
 --  , revereOperations :: [SetOrUnsetEnvVar]
     }
   deriving stock (Generic)
-  deriving anyclass (Dhall.Inject, Dhall.Interpret)
+  deriving anyclass (Dhall.FromDhall, Dhall.ToDhall)
 
 data Env = Env
     { variables :: Text -> [EnvironmentVariableOperation]
     , actions :: [ReversibleAction]
     }
   deriving stock (Generic)
-  deriving anyclass (Dhall.Interpret)
+  deriving anyclass (Dhall.FromDhall)
 
 readEnvConfig :: FilePath -> IO (Maybe (Text, Env))
 readEnvConfig configFile = do
@@ -126,7 +127,7 @@ readEnvConfig configFile = do
 
     throws = Dhall.throws . validationToEither
 
-parseDhallExpression :: FilePath -> Text -> IO (Dhall.Expr Dhall.Src Dhall.X)
+parseDhallExpression :: FilePath -> Text -> IO (Dhall.Expr Dhall.Src Void)
 parseDhallExpression sourcePath = parseConfig >=> typeCheckAndNormalize
   where
     parseConfig =
@@ -137,7 +138,7 @@ parseDhallExpression sourcePath = parseConfig >=> typeCheckAndNormalize
 
     resolveImports
         :: Dhall.Expr Dhall.Src Dhall.Import
-        -> IO (Dhall.Expr Dhall.Src Dhall.X)
+        -> IO (Dhall.Expr Dhall.Src Void)
     resolveImports expr =
         evalStateT (Dhall.loadWith expr) (Dhall.emptyStatus sourceDir)
       where
@@ -214,7 +215,7 @@ mkFullExpression expr =
 
     -- This should be safe, even unsafeCorece should be safe in this case since
     -- 'X' is 'Void', therefore, it is imposible to have 'Dhall.Embed' case.
-    allowImports :: Dhall.Expr s Dhall.X -> Dhall.Expr s Dhall.Import
+    allowImports :: Dhall.Expr s Void -> Dhall.Expr s Dhall.Import
     allowImports = fmap
         $ const Dhall.Import
             { importHashed = Dhall.ImportHashed

@@ -32,7 +32,7 @@ import Data.Algorithm.Diff (Diff(..), getDiffBy)
 import Data.HashMap.Strict (HashMap)
 import qualified Data.HashMap.Strict as HashMap (delete, insert, lookup)
 import Data.Text (Text)
-import qualified Dhall (Inject, Interpret)
+import qualified Dhall (FromDhall, ToDhall)
 import System.Environment.Variable (EnvVarName, EnvVarValue)
 
 import Main.Config.Env (EnvironmentVariableOperation(..))
@@ -52,7 +52,7 @@ data SetOrUnsetEnvVar
         -- case of 'SetEnv'.
         }
   deriving stock (Eq, Generic, Show)
-  deriving anyclass (Dhall.Inject, Dhall.Interpret)
+  deriving anyclass (Dhall.FromDhall, Dhall.ToDhall)
 
 -- | Take user-specified fancy operation and reduce it to a simple
 -- 'SetEnv'\/'UnsetEnv'.

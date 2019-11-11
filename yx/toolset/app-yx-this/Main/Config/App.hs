@@ -31,9 +31,9 @@ import Data.Text (Text)
 import Data.Text.Prettyprint.Doc (pretty)
 import Data.Text.Prettyprint.Doc.Render.Text (hPutDoc)
 import qualified Dhall
-    ( Inject
+    ( FromDhall
     , InputType(embed)
-    , Interpret
+    , ToDhall
     , auto
     , inject
     , inputFile
@@ -51,7 +51,7 @@ data Config = Config
 --  , userAction :: Action
     }
   deriving stock (Eq, Generic, Show)
-  deriving anyclass (Dhall.Inject, Dhall.Interpret)
+  deriving anyclass (Dhall.FromDhall, Dhall.ToDhall)
 
 data SystemConfig = SystemConfig
     { bootstrapPackages :: [Text]
@@ -63,7 +63,7 @@ data SystemConfig = SystemConfig
 --  , packageRepositories :: PackageRepository
     }
   deriving stock (Eq, Generic, Show)
-  deriving anyclass (Dhall.Inject, Dhall.Interpret)
+  deriving anyclass (Dhall.FromDhall, Dhall.ToDhall)
 
 data NixConfig = NixConfig
     { packages :: [Text]
@@ -72,13 +72,13 @@ data NixConfig = NixConfig
 --  , packageRepositories :: PackageRepository
     }
   deriving stock (Eq, Generic, Show)
-  deriving anyclass (Dhall.Inject, Dhall.Interpret)
+  deriving anyclass (Dhall.FromDhall, Dhall.ToDhall)
 
 data Defaults = Defaults
     { update :: [UpdateWhat]
     }
   deriving stock (Eq, Generic, Show)
-  deriving anyclass (Dhall.Inject, Dhall.Interpret)
+  deriving anyclass (Dhall.FromDhall, Dhall.ToDhall)
 
 -- TODO: Move into a different module?
 data UpdateWhat
@@ -87,7 +87,7 @@ data UpdateWhat
     | UpdateUserEnvironment
     | UpdateNixEnvironment
   deriving stock (Bounded, Enum, Eq, Generic, Ord, Show)
-  deriving anyclass (Dhall.Inject, Dhall.Interpret)
+  deriving anyclass (Dhall.FromDhall, Dhall.ToDhall)
 
 read :: Params -> IO (Maybe Config)
 read Params{config} = do

@@ -33,9 +33,9 @@ import Data.Text (Text)
 import Data.Text.Prettyprint.Doc (pretty)
 import Data.Text.Prettyprint.Doc.Render.Text (hPutDoc)
 import qualified Dhall
-    ( Inject
+    ( FromDhall
     , InputType(embed)
-    , Interpret
+    , ToDhall
     , auto
     , inject
     , inputFile
@@ -49,7 +49,7 @@ data Status
     = Allowed
     | Ignored
   deriving stock (Eq, Generic, Show)
-  deriving anyclass (Dhall.Inject, Dhall.Interpret)
+  deriving anyclass (Dhall.FromDhall, Dhall.ToDhall)
 
 data KnownFile = KnownFile
     { file :: Text
@@ -57,7 +57,7 @@ data KnownFile = KnownFile
 --  , timetamp :: Timestamp -- TODO: Consider adding this.
     }
   deriving stock (Eq, Generic, Show)
-  deriving anyclass (Dhall.Inject, Dhall.Interpret)
+  deriving anyclass (Dhall.FromDhall, Dhall.ToDhall)
 
 -- | User preferences are a cache of user decisions.  It is considered safe to
 -- get rid of it.
@@ -65,7 +65,7 @@ newtype Preferences = Preferences
     { knownFiles :: [KnownFile]
     }
   deriving stock (Generic, Show)
-  deriving anyclass (Dhall.Inject, Dhall.Interpret)
+  deriving anyclass (Dhall.FromDhall, Dhall.ToDhall)
 
 empty :: Preferences
 empty = Preferences

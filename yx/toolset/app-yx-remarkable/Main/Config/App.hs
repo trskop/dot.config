@@ -36,7 +36,7 @@ import qualified Data.HostAndPort as HostAndPort (interpretDhall)
 import Data.ByteString (ByteString)
 import Data.Text (Text)
 import qualified Dhall
-    ( Interpret(autoWith)
+    ( FromDhall(autoWith)
     , InterpretOptions(InterpretOptions, fieldModifier)
     , Type
     , auto
@@ -52,7 +52,7 @@ newtype ConnectToRemarkableViaSsh
         (ConnectTo "remarkable-ssh" ByteString (Maybe Word))
   deriving stock (Generic, Show)
 
-instance Dhall.Interpret ConnectToRemarkableViaSsh where
+instance Dhall.FromDhall ConnectToRemarkableViaSsh where
     autoWith :: Dhall.InterpretOptions -> Dhall.Type ConnectToRemarkableViaSsh
     autoWith opts = ConnectToRemarkableViaSsh
         <$> interpretHostAndPort (Proxy @"remarkable-ssh") opts
@@ -63,7 +63,7 @@ newtype ConnectToRemarkableViaWebUi
         (ConnectTo "remarkable-web-ui" ByteString (Maybe Word))
   deriving stock (Generic, Show)
 
-instance Dhall.Interpret ConnectToRemarkableViaWebUi where
+instance Dhall.FromDhall ConnectToRemarkableViaWebUi where
     autoWith
         :: Dhall.InterpretOptions
         -> Dhall.Type ConnectToRemarkableViaWebUi
@@ -90,7 +90,7 @@ data Config = Config
     , syncDir :: Text
     }
   deriving stock (Generic, Show)
-  deriving anyclass (Dhall.Interpret)
+  deriving anyclass (Dhall.FromDhall)
 
 defaultConfig :: IO Config
 defaultConfig = do

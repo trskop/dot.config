@@ -23,6 +23,7 @@ module Main.State
 import Control.Exception (throwIO)
 import Control.Monad ((>=>))
 import Data.Functor ((<$))
+import Data.Void (Void)
 import GHC.Generics (Generic)
 import System.IO (Handle)
 
@@ -31,9 +32,9 @@ import Data.Either.Validation (validationToEither)
 import Data.Text (Text)
 import qualified Data.Text.IO as Text (readFile)
 import qualified Dhall
-    ( Inject
-    , Interpret
+    ( FromDhall
     , InputType(embed)
+    , ToDhall
     , Type(expected, extract)
     , auto
     , inject
@@ -61,7 +62,7 @@ import qualified Dhall.Core as Dhall
     )
 import qualified Dhall.Import as Dhall (emptyStatus, loadWith)
 import qualified Dhall.Parser as Dhall (Src, exprFromText)
-import qualified Dhall.TypeCheck as Dhall (TypeError, X, typeOf)
+import qualified Dhall.TypeCheck as Dhall (TypeError, typeOf)
 import System.FilePath (takeDirectory)
 import qualified Turtle
 
@@ -76,7 +77,7 @@ data File = File
     -- config then we are using Dhall-specific content-aware hash algorithm.
     }
   deriving stock (Eq, Generic, Show)
-  deriving anyclass (Dhall.Inject, Dhall.Interpret)
+  deriving anyclass (Dhall.FromDhall, Dhall.ToDhall)
 
 data ActionState = ActionState
     { files :: [File]
@@ -98,7 +99,7 @@ data ActionState = ActionState
     -- ^ Changes introduced by an invoked action.
     }
   deriving stock (Eq, Generic)
-  deriving anyclass (Dhall.Inject, Dhall.Interpret)
+  deriving anyclass (Dhall.FromDhall, Dhall.ToDhall)
 
 data State = State
     { shellPid :: Text
@@ -107,7 +108,7 @@ data State = State
 --  , actions :: ActionState  -- TODO
     }
   deriving stock (Eq, Generic, Show)
-  deriving anyclass (Dhall.Inject, Dhall.Interpret)
+  deriving anyclass (Dhall.FromDhall, Dhall.ToDhall)
 
 emptyState :: State
 emptyState = State
@@ -136,7 +137,7 @@ readState stateFile = do
 parseDhallExpression
     :: FilePath
     -> Text
-    -> IO (Dhall.Expr Dhall.Src Dhall.X)
+    -> IO (Dhall.Expr Dhall.Src Void)
 parseDhallExpression sourcePath = parseState >=> interpretState
   where
     parseState = either throwIO resolveImports . Dhall.exprFromText sourcePath
@@ -148,7 +149,7 @@ parseDhallExpression sourcePath = parseState >=> interpretState
 
     resolveImports
         :: Dhall.Expr Dhall.Src Dhall.Import
-        -> IO (Dhall.Expr Dhall.Src Dhall.X)
+        -> IO (Dhall.Expr Dhall.Src Void)
     resolveImports expr =
         evalStateT (Dhall.loadWith expr) (Dhall.emptyStatus sourceDir)
 
@@ -161,11 +162,11 @@ parseDhallExpression sourcePath = parseState >=> interpretState
 -- in  EXPRESSION : TYPE
 -- @
 mkFullExpressionAndTypeCheck
-    :: Dhall.Expr Dhall.Src Dhall.X
+    :: Dhall.Expr Dhall.Src Void
     -- ^ Parsed configuration file.
     -> Either
-        (Dhall.TypeError Dhall.Src Dhall.X)
-        (Dhall.Expr Dhall.Src Dhall.X)
+        (Dhall.TypeError Dhall.Src Void)
+        (Dhall.Expr Dhall.Src Void)
 mkFullExpressionAndTypeCheck configExpression = do
     let expression = mkFullExpression configExpression
     Dhall.normalize expression <$ Dhall.typeOf expression
@@ -173,8 +174,8 @@ mkFullExpressionAndTypeCheck configExpression = do
     -- TODO: Switch to a normal import instead.  With custom context env
     -- configs are unable to import one another.
     mkFullExpression
-        :: Dhall.Expr Dhall.Src Dhall.X
-        -> Dhall.Expr Dhall.Src Dhall.X
+        :: Dhall.Expr Dhall.Src Void
+        -> Dhall.Expr Dhall.Src Void
     mkFullExpression expr =
         Dhall.Let
             Dhall.Binding

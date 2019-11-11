@@ -23,7 +23,7 @@ import Control.Monad (unless)
 import GHC.Generics (Generic)
 
 import Data.Text (Text)
-import qualified Dhall (Inject, Interpret, auto, inputFile)
+import qualified Dhall (FromDhall, ToDhall, auto, inputFile)
 import qualified Turtle
 
 
@@ -34,7 +34,7 @@ data ShellScripts a = ShellScripts
     , zsh :: a
     }
   deriving stock (Generic)
-  deriving anyclass (Dhall.Inject, Dhall.Interpret)
+  deriving anyclass (Dhall.FromDhall, Dhall.ToDhall)
 
 data Config = Config
     { installScript :: Text -> Text -> ShellScripts Text
@@ -42,7 +42,7 @@ data Config = Config
     , initEnv :: Text
     }
   deriving stock (Generic)
-  deriving anyclass (Dhall.Interpret)
+  deriving anyclass (Dhall.FromDhall)
 
 readConfig :: (forall a. FilePath -> IO a) -> FilePath -> IO Config
 readConfig die configFile = do

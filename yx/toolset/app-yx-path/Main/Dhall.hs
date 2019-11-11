@@ -20,9 +20,10 @@ import Control.Exception (Exception, throwIO)
 import Control.Monad ((>=>))
 import Data.Foldable (asum, traverse_)
 import Data.Functor ((<&>))
-import Data.String (fromString)
 import Data.Maybe (fromMaybe)
+import Data.String (fromString)
 import Data.Traversable (for)
+import Data.Void (Void)
 import Numeric.Natural (Natural)
 
 import Control.Monad.State.Strict (evalStateT)
@@ -62,7 +63,7 @@ import qualified Dhall.Core as Dhall
 import qualified Dhall.Import as Dhall (emptyStatus, loadWith)
 import qualified Dhall.Map (fromList)
 import qualified Dhall.Parser as Dhall (Src, exprFromText)
-import qualified Dhall.TypeCheck as Dhall (TypeError, X, typeOf)
+import qualified Dhall.TypeCheck as Dhall (TypeError, typeOf)
 import System.FilePath (takeDirectory)
 import System.Exit (die)
 
@@ -92,10 +93,10 @@ dhall Options{output} paths possiblyConfigFile expressionText = do
 
 printDhall
     :: Paths
-    -> Dhall.Expr Dhall.Src Dhall.X
-    -> Maybe (Dhall.Expr Dhall.Src Dhall.X)
-    ->  ( (Dhall.Expr Dhall.Src Dhall.X, Dhall.Expr Dhall.Src Dhall.X)
-        -> Dhall.Expr Dhall.Src Dhall.X
+    -> Dhall.Expr Dhall.Src Void
+    -> Maybe (Dhall.Expr Dhall.Src Void)
+    ->  ( (Dhall.Expr Dhall.Src Void, Dhall.Expr Dhall.Src Void)
+        -> Dhall.Expr Dhall.Src Void
         )
     -> IO ()
 printDhall paths expression possiblyConfigExpression selector = do
@@ -109,13 +110,13 @@ printDhall paths expression possiblyConfigExpression selector = do
 
 printPlain
     :: Paths
-    -> Dhall.Expr Dhall.Src Dhall.X
-    -> Maybe (Dhall.Expr Dhall.Src Dhall.X)
+    -> Dhall.Expr Dhall.Src Void
+    -> Maybe (Dhall.Expr Dhall.Src Void)
     -> IO ()
 printPlain paths expression possiblyConfigExpression =
     either dieWithNotPlainType id result
   where
-    result :: Either [Dhall.TypeError Dhall.Src Dhall.X] (IO ())
+    result :: Either [Dhall.TypeError Dhall.Src Void] (IO ())
     result = runExcept $ asum
         [ printText <$> mkExpression Dhall.Text
         , printOptionalText <$> mkExpression (optional Dhall.Text)
@@ -150,7 +151,7 @@ printPlain paths expression possiblyConfigExpression =
     Dhall.Type{extract = extractIntegerList} = Dhall.auto @[Integer]
 
     printText, printOptionalText, printNatural, printInteger
-        :: Dhall.Expr Dhall.Src Dhall.X
+        :: Dhall.Expr Dhall.Src Void
         -> IO ()
 
     printText =
@@ -186,7 +187,7 @@ printPlain paths expression possiblyConfigExpression =
 -- * Support parsing a file
 -- * Allow disabling imports
 -- * Pass root directory for imports resolution.
-parseDhallExpression :: Maybe FilePath -> Text -> IO (Dhall.Expr Dhall.Src Dhall.X)
+parseDhallExpression :: Maybe FilePath -> Text -> IO (Dhall.Expr Dhall.Src Void)
 parseDhallExpression possiblySourcePath =
     either throwIO resolveImports . Dhall.exprFromText sourcePath
   where
@@ -195,7 +196,7 @@ parseDhallExpression possiblySourcePath =
 
     resolveImports
         :: Dhall.Expr Dhall.Src Dhall.Import
-        -> IO (Dhall.Expr Dhall.Src Dhall.X)
+        -> IO (Dhall.Expr Dhall.Src Void)
     resolveImports expr =
         evalStateT (Dhall.loadWith expr) (Dhall.emptyStatus sourceDir)
 
@@ -217,16 +218,16 @@ parseDhallExpression possiblySourcePath =
 --     ) data
 -- @
 mkExpressionAndTypeCheck
-    :: Maybe (Dhall.Expr Dhall.Src Dhall.X)
+    :: Maybe (Dhall.Expr Dhall.Src Void)
     -- ^ Expected type of the result.
-    -> Dhall.Expr Dhall.Src Dhall.X
+    -> Dhall.Expr Dhall.Src Void
     -- ^ Expression from command line.
-    -> Dhall.Expr Dhall.Src Dhall.X
+    -> Dhall.Expr Dhall.Src Void
     -- ^ Parsed configuration file.
     -> Paths
     -> Either
-        (Dhall.TypeError Dhall.Src Dhall.X)
-        (Dhall.Expr Dhall.Src Dhall.X, Dhall.Expr Dhall.Src Dhall.X)
+        (Dhall.TypeError Dhall.Src Void)
+        (Dhall.Expr Dhall.Src Void, Dhall.Expr Dhall.Src Void)
 mkExpressionAndTypeCheck possiblyResultType bodyExpression configExpression paths = do
     expression <- mkExpression <$> Dhall.typeOf configExpression
     Dhall.typeOf expression <&> (Dhall.normalize expression, )
