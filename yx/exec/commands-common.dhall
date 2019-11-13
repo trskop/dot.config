@@ -4,7 +4,7 @@ let Exec = ../../command-wrapper/exec/library.dhall
 
 let emptyArguments = CommandWrapper.Command.emptyArguments
 
-let emptyEnvironment = CommandWrapper.Command.emptyEnvironment
+let Environment/empty = CommandWrapper.Environment.empty
 
 let toolset = env:COMMAND_WRAPPER_EXE as Text ? "yx"
 
@@ -13,7 +13,7 @@ in  [ CommandWrapper.ExecNamedCommand::{
       , description =
           Some "Just invoke 'direnv', but with command line completion."
       , command =
-          Exec.direnv.command (None Text) emptyArguments emptyEnvironment
+          Exec.direnv.command (None Text) emptyArguments Environment/empty
       , completion =
           Some (Exec.direnv.completion toolset (None Text) emptyArguments)
       }

@@ -4,7 +4,7 @@ let Exec = ./library.dhall
 
 let docker = Exec.docker
 
-let emptyEnvironment = CommandWrapper.Command.emptyEnvironment
+let Environment/empty = CommandWrapper.Environment.empty
 
 let List/head-and-tail = CommandWrapper.List.head-and-tail
 
@@ -12,7 +12,7 @@ in  -- {{{ Docker -------------------------------------------------------------
     [ CommandWrapper.ExecNamedCommand::{
       , name = "docker.prune"
       , description = Some "Remove unused images and volumes."
-      , command = docker.prune docker.defaultGlobalOptions emptyEnvironment
+      , command = docker.prune docker.GlobalOptions::{=} Environment/empty
       }
     , CommandWrapper.ExecNamedCommand::{
       , name = "docker.shell"
@@ -29,8 +29,8 @@ in  -- {{{ Docker -------------------------------------------------------------
                   (   λ(container : Text)
                     → docker.exec
                         container
-                        docker.defaultGlobalOptions
-                        docker.interactiveExecOptions
+                        docker.GlobalOptions::{=}
+                        docker.ExecOptions.interactive
                         (   λ ( environment
                               : List CommandWrapper.EnvironmentVariable.Type
                               )
@@ -51,7 +51,7 @@ in  -- {{{ Docker -------------------------------------------------------------
                                 , environment = environment
                                 }
                         )
-                        emptyEnvironment
+                        Environment/empty
                         verbosity
                         colourOutput
                         args.tail
