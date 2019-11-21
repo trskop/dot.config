@@ -42,16 +42,26 @@ User configuration files (dot–files)
 *   [`ripgrep/`](./ripgrep/) – Ripgrep configuration, see
     [`ripgrep/README.md`](./ripgrep/README.md).
 
+*   [`sensible-editor/`](./sensible-editor/) – Configuration files for
+    `sensible-editor`, a Debian-specific tool.  See `sensible-editor(1)` and
+    [`sensible-editor/README.md`](./sensible-editor/README.md` for more
+    information.
+
 *   [`stack/`](./stack/) – Haskell Stack, see
     [`stack/README.md`](./stack/README.md).
 
 *   [`tmux/`](./tmux/) – Tmux configuration, see
     [`tmux/README.md`](./tmux/README.md) for more information.
 
-*   [`Xresources`](./Xresources) – `~/.Xresources` configuration file.
-
 *   [`yx/`](./yx/) – Configuration of Command Wrapper toolset optimised for
     personal use.  See [`yx/README.md`](./yx/README.md) for more details.
+
+*   [user-dirs.dirs](./user-dirs.dirs) and
+    [user-dirs.locale](./user-dirs.locale) are XDG configuration files for
+    special user directories.  See `xdg-user-dir(1)` and
+    `xdg-user-dirs-update(1)` for more information.
+
+*   [`Xresources`](./Xresources) – `~/.Xresources` configuration file.
 
 TODO:
 
