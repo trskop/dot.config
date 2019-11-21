@@ -1,44 +1,57 @@
 User configuration files (dot–files)
 ====================================
 
-* Bash, most notablly `~/.bashrc`, see [`bash/dot.bashrc`](bash/dot.bashrc).
+*   [`bash/`](./bash/) – Configuration for Bash shell, most notablly
+    `~/.bashrc`, i.e. [`bash/dot.bashrc`](./bash/dot.bashrc).
 
-* Bat configuration, see [`bat/README.md`](bat/README.md)
+*   [`bat/`](./bat/) – Configuration for `bat` command, see
+    [`bat/README.md`](./bat/README.md) for more information.
 
-* CommandWrapper configuration:
-    * Default CommandWrapper configuration and configuration of stock
-      subcommands: [`command-wrapper/README.md`](command-wrapper/README.md)
-    * Toolset specialised for work environment:
-      [`habit/README.md`](habit/README.md)
-    * Toolset optimised for personal use: [`yx/README.md`](yx/README.md)
+*   [`bazel/`](./bazel) – Bazel build system user-specific configuration.
+    See [`baze/README.md`](./bazel/README.md)
 
-* GHCi configuration, see [`ghc/README.md`](ghc/README.md) for more information.
+*   [`command-wrapper/`](./command-wrapper/) – Global Command Wrapper
+    configuration.  See [`command-wrapper/README.md`
+    ](./command-wrapper/README.md) for more information.
 
-* Git configuration, see [`git/README.md`](git/README.md) for more information.
+*   [`ghc/`](./ghc/) – GHCi configuration, see
+    [`ghc/README.md`](./ghc/README.md) for more information.
 
-* Haskeline configuration, see [`haskeline/README.md`](haskeline/README.md) for
-  more information.
+*   [`git/`](./git/) – Git configuration, see
+    [`git/README.md`](./git/README.md) for more information.
 
-* Haskell Stack, see [`stack/README.md`](stack/README.md).
+*   [`habit/`](./habit/) – Configuration of Command Wrapper toolset optimised
+    for work environment.  See [`habit/README.md`](./habit/README.md) for more
+    details.
 
-* Kitty terminal emulator configuration, see [`kitty/README.md`
-  ](kitty/README.md).
+*   [`haskeline/`](./haskeline/) – Haskeline configuration, see
+    [`haskeline/README.md`](./haskeline/README.md) for more information.
 
-* Neovim configuration, see [`nvim/README.md`](nvim/README.md) for more
-  information.
+*   [`kitty/`](./kitty/) – Kitty terminal emulator configuration, see
+    [`kitty/README.md`](./kitty/README.md).
 
-* PostgreSQL interactive terminal (`psql`) configuration, see [`psql/README.md`
-  ](psql/README.md) for more information.
+*   [`nvim/`](./nvim/) – Neovim configuration, see
+    [`nvim/README.md`](./nvim/README.md) for more information.
 
-* Readline configuration, see [`readline/README.md`](readline/README.md) for more
-  information.
+*   [`psql/`](./psql/) – PostgreSQL interactive terminal (`psql`) configuration,
+    see [`psql/README.md`](./psql/README.md) for more information.
 
-* Ripgrep configuration, see [`ripgrep/README.md`](ripgrep/README.md).
+*   [`readline/`](./readline/) – Readline configuration, see
+    [`readline/README.md`](./readline/README.md) for more information.
 
-* Tmux configuration, see [`tmux/README.md`](tmux/README.md) for more
-  information.
+*   [`ripgrep/`](./ripgrep/) – Ripgrep configuration, see
+    [`ripgrep/README.md`](./ripgrep/README.md).
 
-* `~/.Xresources`, see [`Xresources`](Xresources) for details.
+*   [`stack/`](./stack/) – Haskell Stack, see
+    [`stack/README.md`](./stack/README.md).
+
+*   [`tmux/`](./tmux/) – Tmux configuration, see
+    [`tmux/README.md`](./tmux/README.md) for more information.
+
+*   [`Xresources`](./Xresources) – `~/.Xresources` configuration file.
+
+*   [`yx/`](./yx/) – Configuration of Command Wrapper toolset optimised for
+    personal use.  See [`yx/README.md`](./yx/README.md) for more details.
 
 TODO:
 
@@ -73,7 +86,7 @@ instead of SSH, since SSH key for accessing GitHub may not be present on a
 pristine system.  Just reconfigure remote URL afterwards.
 
 ```Bash
-git clone https://github.com/trskop/dot.config.git
+git clone https://github.com/trskop/dot.config.git ~/.config
 ```
 
 Now we need to install everything:
@@ -81,7 +94,7 @@ Now we need to install everything:
 ```Bash
 ~/.config/dot.config.init.hs
 ~/.config/yx/toolset/install
-yx this -Uusi
+yx this -Uusin
 ```
 
 
