@@ -145,6 +145,7 @@ in
   -- {{{ Desktop --------------------------------------------------------------
 
   , "dia" -- An editor for diagrams, graphs, charts etc.
+  , "mplayer"
   ]
   # merge osSpecificPackages os
   -- }}} Desktop --------------------------------------------------------------

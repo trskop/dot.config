@@ -20,4 +20,6 @@
 
 , "neovim-remote" -- Control Neovim process from shell.
                   -- <https://github.com/mhinz/neovim-remote>
+
+, "youtube-dl"
 ]
