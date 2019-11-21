@@ -301,11 +301,13 @@ install Directories{..} opts = shakeArgs opts $ do
         -- We need to make sure that correct version of dhall command is used.
         -- Stack may give access to a different version based on resolver in
         -- this script, that is the reason for absolute path to the executable.
-        cmd_ (Stdin src)
+        cmd_
             [ commandWrapperLibDir </> "command-wrapper"
+            , "--change-directory=" <> commandWrapperDir
             , "config"
             , "--dhall-freeze"
             , "--no-remote-only"
+            , "--expression=" <> src
             , "--output=" <> out
             ]
 
@@ -356,7 +358,7 @@ install Directories{..} opts = shakeArgs opts $ do
         need
             [ commandWrapperLibDir </> "command-wrapper"
             ]
-        cmd_ (Stdin src)
+        cmd_
             [ commandWrapperLibDir </> "command-wrapper"
             , "--change-directory=" <> takeDirectory src
             , "config"
@@ -427,11 +429,14 @@ yxRules YxRulesParams{..} = do
         -- We need to make sure that correct version of dhall command is used.
         -- Stack may give access to a different version based on resolver in
         -- this script, that is the reason for absolute path to the executable.
-        cmd_ (Stdin src) (FileStdout out)
+        cmd_
             [ commandWrapperLibDir </> "command-wrapper"
+            , "--change-directory=" <> configDir
             , "config"
             , "--dhall-freeze"
             , "--no-remote-only"
+            , "--expression=" <> src
+            , "--output=" <> out
             ]
 
     (libDir </> "yx-jmp") %> \out ->
