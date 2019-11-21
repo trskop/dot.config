@@ -44,7 +44,7 @@ User configuration files (dot–files)
 
 *   [`sensible-editor/`](./sensible-editor/) – Configuration files for
     `sensible-editor`, a Debian-specific tool.  See `sensible-editor(1)` and
-    [`sensible-editor/README.md`](./sensible-editor/README.md` for more
+    [`sensible-editor/README.md`](./sensible-editor/README.md) for more
     information.
 
 *   [`stack/`](./stack/) – Haskell Stack, see
