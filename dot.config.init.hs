@@ -205,6 +205,8 @@ install Directories{..} opts = shakeArgs opts $ do
         -- Dein is a Vim/Neovim plugin manager.
         , deinInstallDir </> "installed.lock"
 
+        , home </> ".bazelrc"
+
         , nixTarget
         ]
 
@@ -348,6 +350,25 @@ install Directories{..} opts = shakeArgs opts $ do
         writeFile' out ""
 
     nixRules nixParams
+
+    (srcDir </> "bazel" </> "bazelrc") %> \out -> do
+        let src = srcDir </> "bazel" </> "bazelrc.dhall"
+        need
+            [ commandWrapperLibDir </> "command-wrapper"
+            ]
+        cmd_ (Stdin src)
+            [ commandWrapperLibDir </> "command-wrapper"
+            , "--change-directory=" <> takeDirectory src
+            , "config"
+            , "--dhall-text"
+            , "--input=" <> src
+            , "--output=" <> out
+            ]
+
+    (home </> ".bazelrc") %> \out -> do
+        let src = srcDir </> "bazel" </> "bazelrc"
+        need [src]
+        symlink (src `dropPrefixDir` home) out
 
 data StackRulesParams = StackRulesParams
     { home :: FilePath

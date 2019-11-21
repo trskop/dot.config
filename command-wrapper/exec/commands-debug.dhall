@@ -33,11 +33,11 @@ in  [ CommandWrapper.ExecNamedCommand::{
                   [ "VERBOSITY=${verbosityToText verbosity}"
                   , "COLOUR_OUTPUT=${CommandWrapper.ColourOutput.toText
                                        colourOutput}"
-                  , "COMMAND_WRAPPER_NAME=${env:COMMAND_WRAPPER_NAME as Text}"
-                  , "COMMAND_WRAPPER_EXE=${env:COMMAND_WRAPPER_EXE as Text}"
-                  , "COMMAND_WRAPPER_VERSION=${env:COMMAND_WRAPPER_VERSION as Text}"
-                  , "COMMAND_WRAPPER_SUBCOMMAND=${env:COMMAND_WRAPPER_SUBCOMMAND as Text}"
-                  , "COMMAND_WRAPPER_CONFIG=${env:COMMAND_WRAPPER_CONFIG as Text}"
+--                , "COMMAND_WRAPPER_NAME=${env:COMMAND_WRAPPER_NAME as Text}"
+--                , "COMMAND_WRAPPER_EXE=${env:COMMAND_WRAPPER_EXE as Text}"
+--                , "COMMAND_WRAPPER_VERSION=${env:COMMAND_WRAPPER_VERSION as Text}"
+--                , "COMMAND_WRAPPER_SUBCOMMAND=${env:COMMAND_WRAPPER_SUBCOMMAND as Text}"
+--                , "COMMAND_WRAPPER_CONFIG=${env:COMMAND_WRAPPER_CONFIG as Text}"
                   ]
                 # arguments
             }

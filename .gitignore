@@ -32,6 +32,12 @@
 !/ghc/ghci.conf
 !/ghc/README.md
 
+# Contains generated `bazelrc` file and local Bazel configuration that is
+# machine specific.
+!/bazel/
+/bazel/bazelrc
+/bazel/local.bazelrc
+
 # {{{ Command Wrapper #########################################################
 
 !/command-wrapper/
