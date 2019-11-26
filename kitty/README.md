@@ -11,6 +11,11 @@ Configuration:
     certain machine (not committed into repository).  It has to be included by
     `kitty.conf` for it to apply.  Kitty ignores non-existing imports,
     therefore, it is safe not to provide this file.
+*   `~/.local/src/localhost/dot.config/kitty/kitty-local.conf` custom settings
+    specific to a certain machine, but version controlled in a different
+    repository.  It has to be included by `kitty.conf` for it to apply.  Kitty
+    ignores non-existing imports, therefore, it is safe not to provide this
+    file.
 
 Documentation:
 
