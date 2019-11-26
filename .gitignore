@@ -46,6 +46,7 @@
 # Some top-level Dhall configs are generated:
 /command-wrapper/default.dhall
 /habit/*.dhall
+!/habit/command-wrapper-*.dhall
 /yx/default.dhall
 /yx/yx-env.dhall
 /yx/toolset/.shake
@@ -58,7 +59,8 @@
 /command-wrapper/exec/commands-local.dhall
 /command-wrapper/skel/*-skel.dhall
 !/command-wrapper/skel/default-*-skel.dhall
-!/habit/command-wrapper-*.dhall
+/habit/cd/directories-local.dhall
+/habit/cd/directories.dhall
 /habit/default/aliases.dhall
 /habit/default/help-msg.txt
 /habit/exec/commands.dhall
@@ -66,11 +68,18 @@
 /habit/pgpass.conf
 /habit/pgpass.d/*
 !/habit/pgpass.d/.gitkeep
+/habit/skel/*-skel.dhall
+!/habit/skel/default-*-skel.dhall
 /habit/toolset
-/yx/default/aliases.dhall
+/yx/cd/directories-local.dhall
+/yx/cd/directories.dhall
 /yx/default/aliases-local.dhall
+/yx/default/aliases.dhall
+/yx/exec/commands-local.dhall
+/yx/exec/commands.dhall
 /yx/new/templates.dhall
 /yx/path/path-local.dhall
+/yx/skel/*-skel.dhall
 /yx/this/backup-local.dhall
 /yx/this/bootstrap-packages-local.dhall
 /yx/this/nix-packages-local.dhall
