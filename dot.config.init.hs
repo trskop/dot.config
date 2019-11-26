@@ -356,7 +356,8 @@ install Directories{..} opts = shakeArgs opts $ do
     (srcDir </> "bazel" </> "bazelrc") %> \out -> do
         let src = srcDir </> "bazel" </> "bazelrc.dhall"
         need
-            [ commandWrapperLibDir </> "command-wrapper"
+            [ src
+            , commandWrapperLibDir </> "command-wrapper"
             ]
         cmd_
             [ commandWrapperLibDir </> "command-wrapper"
