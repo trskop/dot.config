@@ -12,11 +12,17 @@ variables.
 
 List of relevant files:
 
-*   [bazelrc.dhall](./bazelrc.dhall) – Template of `~/.bazelrc` file.
-*   `local.bazelrc` – File that is imported by
-    [bazelrc.dhall](./bazelrc.dhall), but not part of this repository.  It is
+*   [`bazelrc.dhall`](./bazelrc.dhall) – Template of `~/.bazelrc` file.
+
+*   `local.bazelrc` – File that is imported by generated
+    [`bazelrc`](./bazelrc.dhall), but not part of this repository.  It is
     assumed to be machine specific.  Common content of this file is:
 
     ```
+    build --remote_http_cache=
     build --disk_cache=/path/to/build/cache
     ```
+
+*   `~/.local/src/localhost/this/dot.config/bazel/local.bazelrc` – File that is
+    imported by generated [`bazelrc`](./bazelrc.dhall), but is versioned
+    separately.
