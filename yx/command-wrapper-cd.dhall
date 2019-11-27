@@ -10,7 +10,7 @@ in    global
           # (./cd/directories-common.dhall ? emptyDirectories)
           # (./cd/directories-local.dhall ? emptyDirectories)
           # (./cd/directories.dhall ? emptyDirectories)
-          # (   ~/.local/src/localhost/this/dot.config/yx/cd/directories-local.dhall
+          # (   ~/.local/src/localhost/dot.config/yx/cd/directories-local.dhall
               ? emptyDirectories
             )
       }

@@ -23,6 +23,6 @@ List of relevant files:
     build --disk_cache=/path/to/build/cache
     ```
 
-*   `~/.local/src/localhost/this/dot.config/bazel/local.bazelrc` – File that is
+*   `~/.local/src/localhost/dot.config/bazel/local.bazelrc` – File that is
     imported by generated [`bazelrc`](./bazelrc.dhall), but is versioned
     separately.

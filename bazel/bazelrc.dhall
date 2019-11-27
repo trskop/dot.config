@@ -7,7 +7,7 @@ let home = env:HOME as Text
 
 let config = env:XDG_CONFIG_HOME as Text ? "${home}/.config"
 
-let hostSpecificConfig = "${home}/.local/src/localhost/this/dot.config"
+let hostSpecificConfig = "${home}/.local/src/localhost/dot.config"
 
 in  ''
     # Machine-specific, i.e. local, configuration.  It contains options that

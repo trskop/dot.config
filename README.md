@@ -108,6 +108,34 @@ yx this -Uusin
 ```
 
 
+Version-controlled Host-specific Configuration
+----------------------------------------------
+
+Host-specific configuration is stored in `~/.local/src/localhost` repository
+with following directory structure:
+
+```
+~/.local/src/localhost
+├── ${host}/
+│   └── dot.config
+│       └── ...
+│
+├── dot.config -> ${host}/dot.config
+└── this -> ${host}
+```
+
+Where `${host}` is the result of `hostname --fqdn`.  This allows us to
+reuse/share the repository for multiple machines.
+
+Script [`init-host-specific-config-repo.sh`
+](./init-host-specific-config-repo.sh) is provided to create the repository
+with the above structure.  It can be invoked as:
+
+```Bash
+~/.config/init-host-specific-config-repo.sh
+```
+
+
 Other Resources
 ---------------
 

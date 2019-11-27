@@ -10,7 +10,7 @@ in    global
           # ./exec/commands-common.dhall
           # (./exec/commands.dhall ? empty)
           # (./exec/commands-local.dhall ? empty)
-          # (   ~/.local/src/localhost/this/dot.config/yx/exec/commands-local.dhall
+          # (   ~/.local/src/localhost/dot.config/yx/exec/commands-local.dhall
               ? emptyDirectories
             )
       }
