@@ -127,8 +127,8 @@ with following directory structure:
 Where `${host}` is the result of `hostname --fqdn`.  This allows us to
 reuse/share the repository for multiple machines.
 
-Script [`init-host-specific-config-repo.sh`
-](./init-host-specific-config-repo.sh) is provided to create the repository
+Script [`init-host-specific-config-repo.bash`
+](./init-host-specific-config-repo.bash) is provided to create the repository
 with the above structure.  It can be invoked as:
 
 ```Bash
