@@ -115,11 +115,15 @@ Host-specific configuration is stored in `~/.local/src/localhost` repository
 with following directory structure:
 
 ```
-~/.local/src/localhost
+~/.local/src/localhost/
 ├── ${host}/
-│   ├── dot.config/
+│   ├── dot.config/   <── Private configuration that would normally go to
+│   │   │                 ${XDG_CONFIG_HOME:-${HOME}/.config}
 │   │   └── ...
-│   └── notes/
+│   │
+│   └── notes/        <── Notes about the hardware, installation specifics, etc.
+│       │                 Basically anything that is easily forgotten once the
+│       │                 system is installed and configured.
 │       └── ...
 │
 ├── dot.config -> ${host}/dot.config
@@ -127,7 +131,9 @@ with following directory structure:
 ```
 
 Where `${host}` is the result of `hostname --fqdn`.  This allows us to
-reuse/share the repository for multiple machines.
+reuse/share the repository for multiple machines.  One such example is when one
+machine dies, and new one has to be installed.  Copying over existing
+repository can serve as a nice starting point.
 
 Script [`init-host-specific-config-repo.bash`
 ](./init-host-specific-config-repo.bash) is provided to create the repository
