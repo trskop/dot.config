@@ -57,8 +57,7 @@
 /command-wrapper/cd/directories-local.dhall
 /command-wrapper/exec/commands.dhall
 /command-wrapper/exec/commands-local.dhall
-/command-wrapper/skel/*-skel.dhall
-!/command-wrapper/skel/default-*-skel.dhall
+/command-wrapper/skel/*-template.dhall
 /habit/cd/directories-local.dhall
 /habit/cd/directories.dhall
 /habit/default/aliases.dhall
@@ -68,8 +67,7 @@
 /habit/pgpass.conf
 /habit/pgpass.d/*
 !/habit/pgpass.d/.gitkeep
-/habit/skel/*-skel.dhall
-!/habit/skel/default-*-skel.dhall
+/habit/skel/*-template.dhall
 /habit/toolset
 /yx/cd/directories-local.dhall
 /yx/cd/directories.dhall
@@ -79,7 +77,7 @@
 /yx/exec/commands.dhall
 /yx/new/templates.dhall
 /yx/path/path-local.dhall
-/yx/skel/*-skel.dhall
+/yx/skel/*-template.dhall
 /yx/this/backup-local.dhall
 /yx/this/bootstrap-packages-local.dhall
 /yx/this/nix-packages-local.dhall

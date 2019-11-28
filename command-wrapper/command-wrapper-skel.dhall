@@ -18,21 +18,21 @@ in    λ(toolset : Text)
                       "${config}/${toolset}/toolset/app-${command}/Main.hs"
                   , executable = False
                   , template =
-                        ./haskell-skel.dhall
+                        ./skel/haskell-template.dhall
                       ? CommandWrapper.SkelConfig.template.haskell
                   }
               , Bash =
                   { targetFile = "${lib}/${toolset}/${command}"
                   , executable = True
                   , template =
-                        ./bash-skel.dhall
+                        ./skel/bash-template.dhall
                       ? CommandWrapper.SkelConfig.template.bash
                   }
               , Dhall =
                   { targetFile = "${config}/${toolset}/${command}.dhall"
                   , executable = False
                   , template =
-                        ./dhall-skel.dhall
+                        ./skel/dhall-template.dhall
                       ? CommandWrapper.SkelConfig.template.dhall
                   }
               }
