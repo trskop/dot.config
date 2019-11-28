@@ -117,7 +117,9 @@ with following directory structure:
 ```
 ~/.local/src/localhost
 ├── ${host}/
-│   └── dot.config
+│   ├── dot.config/
+│   │   └── ...
+│   └── notes/
 │       └── ...
 │
 ├── dot.config -> ${host}/dot.config
