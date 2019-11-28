@@ -1,13 +1,19 @@
 let CommandWrapper = ../../command-wrapper/library.dhall
 
-let habitDefaults =
-      { aliases = [] : List CommandWrapper.SubcommandAlias.Type
-      , helpMessage = ""
-      }
+let emptyAliases = [] : List CommandWrapper.SubcommandAlias.Type
 
 let execAliases = ./exec-aliases.dhall
 
-let habit = ./aliases.dhall ? habitDefaults
+let userAliases = ./aliases.dhall ? emptyAliases
+
+let hostAliases =
+        ~/.local/src/localhost/dot.config/habit/default/aliases.dhall
+      ? emptyAliases
+
+let userHelpMessage : Text = ./help-msg.txt as Text ? ""
+
+let hostHelpMessage : Text =
+      ~/.local/src/localhost/dot.config/habit/default/help-msg.txt as Text ? ""
 
 let defaults =
       (../config.dhall).add-monorepo-settings
@@ -22,7 +28,7 @@ let defaults =
         }
 
 in    CommandWrapper.ToolsetConfig.addSubcommandAliases
-        (habit.aliases # execAliases)
-        habit.helpMessage
+        (userAliases # hostAliases # execAliases)
+        (userHelpMessage ++ hostHelpMessage)
         defaults
     : CommandWrapper.ToolsetConfig.Type
