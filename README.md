@@ -132,7 +132,7 @@ Script [`init-host-specific-config-repo.sh`
 with the above structure.  It can be invoked as:
 
 ```Bash
-~/.config/init-host-specific-config-repo.sh
+bash ~/.config/init-host-specific-config-repo.bash
 ```
 
 

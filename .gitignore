@@ -20,6 +20,7 @@
 !README.md
 !Xresources
 !dot.config.init.hs
+!init-host-specific-config-repo.bash
 !user-dirs.dirs
 !user-dirs.locale
 
