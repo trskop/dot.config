@@ -7,7 +7,8 @@
 	co = checkout
 	egrep = grep -E -n
 	amend = commit --amend
-	push-force = push --force-with-lease
+	push-force = push --force-with-lease --prune
+	push = push --prune
 [grep]
 	lineNumber = true
 [commit]
@@ -21,9 +22,11 @@
 [merge]
 	ff = only
 	tool = vimdiff
-	# Include original text in the conflictin file.
-	conflictstyle = diff3
+	conflictstyle = merge # diff3 was terrible
 [mergetool]
 	prompt = true
 [mergetool "vimdiff"]
 	cmd = nvim -d -O ${LOCAL} ${REMOTE} ${MERGED}
+[fetch]
+	prune = true
+	pruneTags = true
