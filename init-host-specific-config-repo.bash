@@ -40,8 +40,72 @@
 
 set -euo pipefail
 
+# Default location of host-specific configuration repository.
+declare -r repo="${HOME}/.local/src/localhost"
+
+# Usage:
+#
+#   printHelp
+function printHelp() {
+    local -r commandName="${0##*/}"
+
+    cat <<EOF
+Initialise host-specific configuration repository.
+
+Usage:
+
+  ${commandName} [--help|-h]
+
+Options:
+
+  --help, -h
+      Print short help message and exit.
+
+Repository location:
+
+  ${repo}
+
+This script is idempontent and it is safe to rerun it even if host-specific
+configuration repository was already  initialised.
+EOF
+}
+
+# Usage:
+#
+#   warning FORMAT [ARGUMENT [...]]
+function warning() {
+    local -r format="$1"; shift
+
+    # shellcheck disable=SC2059
+    printf "Warning: ${format}\n" "$@" 1>&2
+}
+
+# Usage:
+#
+#   error FORMAT [ARGUMENT [...]]
+function error() {
+    local -r format="$1"; shift
+
+    # shellcheck disable=SC2059
+    printf "Error: ${format}\n" "$@" 1>&2
+}
+
+# Usage:
+#
+#   die EXIT_CODE FORMAT [ARGUMENT [...]]
+function die() {
+    local -r -i exitCode="$1"; shift
+    local -r format="$1"; shift
+
+    error "${format}" "$@"
+    exit "${exitCode}"
+}
+
+# Usage:
+#
+#   mkGitignore FILE
 function mkGitignore() {
-    local output="$1"; shift
+    local -r output="$1"; shift
 
     cat > "${output}" <<'EOF'
 /dot.config
@@ -49,12 +113,70 @@ function mkGitignore() {
 EOF
 }
 
+# Usage:
+#
+#   mkReadme HOSTNAME FILE
+function mkReadme() {
+    local -r host="$1"; shift
+    local -r output="$1"; shift
+
+    cat > "${output}" <<EOF
+# Private Host-specific Configuration
+
+Version-controlled configuration files and documentation specific to current
+host (machine).  Generic and publicly available configuration is in
+\`~/.config\`, while private and host-specific stuff is kept here.
+
+
+## ${host}
+
+*   [\`${host}\`](./${host}/dot.config) -- Configuration files referenced from
+    \`~/.config\`.  Don't use this directory directly when referencing
+    configuration files.  Instead use \`./dot.config\` symbolic link.  That way
+    configuration in \`~/.config\` will work on all machines that have
+    repository such as this one.
+
+*   [\`${host}\`](./${host}/notes) -- Hardware information, installation notes,
+    etc.
+EOF
+}
+
+# Usage:
+#
+#   main [--help|-h]
 function main() {
-    local prefix="${HOME}/.local/src/localhost"
+    local prefix="${repo}"
+
+    local arg
+    while (( $# )); do
+        arg="$1"; shift
+        case "${arg}" in
+            --help|-h)
+                printHelp
+                exit 0
+                ;;
+
+            -*)
+                die 1 "'%s': Unknown option." "${arg}"
+                ;;
+
+            *)
+                die 1 "'%s': Too many arguments." "${arg}"
+                ;;
+        esac
+    done
+
     local host=''
+    host="$(hostname --fqdn || true)"
+    if [[ -z "${host}" ]]; then
+        die 2 "Unable to detect hostname of this machine."
+        exit 1
+    fi
 
     if [[ -e "${prefix}/.git" ]]; then
-        echo "Warning: '${prefix}': Git repository already initialised; not reinitialising."
+        warning \
+            "'%s': Git repository already initialised; not reinitialising." \
+            "${prefix}"
     else
         if [[ -e "${prefix}" ]]; then
             git -C "${prefix}" init
@@ -66,30 +188,37 @@ function main() {
         git -C "${prefix}" -m 'Initial commit' --allow-empty
     fi
 
-    host="$(hostname --fqdn)"
-    if [[ -n "${host}" ]]; then
-        if [[ ! -e "${prefix}/${host}" || ! -d "${prefix}/${host}" ]]; then
-            echo "Warning: '${host}': Directory doesn't exist or is not a directory."
-            mkdir -p "${prefix}/${host}/dot.config" "${prefix}/${host}/notes"
-        fi
-        if [[ -e 'this' ]]; then
-            echo "Warning: 'this': File already exists, skipping symlink creation."
+    local -a directories=(
+        "${prefix}/${host}"
+        "${prefix}/${host}/dot.config"
+        "${prefix}/${host}/notes"
+    )
+    for dir in "${directories[@]}"; do
+        if [[ -d "${dir}" ]]; then
+            warning \
+                "'%s': Directory already exists, skipping its creation." \
+                "${dir}"
         else
-        (
-            set -euo pipefail
-
-            cd "${prefix}"
-            ln -s "${host}" this
-        )
+            mkdir -p "${dir}"
         fi
+    done
+
+    if [[ -e "${prefix}/this" ]]; then
+        warning "'%s': File already exists, skipping symlink creation." \
+            "${prefix}/this"
     else
-        echo "Error: Unable to detect hostname of this machine."
-        exit 1
+    (
+        set -euo pipefail
+
+        cd "${prefix}"
+        ln -s "${host}" this
+    )
     fi
 
     local dotConfig="${prefix}/dot.config"
     if [[ -e "${dotConfig}" ]]; then
-        echo "Warning: '${dotConfig}': File already exists, skipping symlink creation."
+        warning "'%s': File already exists, skipping symlink creation." \
+            "${dotConfig}"
     else
     (
         set -euo pipefail
@@ -101,10 +230,20 @@ function main() {
 
     local -r gitignore="${prefix}/.gitignore"
     if [[ -e "${gitignore}" ]]; then
-        echo "Warning: '${gitignore}': File already exists, skipping its creation."
+        warning "'%s': File already exists, skipping its creation." \
+            "${gitignore}"
     else
         mkGitignore "${gitignore}"
         git -C "${prefix}" add "${gitignore}"
+    fi
+
+    local -r readme="${prefix}/README.md"
+    if [[ -e "${readme}" ]]; then
+        warning "'%s': File already exists, skipping its creation." \
+            "${readme}"
+    else
+        mkReadme "${readme}"
+        git -C "${readme}" add "${readme}"
     fi
 }
 

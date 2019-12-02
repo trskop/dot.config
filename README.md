@@ -126,8 +126,8 @@ with following directory structure:
 │       │                 system is installed and configured.
 │       └── ...
 │
-├── dot.config -> ${host}/dot.config
-└── this -> ${host}
+├── this -> ${host}
+└── dot.config -> this/dot.config
 ```
 
 Where `${host}` is the result of `hostname --fqdn`.  This allows us to
