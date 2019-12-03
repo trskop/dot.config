@@ -32,6 +32,10 @@ let helpMessage =
         this
       ''
 
+let home = env:HOME as Text
+
+let xdgDataHome = env:XDG_DATA_HOME as Text ? "${home}/.local/share"
+
 let yx =
       join
         ( join
@@ -47,7 +51,7 @@ in    CommandWrapper.ToolsetConfig.addSubcommandAliases
         , description =
             Some "Y repeate X; set of personalised command line tools."
         , searchPath =
-            CommandWrapper.ToolsetConfig.defaultSearchPath env:HOME as Text "yx"
-        , manPath = [ "${env:HOME as Text}/.local/man" ]
+            CommandWrapper.ToolsetConfig.defaultSearchPath home "yx"
+        , manPath = [ "${xdgDataHome}/man" ]
         }
     : CommandWrapper.ToolsetConfig.Type
