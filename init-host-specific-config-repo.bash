@@ -108,6 +108,9 @@ function mkGitignore() {
     local -r output="$1"; shift
 
     cat > "${output}" <<'EOF'
+# These are symbolic links to directories containing configuration for the
+# current machine.  It allows us to have generic stuff in ~/.config directory,
+# whithout encoding hostname in the path.
 /dot.config
 /this
 EOF
@@ -130,14 +133,14 @@ host (machine).  Generic and publicly available configuration is in
 
 ## ${host}
 
-*   [\`${host}\`](./${host}/dot.config) -- Configuration files referenced from
-    \`~/.config\`.  Don't use this directory directly when referencing
-    configuration files.  Instead use \`./dot.config\` symbolic link.  That way
-    configuration in \`~/.config\` will work on all machines that have
-    repository such as this one.
+*   [\`${host}/dot.config\`](./${host}/dot.config) -- Configuration files
+    referenced from \`~/.config\`.  Don't use this directory directly when
+    referencing configuration files.  Instead use \`./dot.config\` symbolic
+    link.  That way configuration in \`~/.config\` will work on all machines
+    that have repository such as this one.
 
-*   [\`${host}\`](./${host}/notes) -- Hardware information, installation notes,
-    etc.
+*   [\`${host}/notes\`](./${host}/notes) -- Hardware information, installation
+    notes, etc.
 EOF
 }
 
@@ -146,6 +149,11 @@ EOF
 #   main [--help|-h]
 function main() {
     local prefix="${repo}"
+
+    # For safety reasons we are assuming that the Git repository was already
+    # initialsed before this script was executed.  If that is not the case we
+    # set value of this variable to 0.
+    local repositoryAlreadyInitialised=1
 
     local arg
     while (( $# )); do
@@ -178,6 +186,8 @@ function main() {
             "'%s': Git repository already initialised; not reinitialising." \
             "${prefix}"
     else
+        repositoryAlreadyInitialised=0
+
         if [[ -e "${prefix}" ]]; then
             git -C "${prefix}" init
         else
@@ -188,7 +198,7 @@ function main() {
         git -C "${prefix}" -m 'Initial commit' --allow-empty
     fi
 
-    local -a directories=(
+    local -r -a directories=(
         "${prefix}/${host}"
         "${prefix}/${host}/dot.config"
         "${prefix}/${host}/notes"
@@ -242,8 +252,36 @@ function main() {
         warning "'%s': File already exists, skipping its creation." \
             "${readme}"
     else
-        mkReadme "${readme}"
-        git -C "${readme}" add "${readme}"
+        mkReadme "${host}" "${readme}"
+        git -C "${prefix}" add "${readme}"
+    fi
+
+    # We want to keep track of directories created by this script.  Git doesn't
+    # do that for us.  Workaround is to create a file inside empty directories
+    # that can be version controlled.
+    #
+    # This step is at the end to prevent creation of these tracking files if
+    # they are not necessary, i.e. we created a file that will be tracked.
+    local -i count=0
+    for dir in "${directories[@]}"; do
+        count=$(
+            set -euo pipefail
+
+            { find "${dir}" | wc -l; } || echo 0
+        )
+        if (( count == 0 )); then
+            touch "${dir}/.gitkeep"
+            git -C "${prefix}" add "${dir}/.gitkeep"
+        fi
+    done
+
+    if (( ! repositoryAlreadyInitialised )); then
+        git -C "${prefix}" -m 'Repository structure'
+    else
+        warning "'%s': %s: %s" \
+            "${prefix}" \
+            'No Git commit made' \
+            'If there were any changes they have to be commited manually.'
     fi
 }
 
