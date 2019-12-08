@@ -39,6 +39,9 @@
 /bazel/bazelrc
 /bazel/local.bazelrc
 
+# Machine-specific, i.e. local, Git configuration.
+/git/local.gitconfig
+
 # {{{ Command Wrapper #########################################################
 
 !/command-wrapper/
@@ -91,7 +94,11 @@
 # section is to prevent accidental inclusion of such data, however, there is no
 # reason for these files/directories to actually exist.  Especially not on all
 # systems.
+/GIMP/
 /QtProject.conf
+/Thunar/
+/Trolltech.conf
+/autostart/
 /autostart/
 /chromium/
 /dconf/
@@ -99,7 +106,12 @@
 /google-chrome/
 /gtk-2.0/
 /gtk-3.0/
+/menus/
+/pavucontrol.ini
 /pulse/
+/xarchiver/
+/xfce-4-session/
+/xfce-4/
 
 # This contains generated files.  Installation of FZF is handled by
 # ./dot.config.init.hs script.

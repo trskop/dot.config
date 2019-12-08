@@ -8,7 +8,7 @@
 	egrep = grep -E -n
 	amend = commit --amend
 	push-force = push --force-with-lease --prune
-	push = push --prune
+	push-prune = push --prune
 [grep]
 	lineNumber = true
 [commit]
@@ -30,3 +30,5 @@
 [fetch]
 	prune = true
 	pruneTags = true
+[include]
+	path = local.gitconfig
