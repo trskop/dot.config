@@ -32,10 +32,10 @@ import Data.Either.Validation (validationToEither)
 import Data.Text (Text)
 import qualified Data.Text.IO as Text (readFile)
 import qualified Dhall
-    ( FromDhall
-    , InputType(embed)
+    ( Decoder(expected, extract)
+    , Encoder(embed)
+    , FromDhall
     , ToDhall
-    , Type(expected, extract)
     , auto
     , inject
     )

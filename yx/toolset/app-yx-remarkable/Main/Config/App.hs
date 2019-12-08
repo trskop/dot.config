@@ -36,9 +36,9 @@ import qualified Data.HostAndPort as HostAndPort (interpretDhall)
 import Data.ByteString (ByteString)
 import Data.Text (Text)
 import qualified Dhall
-    ( FromDhall(autoWith)
+    ( Decoder
+    , FromDhall(autoWith)
     , InterpretOptions(InterpretOptions, fieldModifier)
-    , Type
     , auto
     , inputFile
     , maybe
@@ -53,7 +53,7 @@ newtype ConnectToRemarkableViaSsh
   deriving stock (Generic, Show)
 
 instance Dhall.FromDhall ConnectToRemarkableViaSsh where
-    autoWith :: Dhall.InterpretOptions -> Dhall.Type ConnectToRemarkableViaSsh
+    autoWith :: Dhall.InterpretOptions -> Dhall.Decoder ConnectToRemarkableViaSsh
     autoWith opts = ConnectToRemarkableViaSsh
         <$> interpretHostAndPort (Proxy @"remarkable-ssh") opts
                 interpretStrictByteString (Dhall.maybe interpretWord)
@@ -66,7 +66,7 @@ newtype ConnectToRemarkableViaWebUi
 instance Dhall.FromDhall ConnectToRemarkableViaWebUi where
     autoWith
         :: Dhall.InterpretOptions
-        -> Dhall.Type ConnectToRemarkableViaWebUi
+        -> Dhall.Decoder ConnectToRemarkableViaWebUi
     autoWith opts = ConnectToRemarkableViaWebUi
         <$> interpretHostAndPort (Proxy @"remarkable-web-ui") opts
                 interpretStrictByteString (Dhall.maybe interpretWord)
@@ -75,9 +75,9 @@ interpretHostAndPort
     :: forall (tag :: k) host port
     .  Proxy tag
     -> Dhall.InterpretOptions
-    -> Dhall.Type host
-    -> Dhall.Type port
-    -> Dhall.Type (ConnectTo tag host port)
+    -> Dhall.Decoder host
+    -> Dhall.Decoder port
+    -> Dhall.Decoder (ConnectTo tag host port)
 interpretHostAndPort Proxy Dhall.InterpretOptions{fieldModifier} =
     HostAndPort.interpretDhall \case
         HostField -> fieldModifier "host"

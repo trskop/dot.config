@@ -142,13 +142,13 @@ printPlain paths expression possiblyConfigExpression =
 --  dieWithUnexpectedType t =
 --      die ("Error: Expected " <> t <> " as result.")
 
-    Dhall.Type{extract = extractText} = Dhall.auto @Text
-    Dhall.Type{extract = extractMaybeText} = Dhall.auto @(Maybe Text)
-    Dhall.Type{extract = extractNatural} = Dhall.auto @Natural
-    Dhall.Type{extract = extractInteger} = Dhall.auto @Integer
-    Dhall.Type{extract = extractTextList} = Dhall.auto @[Text]
-    Dhall.Type{extract = extractNaturalList} = Dhall.auto @[Natural]
-    Dhall.Type{extract = extractIntegerList} = Dhall.auto @[Integer]
+    Dhall.Decoder{extract = extractText} = Dhall.auto @Text
+    Dhall.Decoder{extract = extractMaybeText} = Dhall.auto @(Maybe Text)
+    Dhall.Decoder{extract = extractNatural} = Dhall.auto @Natural
+    Dhall.Decoder{extract = extractInteger} = Dhall.auto @Integer
+    Dhall.Decoder{extract = extractTextList} = Dhall.auto @[Text]
+    Dhall.Decoder{extract = extractNaturalList} = Dhall.auto @[Natural]
+    Dhall.Decoder{extract = extractIntegerList} = Dhall.auto @[Integer]
 
     printText, printOptionalText, printNatural, printInteger
         :: Dhall.Expr Dhall.Src Void
@@ -232,7 +232,7 @@ mkExpressionAndTypeCheck possiblyResultType bodyExpression configExpression path
     expression <- mkExpression <$> Dhall.typeOf configExpression
     Dhall.typeOf expression <&> (Dhall.normalize expression, )
   where
-    Dhall.InputType{..} = Dhall.inject @Paths
+    Dhall.Encoder{..} = Dhall.inject @Paths
 
     bodyExpression' =
         maybe bodyExpression (Dhall.Annot bodyExpression) possiblyResultType

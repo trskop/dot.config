@@ -18,7 +18,7 @@ import System.IO (Handle, hPutStrLn)
 
 import Data.Text.Prettyprint.Doc (pretty)
 import Data.Text.Prettyprint.Doc.Render.Text (hPutDoc)
-import qualified Dhall (Inject, InputType(embed), inject)
+import qualified Dhall (Inject, Encoder(embed), inject)
 
 
 hPut :: Dhall.Inject a => Handle -> a -> IO ()

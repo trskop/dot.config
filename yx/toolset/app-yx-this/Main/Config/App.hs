@@ -31,8 +31,8 @@ import Data.Text (Text)
 import Data.Text.Prettyprint.Doc (pretty)
 import Data.Text.Prettyprint.Doc.Render.Text (hPutDoc)
 import qualified Dhall
-    ( FromDhall
-    , InputType(embed)
+    ( Encoder(embed)
+    , FromDhall
     , ToDhall
     , auto
     , inject

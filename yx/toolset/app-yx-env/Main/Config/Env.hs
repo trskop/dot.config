@@ -33,9 +33,9 @@ import Data.Either.Validation (validationToEither)
 import Data.Text (Text)
 import qualified Data.Text.IO as Text (readFile)
 import qualified Dhall
-    ( FromDhall
+    ( Decoder(expected, extract)
+    , FromDhall
     , ToDhall
-    , Type(expected, extract)
     , auto
     )
 import qualified Dhall.Core as Dhall
@@ -63,6 +63,7 @@ import qualified Dhall.Core as Dhall
     , ImportHashed(..)
     , ImportMode(Code)
     , ImportType(Missing)
+    , denote
     , normalize
     , throws
     )
@@ -123,7 +124,7 @@ readEnvConfig configFile = do
         else
             pure Nothing
   where
-    mkHash = fromString . show . Dhall.hashExpression
+    mkHash = fromString . show . Dhall.hashExpression . Dhall.denote
 
     throws = Dhall.throws . validationToEither
 

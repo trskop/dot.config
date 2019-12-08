@@ -262,7 +262,9 @@ env params@Params{name, subcommand} = \case
 
     RunHook shellPid config -> do
         let envFileName = mkEnvFileName params config
+        printMsg params Info ("envFileName = " <> fromString (show envFileName))
         envFile' <- Turtle.pwd >>= findEnvFile envFileName
+        printMsg params Info ("envFile' = " <> fromString (show envFile'))
 
         -- TODO: We may want to move most of this logic into 'findEnvFile'.
         envFile <- fmap join . for envFile' $ \file -> do
@@ -301,7 +303,9 @@ env params@Params{name, subcommand} = \case
         envVars <- HashMap.fromList <$> Turtle.env
         let stateFile = HashMap.lookup stateEnvVar envVars
         -- TODO: Handle parse, type, and other read state errors correctly.
+        printMsg params Info ("stateFile = " <> fromString (show stateFile))
         state <- maybe (pure emptyState) (readState . Text.unpack) stateFile
+        printMsg params Info ("state = " <> fromString (show state))
 
         possiblyParsedConfig <-
             maybe (pure Nothing) (\fp -> fmap (fp, ) <$> readEnvConfig fp)
