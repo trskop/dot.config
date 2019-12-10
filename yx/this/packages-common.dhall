@@ -25,13 +25,6 @@ let osSpecificPackages =
 
           , "mbuffer" -- Stream buffering tool that also shows the I/O rate
                       --   and summary to the user.
-
-          , "uuid-runtime" -- Useful UUID commands built using libuuid.
-
-          , "pwgen" -- Random password generator.
-
-          , "yank"  -- Reads input from stdin and allows data to be selected
-                    -- and copied to the clipboard.
           ]
 
       , BuntishLinux =
@@ -103,6 +96,13 @@ in
 
   , "graphviz"
 
+  , "uuid-runtime" -- Useful UUID commands built using libuuid.
+
+  , "pwgen" -- Random password generator.
+
+  , "yank"  -- Reads input from stdin and allows data to be selected
+            -- and copied to the clipboard.
+
   -- Using Nix fore these:
   --, "pandoc"
   --, "plantuml"  -- Compile text-based UML diagrams into other formats
@@ -154,5 +154,5 @@ in
   , "dia" -- An editor for diagrams, graphs, charts etc.
   , "mplayer"
   ]
-  # merge osSpecificPackages os
   -- }}} Desktop --------------------------------------------------------------
+  # merge osSpecificPackages os
