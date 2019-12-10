@@ -15,6 +15,10 @@ let userHelpMessage : Text = ./help-msg.txt as Text ? ""
 let hostHelpMessage : Text =
       ~/.local/src/localhost/dot.config/habit/default/help-msg.txt as Text ? ""
 
+let home = env:HOME as Text
+
+let xdgDataHome = env:XDG_DATA_HOME as Text ? "${home}/.local/share"
+
 let defaults =
       (../config.dhall).add-monorepo-settings
         (../config.dhall).options
@@ -24,7 +28,7 @@ let defaults =
             CommandWrapper.ToolsetConfig.defaultSearchPath
               env:HOME as Text
               "habit"
-        , manPath = [ "${env:HOME as Text}/.local/man" ]
+        , manPath = [ "${xdgDataHome}/man" ]
         }
 
 in    CommandWrapper.ToolsetConfig.addSubcommandAliases
