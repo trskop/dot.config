@@ -25,6 +25,8 @@ let osSpecificPackages =
 
           , "mbuffer" -- Stream buffering tool that also shows the I/O rate
                       --   and summary to the user.
+
+          , "fd-find" -- Simple, fast and user-friendly alternative to find.
           ]
 
       , BuntishLinux =
