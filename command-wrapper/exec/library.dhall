@@ -6,13 +6,20 @@
 -- running following Ex command on it:
 --
 -- ```
--- :.!habit config --dhall-hash
+-- :.!yx config --dhall-hash
 -- ```
 --
 -- Other option is to run `habit config --dhall-freeze` on the whole file.  In
 -- Vim/Neovim we can do this using:
 --
 -- ```
--- :%!habit config --dhall-freeze
+-- :%!yx config --dhall-freeze
 -- ```
-https://raw.githubusercontent.com/trskop/command-wrapper/481be4b7ec0523ca5ed8309751a2ccd08872e284/dhall/Exec/package.dhall sha256:a461417e031fd0fba099a807fd7319167cdb59537fb1633ccfee6bd2abdd290a
+--
+-- To use latest (known) version of the library we can ask Command Wrapper
+-- itself:
+-- 
+-- ```
+-- :.!yx completion --library --dhall=exec --import
+-- ```
+https://raw.githubusercontent.com/trskop/exec/9f9ec60ea77d7bec529f7689abb80cb34a47eabe/dhall/Exec/package.dhall sha256:150d37b4514e73cea35884e750fc2fc240136162d25589b4cc20cca1f77e3131

@@ -16,17 +16,21 @@ let directories
 in  CommandWrapper.CdConfig::{
     , directories = directories
     , menuTool =
-          λ(query : Optional Text)
-        → let fzf = CommandWrapper.CdConfig.menu-tool.fzf query
+        Some
+          (   λ(query : Optional Text)
+            → let fzf = CommandWrapper.CdConfig.menu-tool.fzf query
 
-          in  fzf ⫽ { arguments = [ "--height=40%" ] # fzf.arguments }
+              in  fzf ⫽ { arguments = [ "--height=40%" ] # fzf.arguments }
+          )
     , terminalEmulator =
         let terminalEmulator =
               { DebianLinux =
                     λ(directory : Text)
                   → CommandWrapper.TerminalEmulator.kitty (Some directory)
-              , BuntishLinux = CommandWrapper.CdConfig.default.terminalEmulator
+              , BuntishLinux =
+                    λ(directory : Text)
+                  → CommandWrapper.TerminalEmulator.urxvt (Some directory)
               }
 
-        in  merge terminalEmulator systemInfo.os
+        in  Some (merge terminalEmulator systemInfo.os)
     }
