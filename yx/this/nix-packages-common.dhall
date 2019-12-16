@@ -22,4 +22,7 @@
                   -- <https://github.com/mhinz/neovim-remote>
 
 , "youtube-dl"
+
+, "fd" -- Simple, fast and user-friendly alternative to find.
+       -- <https://github.com/sharkdp/fd>
 ]
