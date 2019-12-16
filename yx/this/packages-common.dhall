@@ -14,20 +14,24 @@ let osSpecificPackages =
           -- TODO: Test that these packages are available on Buntish distros:
 
           , "fzy" -- Fuzzy text selector like `fzf`, but simpler.  The
-                  --   algorithm, it uses, is slightly different, which may
-                  --   be better in some cases.
+                  -- algorithm, it uses, is slightly different, which may
+                  -- be better in some cases.
 
           , "ripgrep" -- Grep alternative that is faster and uses recursive
-                      --   search by default.
-                      --   <https://github.com/BurntSushi/ripgrep>
+                      -- search by default.
+                      -- <https://github.com/BurntSushi/ripgrep>
 
           , "bfs" -- a variant of the UNIX `find` command that operates
-                  --   breadth-first rather than depth-first.
+                  -- breadth-first rather than depth-first.
 
           , "mbuffer" -- Stream buffering tool that also shows the I/O rate
-                      --   and summary to the user.
+                      -- and summary to the user.
 
           , "fd-find" -- Simple, fast and user-friendly alternative to find.
+
+          , "bup" -- Backup tool which stores the backups in a system based
+                  -- around the packfile format from git.
+                  -- <https://bup.github.io/>
           ]
 
       , BuntishLinux =
