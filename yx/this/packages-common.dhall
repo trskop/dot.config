@@ -28,10 +28,6 @@ let osSpecificPackages =
                       -- and summary to the user.
 
           , "fd-find" -- Simple, fast and user-friendly alternative to find.
-
-          , "bup" -- Backup tool which stores the backups in a system based
-                  -- around the packfile format from git.
-                  -- <https://bup.github.io/>
           ]
 
       , BuntishLinux =
@@ -109,6 +105,10 @@ in
 
   , "yank"  -- Reads input from stdin and allows data to be selected
             -- and copied to the clipboard.
+
+  , "bup" -- Backup tool which stores the backups in a system based around the
+          -- packfile format from Git.
+          -- <https://bup.github.io/>
 
   -- Using Nix fore these:
   --, "pandoc"
