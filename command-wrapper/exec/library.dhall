@@ -22,4 +22,4 @@
 -- ```
 -- :.!yx completion --library --dhall=exec --import
 -- ```
-https://raw.githubusercontent.com/trskop/exec/9f9ec60ea77d7bec529f7689abb80cb34a47eabe/dhall/Exec/package.dhall sha256:150d37b4514e73cea35884e750fc2fc240136162d25589b4cc20cca1f77e3131
+https://raw.githubusercontent.com/trskop/exec/ed45bcbf451d7cef902cf046856e4b2529a4505b/dhall/Exec/package.dhall sha256:38900a8210a254861364428b9ab96a1ac473a73b2fc271085d4dda2afc2e9a9c

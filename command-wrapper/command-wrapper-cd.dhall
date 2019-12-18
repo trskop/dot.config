@@ -1,5 +1,7 @@
 let CommandWrapper = ./library.dhall
 
+let Exec = ./exec/library.dhall
+
 let systemInfo = ../yx/this/system-info.dhall
 
 let emptyDirectories = CommandWrapper.CdConfig.emptyDirectories
@@ -13,15 +15,29 @@ let directories
           ? emptyDirectories
         )
 
+let fzf =
+        λ(query : Optional Text)
+      → CommandWrapper.CommandWithEnvironment::{
+        , command = "fzf"
+        , arguments =
+            Exec.fzf.Options.toArguments
+              Exec.fzf.Options::{
+              , query = query
+              , layout =
+                  Some
+                    < BottomOfTheScreen
+                    | TopOfTheScreen
+                    | TopOfTheScreenPromptAtTheBottom
+                    >.TopOfTheScreen
+              , height =
+                  Some
+                    (< Lines : Natural | Percentage : Natural >.Percentage 40)
+              }
+        }
+
 in  CommandWrapper.CdConfig::{
     , directories = directories
-    , menuTool =
-        Some
-          (   λ(query : Optional Text)
-            → let fzf = CommandWrapper.CdConfig.menu-tool.fzf query
-
-              in  fzf ⫽ { arguments = [ "--height=40%" ] # fzf.arguments }
-          )
+    , menuTool = Some fzf
     , terminalEmulator =
         let terminalEmulator =
               { DebianLinux =
