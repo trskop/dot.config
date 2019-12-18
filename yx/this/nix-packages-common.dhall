@@ -25,4 +25,7 @@
 
 , "fd" -- Simple, fast and user-friendly alternative to find.
        -- <https://github.com/sharkdp/fd>
+
+, "skim"  -- Full-featured alternative to `fzf` written in Rust.
+          -- <https://github.com/lotabout/skim>
 ]
