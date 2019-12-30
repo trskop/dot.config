@@ -28,4 +28,6 @@
 
 , "skim"  -- Full-featured alternative to `fzf` written in Rust.
           -- <https://github.com/lotabout/skim>
+
+, "nixfmt"
 ]
