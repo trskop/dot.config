@@ -389,7 +389,9 @@ function main() {
             auto)
                 if [[ -n "${VIM:-}" && -n "${VIMRUNTIME:-}" ]]; then
                     # Running inside Vim/Neovim terminal
-                    die 3 "Not running in a neither Kitty nor Tmux, see yx-jmp(1)."
+                    #die 3 "Not running in a neither Kitty nor Tmux, see yx-jmp(1)."
+                    neovimTerminalScrollback "${allowNeovimRemote}" \
+                        "${rootDir}" "${syntax}" "${lines}"
                 elif [[ -n "${TMUX:-}" && -n "${TMUX_PANE:-}" ]]; then
                     tmuxScrollback "${allowNeovimRemote}" "${rootDir}" \
                         "${syntax}" "${lines}"
@@ -612,6 +614,41 @@ function kittyScrollback() {
             "${COMMAND_WRAPPER_NAME}-${COMMAND_WRAPPER_SUBCOMMAND}.XXXXXXXXXX"
     )
     kitty @ get-text --extent all --self > "${temp}"
+
+    # TODO:
+    #
+    # - Detect that the imput is empty and notify user instead of starting
+    #   "${menuCommand[@]}".
+    parseInput "${syntax}" "${lines}" "${temp}" \
+    | uniq \
+    | "${menuCommand[@]}" \
+    | startEditor "${allowNeovimRemote}" "${rootDir}"
+}
+
+# Usage:
+#
+#   neovimTerminalScrollback ALLOW_NEOVIM_REMOTE ROOT_DIR SYNTAX {LINES|-}
+function neovimTerminalScrollback() {
+    local -r -i allowNeovimRemote="$1"; shift
+    local -r rootDir="$1"; shift
+    local -r syntax="$1"; shift
+    local -r lines="$1"; shift
+
+    eval "$(declareCfg)"
+
+    # TODO:
+    #
+    # * Remove temp file afterwards. Maybe using subshell via (...)?
+    # * Is ~/.cache good default?
+    # * We should probably create and use "${XDG_RUNTIME_DIR:-~/.cache}/yx-jmp"
+    #   instead of putting these files there directly.
+    local temp
+    temp=$(
+        mktemp --tmpdir="${XDG_RUNTIME_DIR:-~/.cache}" \
+            "${COMMAND_WRAPPER_NAME}-${COMMAND_WRAPPER_SUBCOMMAND}.XXXXXXXXXX"
+    )
+    #nvr --remote-expr 'bufname("")'
+    nvr --remote-expr "execute([':autocmd!',':write ${temp}'])"
 
     # TODO:
     #
