@@ -51,7 +51,7 @@ function download() {
     if [[ ! -e "${output}" ]]; then
         mkdir -p "$(dirname "${output}")" || return 1
         curl --silent --location "${url}" > "${output}" || return 1
-        sha256sum -c - <<< "${sha256}  ${output}" || return 1
+        sha256sum --quiet --check - <<< "${sha256}  ${output}" || return 1
     fi
     echo "${output}"
 }
@@ -74,7 +74,7 @@ function unpack() {
 }
 
 function main() {
-    local -r cacheDir="${XDG_CACHE_HOME:-${HOME}/.cache}/${dhallVersion}"
+    local -r cacheDir="${XDG_CACHE_HOME:-${HOME}/.cache}/dhall-lsp-server/${dhallVersion}"
 
     local tarball
     tarball=$(download "${cacheDir}" "${downloadUrl}" "${downloadSha256}")
