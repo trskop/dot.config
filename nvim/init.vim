@@ -327,8 +327,8 @@ autocmd! FileType fzf
 autocmd  FileType fzf set laststatus=0 noshowmode noruler
   \| autocmd BufLeave <buffer> set laststatus=2 showmode ruler
 
-let g:fzf_colors =
-\ { 'fg':      ['fg', 'Normal'],
+let g:fzf_colors = {
+  \ 'fg':      ['fg', 'Normal'],
   \ 'bg':      ['bg', 'Normal'],
   \ 'hl':      ['fg', 'Comment'],
   \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
@@ -340,7 +340,8 @@ let g:fzf_colors =
   \ 'pointer': ['fg', 'Exception'],
   \ 'marker':  ['fg', 'Keyword'],
   \ 'spinner': ['fg', 'Label'],
-  \ 'header':  ['fg', 'Comment'] }
+  \ 'header':  ['fg', 'Comment']
+  \ }
 
 command! -bang -nargs=? -complete=dir Files
   \ call fzf#vim#files(<q-args>, fzf#vim#with_preview(), <bang>0)
@@ -529,3 +530,15 @@ nmap <silent> <leader>t <ESC>:belowright split +terminal<CR>
 nmap <silent> <leader>T <ESC>:belowright vsplit +terminal<CR>
 
 " }}} Terminal ----------------------------------------------------------------
+
+" {{{ Local Configuration -----------------------------------------------------
+
+function! SourceLocalConfig(file)
+  if filereadable(expand(a:file))
+    execute 'source' a:file
+  endif
+endfunction
+
+call SourceLocalConfig('~/.local/src/localhost/dot.config/nvim/init-local.vim')
+
+" }}} Local Configuration -----------------------------------------------------
