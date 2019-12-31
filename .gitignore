@@ -14,6 +14,7 @@
 !/psql/
 !/readline/
 !/ripgrep/
+!/scripts/
 !/sensible-editor/
 !/stack/
 !/tmux/

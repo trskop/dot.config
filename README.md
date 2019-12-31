@@ -135,13 +135,27 @@ reuse/share the repository for multiple machines.  One such example is when one
 machine dies, and new one has to be installed.  Copying over existing
 repository can serve as a nice starting point.
 
-Script [`init-host-specific-config-repo.bash`
-](./init-host-specific-config-repo.bash) is provided to create the repository
-with the above structure.  It can be invoked as:
+Script [`scripts/init-host-specific-config-repo.bash`
+](./scripts/init-host-specific-config-repo.bash) is provided to create the
+repository with the above structure.  It can be invoked as:
 
 ```Bash
-bash ~/.config/init-host-specific-config-repo.bash
+bash ~/.config/scripts/init-host-specific-config-repo.bash
 ```
+
+
+Scripts
+-------
+
+*   [`scripts/init-host-specific-config-repo.bash`](./scripts/init-host-specific-config-repo.bash)
+    – Initialise version-controlled host-specific configuration repo.  See
+    [Version-controlled Host-specific Configuration
+    ](#version-controlled-host-specific-configuration) section for more
+    information.
+
+*   [`scripts/dhall-lsp-server-wrapper`](./scripts/dhall-lsp-server-wrapper) –
+    Run `dhall-lsp-server`, but if it's not available locally then download it
+    first.
 
 
 Other Resources
