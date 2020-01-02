@@ -388,8 +388,10 @@ function main() {
         case "${expectTerminal}" in
             auto)
                 if [[ -n "${VIM:-}" && -n "${VIMRUNTIME:-}" ]]; then
-                    # Running inside Vim/Neovim terminal
-                    #die 3 "Not running in a neither Kitty nor Tmux, see yx-jmp(1)."
+                    if (( ! allowNeovimRemote )); then
+                        die 3 "%s, %s" "Running inside a Vim/Neovim terminal" \
+                            "but neovim-remote is disabled, see yx-jmp(1)."
+                    fi
                     neovimTerminalScrollback "${allowNeovimRemote}" \
                         "${rootDir}" "${syntax}" "${lines}"
                 elif [[ -n "${TMUX:-}" && -n "${TMUX_PANE:-}" ]]; then
@@ -647,7 +649,6 @@ function neovimTerminalScrollback() {
         mktemp --tmpdir="${XDG_RUNTIME_DIR:-~/.cache}" \
             "${COMMAND_WRAPPER_NAME}-${COMMAND_WRAPPER_SUBCOMMAND}.XXXXXXXXXX"
     )
-    #nvr --remote-expr 'bufname("")'
     nvr --remote-expr "execute([':autocmd!',':write ${temp}'])"
 
     # TODO:
