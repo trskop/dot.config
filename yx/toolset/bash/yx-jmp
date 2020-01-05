@@ -649,7 +649,9 @@ function neovimTerminalScrollback() {
         mktemp --tmpdir="${XDG_RUNTIME_DIR:-~/.cache}" \
             "${COMMAND_WRAPPER_NAME}-${COMMAND_WRAPPER_SUBCOMMAND}.XXXXXXXXXX"
     )
-    nvr --remote-expr "execute([':autocmd!',':write ${temp}'])"
+    # We need to disable autocommands since they may be interfering with
+    # writting down raw contents of the `:terminal` buffer.
+    nvr --remote-expr "execute(':noautocmd write ${temp}')"
 
     # TODO:
     #
