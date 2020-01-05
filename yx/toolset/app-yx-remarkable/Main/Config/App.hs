@@ -3,7 +3,7 @@
 -- |
 -- Module:      Main.Config
 -- Description: TODO: Module synopsis
--- Copyright:   (c) 2019 Peter Trško
+-- Copyright:   (c) 2019-2020 Peter Trško
 -- License:     BSD3
 --
 -- Maintainer:  peter.trsko@gmail.com
@@ -16,7 +16,7 @@ module Main.Config.App
 --  )
   where
 
-import Control.Monad (unless)
+import Control.Monad (when)
 import Data.Proxy (Proxy(..))
 import Data.String (fromString)
 import GHC.Generics (Generic)
@@ -35,12 +35,13 @@ import Data.HostAndPort
 import qualified Data.HostAndPort as HostAndPort (interpretDhall)
 import Data.ByteString (ByteString)
 import Data.Text (Text)
+import qualified Data.Text as Text (null)
 import qualified Dhall
     ( Decoder
     , FromDhall(autoWith)
     , InterpretOptions(InterpretOptions, fieldModifier)
     , auto
-    , inputFile
+    , input
     , maybe
     )
 import System.Directory (doesFileExist, getHomeDirectory)
@@ -109,10 +110,7 @@ defaultConfig = do
         , syncDir = fromString (home </> "Documents" </> "reMarkable")
         }
 
-readConfig :: (forall a. FilePath -> IO a) -> FilePath -> IO Config
-readConfig die configFile = do
-    configExists <- doesFileExist configFile
-    unless configExists
-        $ die configFile
-
-    Dhall.inputFile Dhall.auto configFile
+parseConfig :: (forall a. IO a) -> Text -> IO Config
+parseConfig die configExpr = do
+    when (Text.null configExpr) die
+    Dhall.input Dhall.auto configExpr

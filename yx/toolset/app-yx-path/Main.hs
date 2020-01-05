@@ -1,7 +1,7 @@
 -- |
 -- Module:      Main
 -- Description: Generate Dhall configuration file with XDG Directories.
--- Copyright:   (c) 2018-2019 Peter Trško
+-- Copyright:   (c) 2018-2020 Peter Trško
 -- License:     BSD3
 --
 -- Maintainer:  peter.trsko@gmail.com
@@ -25,7 +25,7 @@ import CommandWrapper.Prelude
     )
 import Data.Monoid.Endo (E)
 import Data.Text (Text)
-import qualified Data.Text as Text (strip, {-unlines,-} unwords)
+import qualified Data.Text as Text (null, strip, {-unlines,-} unwords)
 import qualified Data.Text.IO as Text (getContents{-, putStr-})
 import qualified Turtle
 
@@ -52,10 +52,9 @@ main = do
             printOptparseCompletionInfoExpression stdout
   where
     defaultAction params@Params{config} dhallOptions possibleExpression = do
-        configExists <- Turtle.testfile (Turtle.fromString config)
         paths <- Paths.mk params
-        let configFile = if configExists then Just config else Nothing
-        dhall dhallOptions paths configFile =<< case possibleExpression of
+        let configExpr = if Text.null config then Just config else Nothing
+        dhall dhallOptions paths configExpr =<< case possibleExpression of
             "" -> pure "data : {paths : Paths, config : Config}"
             "-" -> Text.getContents
             _ -> pure possibleExpression

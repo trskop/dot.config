@@ -1,7 +1,7 @@
 -- |
 -- Module:      Main
 -- Description: TODO: Module synopsis
--- Copyright:   (c) 2018-2019 Peter Trško
+-- Copyright:   (c) 2018-2020 Peter Trško
 -- License:     BSD3
 --
 -- Maintainer:  peter.trsko@gmail.com
@@ -77,7 +77,7 @@ import Main.Action
     , mkPreferencesFilePath
     , withTerminal
     )
-import Main.Config.App (Config(..), readConfig)
+import Main.Config.App (Config(..), parseConfig)
 import Main.Config.Env (Env, readEnvConfig)
 import Main.Config.Preferences (Preferences(Preferences))
 import qualified Main.Config.Preferences as Preferences
@@ -101,15 +101,14 @@ import Main.State (File(..), State(..), emptyState, readState, writeState)
 
 main :: IO ()
 main = do
-    params@Params{config = configFile} <- subcommandParams
-    config <- readConfig (dieMissingConfig params) configFile
+    params@Params{config = configExpr} <- subcommandParams
+    config <- parseConfig (dieMissingConfig params) configExpr
     mode <- parseOptions config
     env params mode
 
-dieMissingConfig :: Params -> FilePath -> IO a
-dieMissingConfig params fp = do
-    printMsg params Error
-        $ "Missing configuration file " <> gshow fp
+dieMissingConfig :: Params -> IO a
+dieMissingConfig params = do
+    printMsg params Error "Missing configuration file."
     exitFailure
 
 dieMissingRuntimeDir :: Params -> IO a

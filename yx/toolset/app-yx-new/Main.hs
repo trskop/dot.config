@@ -1,7 +1,7 @@
 -- |
 -- Module:      Main
 -- Description: TODO: Module synopsis
--- Copyright:   (c) 2019 Peter Trško
+-- Copyright:   (c) 2019-2020 Peter Trško
 -- License:     BSD3
 --
 -- Maintainer:  peter.trsko@gmail.com
@@ -29,9 +29,10 @@ import CommandWrapper.Prelude
     )
 import qualified Data.HashMap.Strict as HashMap (fromList, lookup)
 import Data.Text (Text)
-import qualified Data.Text as Text (unpack)
+import qualified Data.Text as Text (null, unpack)
 import qualified Data.Text.IO as Text (putStrLn, writeFile)
-import qualified Dhall
+import Dhall (FromDhall)
+import qualified Dhall (auto, input)
 import qualified Options.Applicative as Options
 import System.Directory
     ( createDirectoryIfMissing
@@ -51,7 +52,7 @@ data FileTemplate = FileTemplate
     , executable :: Bool
     }
   deriving stock (Generic, Show)
-  deriving anyclass (Dhall.FromDhall)
+  deriving anyclass (FromDhall)
 
 type Template = [FileTemplate]
 
@@ -60,13 +61,13 @@ data NamedTemplates = NamedTemplates
     , template :: Template
     }
   deriving stock (Generic, Show)
-  deriving anyclass (Dhall.FromDhall)
+  deriving anyclass (FromDhall)
 
 newtype Config = Config
     { templates :: [NamedTemplates]
     }
   deriving stock (Generic, Show)
-  deriving anyclass (Dhall.FromDhall)
+  deriving anyclass (FromDhall)
 
 data Mode a
     = New Text (Maybe FilePath) a
@@ -81,9 +82,15 @@ instance HaveCompletionInfo (Mode a) where
 
 main :: IO ()
 main = do
-    params@Params{config = configFile} <- subcommandParams
+    params@Params{config = configExpr} <- subcommandParams
     mode <- Turtle.options description parseOptions
-    config <- Dhall.inputFile Dhall.auto configFile
+    config <- if Text.null configExpr
+        then
+            dieWith params stderr 1
+                "Configuration file is required and it's missing."
+        else
+            Dhall.input Dhall.auto configExpr
+
     realMain params config mode
   where
     description = "Create a package/project structure from a template."

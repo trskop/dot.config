@@ -2,7 +2,7 @@
 -- |
 -- Module:      Main.Config.App
 -- Description: TODO: Module synopsis
--- Copyright:   (c) 2018 Peter Trško
+-- Copyright:   (c) 2018-2020 Peter Trško
 -- License:     BSD3
 --
 -- Maintainer:  peter.trsko@gmail.com
@@ -16,29 +16,21 @@ module Main.Config.App
     , UpdateWhat(..)
     , SystemConfig(..)
     , NixConfig(..)
-    , read
-    , writeDef
+    , parse
+    , printDef
     )
   where
 
-import Prelude hiding (read)
-
 import GHC.Generics (Generic)
-import System.IO (IOMode(WriteMode), hPutStrLn, withFile)
+import System.IO (hPutStrLn, stdout)
 
 import CommandWrapper.Environment (Params(Params, config))
 import Data.Text (Text)
+import qualified Data.Text as Text (null)
 import Data.Text.Prettyprint.Doc (pretty)
 import Data.Text.Prettyprint.Doc.Render.Text (hPutDoc)
-import qualified Dhall
-    ( Encoder(embed)
-    , FromDhall
-    , ToDhall
-    , auto
-    , inject
-    , inputFile
-    )
-import System.Directory (doesFileExist)
+import Dhall (FromDhall, ToDhall)
+import qualified Dhall (Encoder(embed), auto, inject, input)
 
 
 data Config = Config
@@ -51,7 +43,7 @@ data Config = Config
 --  , userAction :: Action
     }
   deriving stock (Eq, Generic, Show)
-  deriving anyclass (Dhall.FromDhall, Dhall.ToDhall)
+  deriving anyclass (FromDhall, ToDhall)
 
 data SystemConfig = SystemConfig
     { bootstrapPackages :: [Text]
@@ -63,7 +55,7 @@ data SystemConfig = SystemConfig
 --  , packageRepositories :: PackageRepository
     }
   deriving stock (Eq, Generic, Show)
-  deriving anyclass (Dhall.FromDhall, Dhall.ToDhall)
+  deriving anyclass (FromDhall, ToDhall)
 
 data NixConfig = NixConfig
     { packages :: [Text]
@@ -72,13 +64,13 @@ data NixConfig = NixConfig
 --  , packageRepositories :: PackageRepository
     }
   deriving stock (Eq, Generic, Show)
-  deriving anyclass (Dhall.FromDhall, Dhall.ToDhall)
+  deriving anyclass (FromDhall, ToDhall)
 
 data Defaults = Defaults
     { update :: [UpdateWhat]
     }
   deriving stock (Eq, Generic, Show)
-  deriving anyclass (Dhall.FromDhall, Dhall.ToDhall)
+  deriving anyclass (FromDhall, ToDhall)
 
 -- TODO: Move into a different module?
 data UpdateWhat
@@ -87,21 +79,20 @@ data UpdateWhat
     | UpdateUserEnvironment
     | UpdateNixEnvironment
   deriving stock (Bounded, Enum, Eq, Generic, Ord, Show)
-  deriving anyclass (Dhall.FromDhall, Dhall.ToDhall)
+  deriving anyclass (FromDhall, ToDhall)
 
-read :: Params -> IO (Maybe Config)
-read Params{config} = do
-    configExists <- doesFileExist config
-    if configExists
+parse :: Params -> IO (Maybe Config)
+parse Params{config}
+  | Text.null config =
+        pure Nothing
+  | otherwise =
         -- TODO: Catch exception and propagate it in Either.
-        then Just <$> Dhall.inputFile Dhall.auto config
-        else pure Nothing
+        Just <$> Dhall.input Dhall.auto config
 
-writeDef :: Params -> IO ()
-writeDef Params{config} =
-    withFile config WriteMode $ \h -> do
-        hPutDoc h . pretty $ Dhall.embed Dhall.inject def
-        hPutStrLn h ""
+printDef :: IO ()
+printDef = do
+    hPutDoc stdout . pretty $ Dhall.embed Dhall.inject def
+    hPutStrLn stdout ""
 
 def :: Config
 def = Config
@@ -111,20 +102,20 @@ def = Config
 
     , system = SystemConfig
         { bootstrapPackages =
-            -- Store /etc in version control.  Git here is for 'etckeeper', but to
-            -- also mark it as manually installed.
+            -- Store /etc in version control.  Git here is for 'etckeeper', but
+            -- to also mark it as manually installed.
             [ "etckeeper", "git"
 
-            -- Essential for most of these tools to work reliably when used under
-            -- non-root user.
+            -- Essential for most of these tools to work reliably when used
+            -- under non-root user.
             , "sudo"
 
-            -- Most of this tooling is in Haskell.  Stack provides a way how to run
-            -- Haskell scripts and istall rest of the tooling.
+            -- Most of this tooling is in Haskell.  Stack provides a way how to
+            -- run Haskell scripts and istall rest of the tooling.
             , "haskell-stack"
 
-            -- Access repositories via HTTPS.  Hopefully most Debian-like systems
-            -- have this by default now.
+            -- Access repositories via HTTPS.  Hopefully most Debian-like
+            -- systems have this by default now.
             , "apt-transport-https"
             ]
 

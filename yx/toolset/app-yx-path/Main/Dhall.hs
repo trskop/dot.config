@@ -1,7 +1,7 @@
 -- |
 -- Module:      Main.Dhall
 -- Description: Generate Dhall configuration file with XDG Directories.
--- Copyright:   (c) 2018-2019 Peter Trško
+-- Copyright:   (c) 2018-2020 Peter Trško
 -- License:     BSD3
 --
 -- Maintainer:  peter.trsko@gmail.com
@@ -30,7 +30,7 @@ import Control.Monad.State.Strict (evalStateT)
 import Control.Monad.Except (liftEither, runExcept, withExcept)
 import Data.Either.Validation (validationToEither)
 import Data.Text (Text)
-import qualified Data.Text.IO as Text (putStrLn, readFile)
+import qualified Data.Text.IO as Text (putStrLn)
 import Data.Text.Prettyprint.Doc (pretty)
 import Data.Text.Prettyprint.Doc.Render.Text (putDoc)
 import qualified Dhall
@@ -76,11 +76,10 @@ newtype Options = Options
     { output :: Output
     }
 
-dhall :: Options -> Paths -> Maybe FilePath -> Text -> IO ()
-dhall Options{output} paths possiblyConfigFile expressionText = do
-    config <- for possiblyConfigFile Text.readFile
+dhall :: Options -> Paths -> Maybe Text -> Text -> IO ()
+dhall Options{output} paths possiblyConfigExpr expressionText = do
     expression <- parseDhallExpression Nothing expressionText
-    configExpression <- for config (parseDhallExpression possiblyConfigFile)
+    configExpression <- for possiblyConfigExpr (parseDhallExpression Nothing)
     case output of
         Plain ->
             printPlain paths expression configExpression

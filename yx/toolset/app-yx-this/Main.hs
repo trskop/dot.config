@@ -1,7 +1,7 @@
 -- |
 -- Module:      Main
 -- Description: TODO: Description
--- Copyright:   (c) 2018-2019 Peter Trško
+-- Copyright:   (c) 2018-2020 Peter Trško
 -- License:     BSD3
 --
 -- Maintainer:  peter.trsko@gmail.com
@@ -13,13 +13,12 @@ module Main (main)
   where
 
 import Control.Applicative ((<|>), many)
-import Data.Foldable (asum, for_)
+import Data.Foldable (asum)
 import Data.Monoid (Endo(..), mempty)
-import Data.String (fromString)
 
 import CommandWrapper.Prelude
     ( HaveCompletionInfo(completionInfoMode)
-    , Params(Params, config)
+    , Params
     , completionInfoFlag
     , dieWith
     , printOptparseCompletionInfoExpression
@@ -36,7 +35,7 @@ import qualified Turtle
 
 import Main.Action (EditWhat(..), updateAction, editAction, defaultAction)
 import Main.Config.App (Config, UpdateWhat(..))
-import qualified Main.Config.App as Config (read, writeDef)
+import qualified Main.Config.App as Config (parse, printDef)
 
 
 -- TODO:
@@ -120,22 +119,15 @@ import qualified Main.Config.App as Config (read, writeDef)
 main :: IO ()
 main = do
     params <- subcommandParams
-    runAppWith parseOptions (readConfig params) applyDefaults $ \case
+    runAppWith parseOptions (parseConfig params) applyDefaults $ \case
         Update what (Just config) ->
             updateAction params config what
 
         Edit what (Just config) ->
             editAction params config what
 
-        CreateDefaultConfig possiblyConfig -> do
-            for_ possiblyConfig $ \_ ->
-                let Params{config} = params
-                in dieWith params stderr 1
-                    ( fromString (show config) <> ": Configuration file\
-                    \ already exists, refusing to overwrite it."
-                    )
-
-            Config.writeDef params
+        PrintDefaultConfig _ ->
+            Config.printDef
 
         Default (Just config) ->
             defaultAction params config
@@ -158,21 +150,21 @@ main = do
         Default Nothing ->
             missingConfig params
   where
-    missingConfig params@Params{config} = dieWith params stderr 1
-        ( fromString (show config) <> ": Configuration file is missing, you\
-            \ can use '--default-config' to generate initial value."
-        )
+    missingConfig params =
+        dieWith params stderr 1
+            "Configuration file is missing, you can use '--default-config' to\
+            \ generate initial value."
 
     notYetImplemented params =
         dieWith params stderr 125 "Bug: This should not happen at the moment."
 
-readConfig :: Params -> mode a -> IO (Either String (Endo (Maybe Config)))
-readConfig params _ = Right . Endo . const <$> Config.read params
+parseConfig :: Params -> mode a -> IO (Either String (Endo (Maybe Config)))
+parseConfig params _ = Right . Endo . const <$> Config.parse params
 
 data Mode config
     = Update (Set UpdateWhat) config
     | Edit EditWhat config
-    | CreateDefaultConfig config
+    | PrintDefaultConfig config
     | Default config
     | CompletionInfo
     | Completion Word [String]
@@ -186,7 +178,7 @@ switchMode :: (forall x. x -> Mode x) -> Endo (Mode config)
 switchMode f = Endo $ \case
     Update _ config -> f config
     Edit _ config -> f config
-    CreateDefaultConfig config -> f config
+    PrintDefaultConfig config -> f config
     Default config -> f config
     CompletionInfo -> CompletionInfo
     Completion i ws -> Completion i ws
@@ -267,7 +259,7 @@ editFlag = Options.flag' (switchMode1 Edit ThisConfigFile) $ mconcat
     ]
 
 defaultConfigFlag :: Options.Parser (Endo (Mode config))
-defaultConfigFlag = Options.flag' (switchMode CreateDefaultConfig) $ mconcat
-    [ Options.long "default-config"
-    , Options.help "Create initial configuration file if it doesn't exist"
+defaultConfigFlag = Options.flag' (switchMode PrintDefaultConfig) $ mconcat
+    [ Options.long "init-config"
+    , Options.help "Print initial configuration file if it doesn't exist"
     ]

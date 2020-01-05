@@ -23,7 +23,7 @@ import CommandWrapper.Prelude
 --import qualified Dhall
 import qualified Turtle
 
-import Main.Config.App (Config, readConfig)
+import Main.Config.App (Config, parseConfig)
 
 
 data Mode
@@ -41,17 +41,15 @@ instance HaveCompletionInfo Mode where
 
 main :: IO ()
 main = do
-    params@Params{config = configFile} <- subcommandParams
+    params@Params{config = configExpr} <- subcommandParams
     mode <- Turtle.options description (completionInfoFlag <*> parseOptions)
-    config <- readConfig
-        ( \fp ->
-            dieWith params stderr 1
-                (fromString fp <> ": Configuration file missing.")
-        )
-        configFile
+    config <- parseConfig (dieMissingConfig params) configExpr
     realMain params config mode
   where
     description = "Better UI for existing reMarkable tools."
+
+    dieMissingConfig params =
+        dieWith params stderr 1 "Configuration file missing."
 
 parseOptions :: Turtle.Parser Mode
 parseOptions = asum

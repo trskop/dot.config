@@ -1,8 +1,8 @@
-{-# LANGUAGE OverloadedLists #-}
+{-# LANGUAGE NoImplicitPrelude #-}
 -- |
 -- Module:      Main.Config.App
 -- Description: TODO: Module synopsis
--- Copyright:   (c) 2018 Peter Trško
+-- Copyright:   (c) 2018-2020 Peter Trško
 -- License:     BSD3
 --
 -- Maintainer:  peter.trsko@gmail.com
@@ -15,16 +15,19 @@ module Main.Config.App
     -- * Application Config
       Config(..)
     , ShellScripts(..)
-    , readConfig
+    , parseConfig
     )
   where
 
-import Control.Monad (unless)
+import Control.Monad (when)
+import Data.Maybe (Maybe)
 import GHC.Generics (Generic)
+import System.IO (IO)
 
 import Data.Text (Text)
-import qualified Dhall (FromDhall, ToDhall, auto, inputFile)
-import qualified Turtle
+import qualified Data.Text as Text (null)
+import Dhall (FromDhall, ToDhall)
+import qualified Dhall (auto, input)
 
 
 data ShellScripts a = ShellScripts
@@ -34,7 +37,7 @@ data ShellScripts a = ShellScripts
     , zsh :: a
     }
   deriving stock (Generic)
-  deriving anyclass (Dhall.FromDhall, Dhall.ToDhall)
+  deriving anyclass (FromDhall, ToDhall)
 
 data Config = Config
     { installScript :: Text -> Text -> ShellScripts Text
@@ -42,12 +45,9 @@ data Config = Config
     , initEnv :: Text
     }
   deriving stock (Generic)
-  deriving anyclass (Dhall.FromDhall)
+  deriving anyclass (FromDhall)
 
-readConfig :: (forall a. FilePath -> IO a) -> FilePath -> IO Config
-readConfig die configFile = do
-    configExists <- Turtle.testfile (Turtle.fromString configFile)
-    unless configExists
-        $ die configFile
-
-    Dhall.inputFile Dhall.auto configFile
+parseConfig :: (forall a. IO a) -> Text -> IO Config
+parseConfig die configExpr = do
+    when (Text.null configExpr) die
+    Dhall.input Dhall.auto configExpr
