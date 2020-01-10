@@ -19,7 +19,7 @@ import Data.Functor ((<&>))
 import GHC.Generics (Generic)
 import System.IO (stderr, stdout)
 
-import CommandWrapper.Prelude
+import CommandWrapper.Subcommand.Prelude
     ( HaveCompletionInfo(completionInfoMode)
     , Params(Params, config)
     , completionInfoFlag

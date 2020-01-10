@@ -10,7 +10,7 @@ import Data.Function (const)
 import Data.String (fromString)
 import GHC.Generics (Generic)
 
-import CommandWrapper.Prelude
+import CommandWrapper.Subcommand.Prelude
     ( HaveCompletionInfo(completionInfoMode)
     , Params(Params, config)
     , completionInfoFlag

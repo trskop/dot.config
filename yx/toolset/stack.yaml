@@ -36,7 +36,7 @@ extra-deps:
     commit: eec72c9c99fd8bd89866bdd85a23343a4a6fbae8
 
   - git: https://github.com/trskop/command-wrapper.git
-    commit: 76b1aa454a1984cac91f9ba1145a70ee415135c0
+    commit: 2e25c38830b400c1c3c637cbbc71d51e937b871a
 
   - git: https://github.com/trskop/genbashrc.git
     commit: 87edf5f77320d716a39376b6a0e210ab46802ff4

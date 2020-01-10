@@ -104,18 +104,18 @@ packages:
     commit: eec72c9c99fd8bd89866bdd85a23343a4a6fbae8
 - completed:
     cabal-file:
-      size: 26745
-      sha256: 4109300d2776d96d7ad92a3c683a472fef54f6762b3c05b10bfedcac469a01fc
+      size: 26848
+      sha256: 628bf3d99eada1f59dd671d6d0016b9d6a8e550f4c0720566a4a85b04f256081
     name: command-wrapper
     version: 0.1.0.0
     git: https://github.com/trskop/command-wrapper.git
     pantry-tree:
-      size: 32366
-      sha256: 319a26736a91245f339689f712a5d89e2328771de9b3d13c2078e88287025222
-    commit: 76b1aa454a1984cac91f9ba1145a70ee415135c0
+      size: 32649
+      sha256: 41a626ca36bf9d5a48fd99c3dd30e62d8d2ff96624c225057e9f28f740670267
+    commit: 2e25c38830b400c1c3c637cbbc71d51e937b871a
   original:
     git: https://github.com/trskop/command-wrapper.git
-    commit: 76b1aa454a1984cac91f9ba1145a70ee415135c0
+    commit: 2e25c38830b400c1c3c637cbbc71d51e937b871a
 - completed:
     cabal-file:
       size: 2042

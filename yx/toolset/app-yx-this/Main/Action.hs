@@ -20,7 +20,7 @@ import GHC.Generics (Generic)
 import qualified System.IO as IO (stderr, stdout)
 import System.Process (callProcess)
 
-import CommandWrapper.Prelude
+import CommandWrapper.Subcommand.Prelude
     ( Params(Params, colour, verbosity)
     , shouldUseColours
     , dieWith

@@ -15,7 +15,7 @@ module Main (main)
 import Control.Applicative (many)
 --import Data.String (fromString)
 
-import CommandWrapper.Prelude
+import CommandWrapper.Subcommand.Prelude
     ( HaveCompletionInfo(completionInfoMode)
     , Params(Params, config)
     , completionInfoFlag

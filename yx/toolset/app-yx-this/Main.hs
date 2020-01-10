@@ -16,7 +16,7 @@ import Control.Applicative ((<|>), many)
 import Data.Foldable (asum)
 import Data.Monoid (Endo(..), mempty)
 
-import CommandWrapper.Prelude
+import CommandWrapper.Subcommand.Prelude
     ( HaveCompletionInfo(completionInfoMode)
     , Params
     , completionInfoFlag

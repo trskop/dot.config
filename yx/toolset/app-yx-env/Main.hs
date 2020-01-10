@@ -32,7 +32,7 @@ import System.IO
     , stdout
     )
 
-import CommandWrapper.Prelude
+import CommandWrapper.Subcommand.Prelude
     ( HaveCompletionInfo(completionInfoMode)
     , Params(Params, colour, config, name, subcommand, verbosity)
     , completionInfoFlag

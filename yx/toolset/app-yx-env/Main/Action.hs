@@ -26,7 +26,7 @@ import System.IO
     , withFile
     )
 
-import CommandWrapper.Prelude
+import CommandWrapper.Subcommand.Prelude
     ( Params(Params, name, subcommand)
     , dieWith
     , warningMsg
