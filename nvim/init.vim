@@ -21,7 +21,11 @@
 " │   ├── nathanaelkane/vim-indent-guides
 " │   └── raichoo/purescript-vim
 " │
-" └── Terminal
+" ├── Terminal
+" │
+" ├── Syntax Highlighting Settings
+" │
+" └── Local Configuration
 "
 " }}} Table of Contents -------------------------------------------------------
 
@@ -183,7 +187,9 @@ if dein#load_state('~/.cache/dein.vim')
   call dein#add('int3/vim-extradite')
 
   " Syntax highlighting and indentation for Haskell and Cabal based on
-  " https://github.com/idris-hackers/idris-vim
+  " <https://github.com/idris-hackers/idris-vim>
+  "
+  " <https://github.com/neovimhaskell/haskell-vim>
   call dein#add('neovimhaskell/haskell-vim')
 
   " Language Server Protocol support for Neovim. See
@@ -530,6 +536,27 @@ nmap <silent> <leader>t <ESC>:belowright split +terminal<CR>
 nmap <silent> <leader>T <ESC>:belowright vsplit +terminal<CR>
 
 " }}} Terminal ----------------------------------------------------------------
+
+" {{{ Syntax Highlighting Settings --------------------------------------------
+
+" This is to help syntax highlighting figure out which croup it is in.  For
+" example multiline strings can break syntax highlighting.  This may not be
+" the best default for all syntaxes, in which case it would be better to put
+" specifics into appropriate ftplugins.
+"
+" Other options that may be interesting to look at are:
+"
+" * `:set redrawtime`
+" * `:syntax sync fromstart`
+"
+" Some relevant sources:
+"
+" * `:help syntax`
+" * `:help 'redrawtime'`
+" * <https://vim.fandom.com/wiki/Fix_syntax_highlighting>
+syntax sync minlines=500
+
+" }}} Syntax Highlighting Settings --------------------------------------------
 
 " {{{ Local Configuration -----------------------------------------------------
 
