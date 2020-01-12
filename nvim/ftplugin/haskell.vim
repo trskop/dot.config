@@ -15,3 +15,6 @@ setlocal errorformat=
   \%+C\ \ %#%m,
   \%W%>%f:%l:%c:,
   \%+C\ \ %#%tarning:\ %m,
+
+" Long or badly placed multi-line strings cause syntax highlighting to fail.
+autocmd BufEnter * syntax sync fromstart
