@@ -19,7 +19,8 @@
 " │   ├── scrooloose/nerdtree
 " │   ├── scrooloose/nerdcommenter
 " │   ├── nathanaelkane/vim-indent-guides
-" │   └── raichoo/purescript-vim
+" │   ├── raichoo/purescript-vim
+" │   └── jremmen/vim-ripgrep
 " │
 " ├── Terminal
 " │
@@ -37,8 +38,15 @@ set scrolloff=2
 " Show commands, as they are constructed, in the status line.
 set showcmd
 
-" Show the effects of a command incrementatlly, as you type.
+" Show the effects of a command incrementally, as you type.
 set inccommand=nosplit
+
+" Ripgrep is a smart and fast alternative to recursive grep.  It's not
+" available on all systems and plugin that we are using is not fetching it on
+" its own.
+"
+" <https://github.com/BurntSushi/ripgrep>
+let g:have_ripgrep = executable('rg')
 
 " {{{ Basics -- Leader --------------------------------------------------------
 
@@ -304,7 +312,7 @@ if dein#load_state('~/.cache/dein.vim')
   "   <https://github.com/jremmen/vim-ripgrep#configuration>
   "
   " <https://github.com/jremmen/vim-ripgrep>
-  if executable('rg')
+  if g:have_ripgrep
     call dein#add('jremmen/vim-ripgrep')
   endif
 
@@ -391,6 +399,8 @@ elseif executable('hie')
   let g:LanguageClient_serverCommands['haskell'] = ['hie', '--lsp']
 endif
 
+" Always show signcolumn when LanguageClient is loaded to prevent it rapidly
+" appearing and disappearing when editing file.
 augroup LanguageClient_signcolumn
   autocmd!
   autocmd User LanguageClientStarted setlocal signcolumn=yes
@@ -608,6 +618,22 @@ let g:purescript_indent_where = 6
 let g:purescript_indent_do = 3
 
 " }}} Plugin -- raichoo/purescript-vim ----------------------------------------
+
+" {{{ Plugin -- jremmen/vim-ripgrep -------------------------------------------
+
+" <https://github.com/jremmen/vim-ripgrep#configuration>
+if g:have_ripgrep
+  let g:rg_highlight = 1
+  let g:rg_derive_root = 1
+  let g:rg_root_types =
+    \ [ '.git'
+    \ , 'WORKSPACE'
+    \ , 'stack.yaml'
+    \ , 'cabal.project'
+    \ ]
+endif
+
+" }}} Plugin -- jremmen/vim-ripgrep -------------------------------------------
 
 " }}} Plugin ------------------------------------------------------------------
 
