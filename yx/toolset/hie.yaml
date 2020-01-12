@@ -1,0 +1,19 @@
+# Configuration for hie-bios which is used by hie (Haskell IDE Engine) and
+# ghcide.
+#
+# Configuration file is documented on:
+# <https://github.com/mpickering/hie-bios#explicit-configuration>
+cradle:
+  multi:
+    - path: ./app-yx-env
+      config: {cradle: {stack: {component: "yx-env:exe"}}}
+    - path: ./app-yx-path
+      config: {cradle: {stack: {component: "yx-path:exe"}}}
+    - path: ./app-yx-this
+      config: {cradle: {stack: {component: "yx-this:exe"}}}
+    - path: ./app-yx-new
+      config: {cradle: {stack: {component: "yx-new:exe"}}}
+    - path: ./app-yx-remarkable
+      config: {cradle: {stack: {component: "yx-remarkable:exe"}}}
+    - path: ./app-yx-template
+      config: {cradle: {stack: {component: "yx-template:exe"}}}
