@@ -22,4 +22,4 @@
 -- ```
 -- :.!yx completion --library --dhall=command-wrapper --import
 -- ```
-https://raw.githubusercontent.com/trskop/command-wrapper/b734ca73a4850236625295271d9b9efae5ce86bd/dhall/CommandWrapper/package.dhall sha256:6730377be4916d576ade7ec1ecc37658aa314191eddbf5aeac86f533e61a64e3
+https://raw.githubusercontent.com/trskop/command-wrapper/c1e8fd4eb3769007fb33ce7bde7d7db78a96c0e8/dhall/CommandWrapper/package.dhall sha256:2a2821a436de9146ab0dccda9384dca5b1c6af412a0f991751e3862aed97b940
