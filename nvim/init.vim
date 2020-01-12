@@ -312,9 +312,15 @@ let g:LanguageClient_autoStart = 1
 let g:LanguageClient_selectionUI = "fzf"
 "let g:LanguageClient_selectionUI = "location-list"
 
-let g:LanguageClient_serverCommands = {
-    \ 'haskell': ['hie-wrapper', '--lsp'],
-    \ }
+let g:LanguageClient_serverCommands = {}
+
+if executable('ghcide')
+  let g:LanguageClient_serverCommands['haskell'] = ['ghcide', '--lsp']
+elseif executable('hie-wrapper')
+  let g:LanguageClient_serverCommands['haskell'] = ['hie-wrapper', '--lsp']
+elseif executable('hie')
+  let g:LanguageClient_serverCommands['haskell'] = ['hie', '--lsp']
+endif
 
 nmap <silent> <leader>c <ESC>:call LanguageClient_contextMenu()<CR>
 nmap <silent> <leader>d <ESC>:call LanguageClient_textDocument_definition()<CR>
