@@ -106,9 +106,16 @@ if dein#load_state('~/.cache/dein.vim')
   " {{{ Plugin -- Dein.vim -- Plugins to Install ------------------------------
   "
   " See ':help dein#add' and ':help dein-options' for more details.
+  "
+  " Note:
+  "
+  " * Always add links to GitHub repos so that it's easy to open it in a
+  "   browser via `gx`.
 
   " Deoplete is the abbreviation of "dark powered neo-completion". It provides
   " an asynchronous keyword completion system in the current buffer.
+  "
+  " <https://github.com/Shougo/deoplete.nvim>
   call dein#add('Shougo/deoplete.nvim')
 
   " The Neosnippet plug-In adds snippet support to Vim. Snippets are small
@@ -118,16 +125,23 @@ if dein#load_state('~/.cache/dein.vim')
   " snippetsEmu.vim. But since you can choose snippets with the
   " neocomplcache/neocomplete interface, you might have less trouble using
   " them, because you do not have to remember each snippet name.
+  "
+  " <https://github.com/Shougo/neosnippet.vim>
+  " <https://github.com/Shougo/neosnippet-snippets>
   call dein#add('Shougo/neosnippet.vim')
   call dein#add('Shougo/neosnippet-snippets')
 
   " Displays function signatures from completions in the command line.
+  "
+  " <https://github.com/Shougo/echodoc.vim>
   call dein#add('Shougo/echodoc.vim')
 
   " Denite is a dark powered plugin for Neovim/Vim to unite all interfaces. It
   " can replace many features or plugins with its interface. It is like a
   " fuzzy finder, but is more generic. You can extend the interface and create
   " the sources.
+  "
+  " <https://github.com/Shougo/denite.vim>
   call dein#add('Shougo/denite.nvim')
 
   " Fzf is a general-purpose command-line fuzzy finder.
@@ -144,23 +158,38 @@ if dein#load_state('~/.cache/dein.vim')
   " doesn't block.
   "
   " Instructions taken from <https://github.com/Shougo/dein.vim/issues/74>
+  "
+  " <https://github.com/junegunn/fzf>
+  " <https://github.com/junegunn/fzf.vim>
   call dein#add('junegunn/fzf', { 'build': './install --bin', 'merged': 0 })
   call dein#add('junegunn/fzf.vim', { 'depends': 'fzf' })
 
   " Molokai is a Vim port of the monokai theme for TextMate originally created
   " by Wimer Hazenberg.
+  "
+  " <https://github.com/tomasr/molokai>
   call dein#add('tomasr/molokai')
 
   " All 256 xterm colors with their RGB equivalents, right in Vim!
   "
-  " Provides command ':XtermColorTable'.
+  " Provides commands such as: ':XtermColorTable'.
+  "
+  " Help:
+  "   :help xterm-color-table.txt
+  "
+  " <https://github.com/guns/xterm-color-table.vim>
   call dein#add('guns/xterm-color-table.vim')
 
   " Lean & mean status/tabline for vim that's light as air.
+  "
+  " <https://github.com/vim-airline/vim-airline>
+  " <https://github.com/vim-airline/vim-airline-themes>
   call dein#add('vim-airline/vim-airline')
   call dein#add('vim-airline/vim-airline-themes')
 
   " Indent Guides is a plugin for visually displaying indent levels in Vim.
+  "
+  " <https://github.com/nathanaelkane/vim-indent-guides>
   call dein#add('nathanaelkane/vim-indent-guides')
 
   " The NERD tree allows you to explore your filesystem and to open files and
@@ -170,20 +199,31 @@ if dein#load_state('~/.cache/dein.vim')
   "
   " Plugin 'Xuyuanp/nerdtree-git-plugin' provides functionality for showing
   " Git flags (modified, staged, untracked, etc.) in NERDTree.
+  "
+  " <https://github.com/scrooloose/nerdtree>
+  " <https://github.com/Xuyuanp/nerdtree-git-plugin>
   call dein#add('scrooloose/nerdtree')
   call dein#add('Xuyuanp/nerdtree-git-plugin')
 
   " Functions for manipulation of comments in source code. For example,
   " commenting-out lines.
+  "
+  " <https://github.com/scrooloose/nerdcommenter>
   call dein#add('scrooloose/nerdcommenter')
 
   " Asynchronous linting and make framework for Neovim/Vim.
+  "
+  " <https://github.com/neomake/neomake>
   call dein#add('neomake/neomake')
 
   " A Git wrapper plugin that provides Git functionality from Neovim.
+  "
+  " <https://github.com/tpope/vim-fugitive>
   call dein#add('tpope/vim-fugitive')
 
   " A Git commit browser / git log wrapper that extends fugitive.vim.
+  "
+  " <https://github.com/int3/vim-extradite>
   call dein#add('int3/vim-extradite')
 
   " Syntax highlighting and indentation for Haskell and Cabal based on
@@ -193,12 +233,13 @@ if dein#load_state('~/.cache/dein.vim')
   call dein#add('neovimhaskell/haskell-vim')
 
   " Language Server Protocol support for Neovim. See
-  " https://github.com/Microsoft/language-server-protocol for more
+  " <https://github.com/Microsoft/language-server-protocol> for more
   " information.
   "
   " Installation instructions:
+  "   <https://github.com/autozimu/LanguageClient-neovim/blob/next/INSTALL.md#deinvim-user>
   "
-  "   https://github.com/autozimu/LanguageClient-neovim/blob/next/INSTALL.md#deinvim-user
+  " <https://github.com/autozimu/LanguageClient-neovim>
   call dein#add('autozimu/LanguageClient-neovim', {
     \ 'rev': 'next',
     \ 'build': 'bash install.sh',
@@ -206,37 +247,52 @@ if dein#load_state('~/.cache/dein.vim')
 
   " Syntax highlighting and indentation for Purescript based on idris-vim and
   " haskell-vim.
+  "
+  " <https://github.com/raichoo/purescript-vim>
   call dein#add('raichoo/purescript-vim')
 
   " Syntax highlighting for the Smart Game Format, which is the default
   " savegame format for the two-player Go game.
+  "
+  " <https://github.com/vim-scripts/sgf.vim>
   call dein#add('vim-scripts/sgf.vim')
 
-  " Syntax highlighting for PlantUML (http://plantuml.com).
+  " Syntax highlighting for PlantUML <http://plantuml.com>.
+  "
+  " <https://github.com/aklt/plantuml-syntax>
   call dein#add('aklt/plantuml-syntax')
 
-  " Syntax highlighting for Dhall (https://github.com/dhall-lang/dhall-lang)
+  " Syntax highlighting for Dhall
+  "
+  " <https://github.com/dhall-lang/dhall-lang>
   call dein#add('vmchale/dhall-vim')
 
   " Extra icons for various Vim/Neovim plugins. It supports plugins such as
   " NERDTree, vim-airline, CtrlP, powerline, denite, unite, lightline.vim,
   " vim-startify, vimfiler, vim-workspace and flagship.
-  " (https://github.com/ryanoasis/vim-devicons)
   "
-  " See also: https://github.com/ryanoasis/nerd-fonts
+  " See also: <https://github.com/ryanoasis/nerd-fonts>
+  "
+  " <https://github.com/ryanoasis/vim-devicons>
   call dein#add('ryanoasis/vim-devicons')
 
   " Syntax highlighting for Nix expressions and other functionality that makes
-  " Nix files editing better.  (https://github.com/LnL7/vim-nix)
+  " Nix files editing better.
   "
-  " Interesting article: http://nicknovitski.com/vim-nix-syntax
+  " Interesting article: <http://nicknovitski.com/vim-nix-syntax>
+  "
+  " <https://github.com/LnL7/vim-nix>
   call dein#add('LnL7/vim-nix')
 
   " Direnv integration that correctly loads Direnv environment, and provides
   " syntax highlighting for `.envrc` files.
+  "
+  " <https://github.com/direnv/direnv.vim>
   call dein#add('direnv/direnv.vim')
 
-  " LookML syntax highlighting. <https://github.com/thalesmello/lkml.vim>
+  " LookML syntax highlighting.
+  "
+  " <https://github.com/thalesmello/lkml.vim>
   call dein#add('thalesmello/lkml.vim')
 
   " }}} Plugin -- Dein.vim -- Plugins to Install ------------------------------

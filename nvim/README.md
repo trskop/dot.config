@@ -260,6 +260,7 @@ Installation *PlantUML* command line tool on Debian-compatible systems:
 apt install plantuml graphviz
 ```
 
+
 ## Interesting Articles
 
 * [blog.jez.io/haskell-development-with-neovim
@@ -273,3 +274,27 @@ apt install plantuml graphviz
 * [reddit.com/r/haskell/comments/ai3326/vimneovim\_with\_haskell\_in\_2019\_is\_there\_any
   ](https://www.reddit.com/r/haskell/comments/ai3326/vimneovim_with_haskell_in_2019_is_there_any/)
   from 20th January, 2019.
+
+
+## Plugins to look into
+
+* [github.com/stefandtw/quickfix-reflector.vim
+  ](https://github.com/stefandtw/quickfix-reflector.vim) - Edit entries in
+  quickfix window and have them reflected in the buffer.
+
+* [github.com/terryma/vim-multiple-cursors
+  ](https://github.com/terryma/vim-multiple-cursors)
+
+* [github.com/ujihisa/unite-haskellimport
+  ](https://github.com/ujihisa/unite-haskellimport)
+
+* [github.com/tpope/vim-surround](https://github.com/tpope/vim-surround)
+
+* [github.com/kien/rainbow\_parentheses.vim
+  ](https://github.com/kien/rainbow_parentheses.vim)
+
+* [github.com/jacoborus/tender.vim](https://github.com/jacoborus/tender.vim) -
+  Theme
+
+* [github.com/enomsg/vim-haskellConcealPlus
+  ](https://github.com/enomsg/vim-haskellConcealPlus)
