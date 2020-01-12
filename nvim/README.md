@@ -1,6 +1,7 @@
 # ~/.config/nvim
 
-Personalised Neovim configuration.
+Personalised Neovim configuration.  Not everything is documented here, see also
+[`init.vim`](./init.vim) and files in [`ftplugin/`](./ftplugin/).
 
 
 ## Installation
@@ -34,8 +35,11 @@ Urxvt it can be by done in `.Xresources`/`.Xdefaults`, e.g.:
 URxvt.font: xft:DejaVu Sans Mono for Powerline:size=14:style=Book
 ```
 
-Install *Haskell IDE Engine* using instructions in section [Haskell IDE Engine
-(command line tool)](#haskell-ide-engine-command-line-tool).
+Install *Haskell IDE Engine* or *ghcide*:
+
+* Follow instructions in section [Haskell IDE Engine (command line tool)
+  ](#haskell-ide-engine-command-line-tool) or in [ghcide (Haskell IDE tool)
+  ](#ghcide-haskell-ide-tool).
 
 
 #### Debian
@@ -54,6 +58,8 @@ apt install libtinfo-dev
 
 
 ### Mac OS X
+
+**WARNING: This hadn't been tested in a while and it may be out of date.**
 
 Install Python and Neovim hosts for it:
 
@@ -86,7 +92,7 @@ directory. Press "Open".
 brew install icu4c
 ```
 
-Install *Haskell IDE Engine*:
+Install *Haskell IDE Engine* or *ghcide*:
 
 * Follow instructions in section [Haskell IDE Engine (command line tool)
   ](#haskell-ide-engine-command-line-tool).
@@ -116,6 +122,9 @@ command line tools. See [`init.vim`](init.vim) for more.
 
 Custom commands and shortcuts are documented in `:help rituals`, i.e.
 [`doc/rituals.txt`](rituals.txt).
+
+Very useful tool for interacting with existing Neovim instance, especially from
+`:terminal`, is [neovim-remote](https://github.com/mhinz/neovim-remote).
 
 
 ### Git Integration (plugins)
@@ -180,6 +189,11 @@ Pligin: [github.com/autozimu/LanguageClient-neovim
 Installation and configuration: [LanguageClient-neovim/INSTALL.md
 ](https://github.com/autozimu/LanguageClient-neovim/blob/next/INSTALL.md)
 
+Alternatives to *LanguageClient-neovim*:
+
+* [github.com/neoclide/coc.nvim](https://github.com/neoclide/coc.nvim)
+* [github.com/prabirshrestha/vim-lsp](https://github.com/prabirshrestha/vim-lsp)
+
 
 ### Haskell IDE Engine (command line tool)
 
@@ -202,11 +216,35 @@ Configuration instructions:
   [haskell-ide-engine/README.md#docs-on-hovercompletion
   ](https://github.com/haskell/haskell-ide-engine#docs-on-hovercompletion)
 
+* Configuration of `hie-bios` used by Haskell IDE Engine:
+  [hie-bios/README.md#explicit-configuration
+  ](https://github.com/mpickering/hie-bios#explicit-configuration)
+
 After installation users don't interact with Haskell IDE Engine directly, but
 through [*LanguageClient-neovim*
 ](#lsp-language-server-protocol-client-for-neovim-plugin) plugin. See its
 documentation (`:help LanguageClient`) and [`init.vim`](init.vim) for more
 information.
+
+
+### ghcide (Haskell IDE tool)
+
+[github.com/digital-asset/ghcide](https://github.com/digital-asset/ghcide)
+
+Requires: [*LanguageClient-neovim*
+](#lsp-language-server-protocol-client-for-neovim-plugin) plugin
+
+Configuration instructions:
+
+* [ghcide/README.md#using-with-vimneovim
+  ](https://github.com/digital-asset/ghcide#using-with-vimneovim)
+
+* Configuration of `hie-bios` used by Haskell IDE Engine:
+  [hie-bios/README.md#explicit-configuration
+  ](https://github.com/mpickering/hie-bios#explicit-configuration)
+
+Same caveats apply as for [Haskell IDE Engine (command line tool)
+](#haskell-ide-engine-command-line-tool).
 
 
 ### PlantUML (command line tool, plugin)
@@ -221,3 +259,17 @@ Installation *PlantUML* command line tool on Debian-compatible systems:
 ```bash
 apt install plantuml graphviz
 ```
+
+## Interesting Articles
+
+* [blog.jez.io/haskell-development-with-neovim
+  ](https://blog.jez.io/haskell-development-with-neovim/) from 16th July, 2017,
+  some of the stuff there is still relevant.
+
+* [mendo.zone/fun/neovim-setup-haskell
+  ](https://mendo.zone/fun/neovim-setup-haskell/) from 30th June, 2018,
+  some of the stuff there is still relevant.
+
+* [reddit.com/r/haskell/comments/ai3326/vimneovim\_with\_haskell\_in\_2019\_is\_there\_any
+  ](https://www.reddit.com/r/haskell/comments/ai3326/vimneovim_with_haskell_in_2019_is_there_any/)
+  from 20th January, 2019.
