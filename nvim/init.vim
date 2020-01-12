@@ -295,6 +295,19 @@ if dein#load_state('~/.cache/dein.vim')
   " <https://github.com/thalesmello/lkml.vim>
   call dein#add('thalesmello/lkml.vim')
 
+  " Call Ripgrep (`rg`) from Neovim.
+  "
+  " Usage:
+  "   :Rg <string|pattern>
+  "
+  " Configuration:
+  "   <https://github.com/jremmen/vim-ripgrep#configuration>
+  "
+  " <https://github.com/jremmen/vim-ripgrep>
+  if executable('rg')
+    call dein#add('jremmen/vim-ripgrep')
+  endif
+
   " }}} Plugin -- Dein.vim -- Plugins to Install ------------------------------
 
   " Required:
