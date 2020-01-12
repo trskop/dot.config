@@ -1,7 +1,7 @@
 -- |
 -- Module:      Main.Paths
 -- Description: Generate Dhall configuration file with XDG Directories.
--- Copyright:   (c) 2018-2019 Peter Trško
+-- Copyright:   (c) 2018-2020 Peter Trško
 -- License:     BSD3
 --
 -- Maintainer:  peter.trsko@gmail.com
@@ -27,7 +27,7 @@ import Data.String (IsString, fromString)
 import GHC.Generics (Generic)
 import System.Environment (lookupEnv)
 
-import CommandWrapper.Environment (Params(Params, exePath, name))
+import CommandWrapper.Subcommand.Prelude (Params(Params, exePath, name))
 import Data.Text (Text)
 import qualified Dhall (Inject)
 import System.Directory

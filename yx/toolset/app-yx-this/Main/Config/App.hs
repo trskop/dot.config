@@ -24,7 +24,7 @@ module Main.Config.App
 import GHC.Generics (Generic)
 import System.IO (hPutStrLn, stdout)
 
-import CommandWrapper.Environment (Params(Params, config))
+import CommandWrapper.Subcommand.Prelude (Params(Params, config))
 import Data.Text (Text)
 import qualified Data.Text as Text (null)
 import Data.Text.Prettyprint.Doc (pretty)

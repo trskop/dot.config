@@ -100,3 +100,10 @@ executables:
     main: Main.hs
     dependencies:
       - bytestring
+
+  yx-template:
+    source-dirs: app-yx-template
+    main: Main.hs
+    dependencies:
+      - prettyprinter-ansi-terminal
+      - safe
