@@ -68,6 +68,7 @@ thisGitRepo directory ThisGitRepo{} = do
         , "app-yx-new/"
         , "app-yx-path/"
         , "app-yx-remarkable/"
+        , "app-yx-template/"
         , "app-yx-this/"
         , "bash/"
         , "man/"
