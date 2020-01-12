@@ -391,6 +391,12 @@ elseif executable('hie')
   let g:LanguageClient_serverCommands['haskell'] = ['hie', '--lsp']
 endif
 
+augroup LanguageClient_signcolumn
+  autocmd!
+  autocmd User LanguageClientStarted setlocal signcolumn=yes
+  autocmd User LanguageClientStopped setlocal signcolumn=auto
+augroup END
+
 nmap <silent> <leader>c <ESC>:call LanguageClient_contextMenu()<CR>
 nmap <silent> <leader>d <ESC>:call LanguageClient_textDocument_definition()<CR>
 nmap <silent> <leader>D <ESC>:call LanguageClient_textDocument_hover()<CR>
