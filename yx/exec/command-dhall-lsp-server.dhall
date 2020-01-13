@@ -4,8 +4,8 @@ let toolset = env:COMMAND_WRAPPER_EXE as Text ? "yx"
 
 let script =
       ''
-      https://raw.githubusercontent.com/trskop/dot.config/e89a4a625fca95220447956d3bdee0afeb4aa4d2/scripts/dhall-lsp-server-wrapper
-      sha256:c12bd9e3b5423c8c5b992b0da928cdfc856fd911d5c4afdd0fc42f2a9f239829
+      https://raw.githubusercontent.com/trskop/dot.config/2b589e34c18df01478b3997792229fd7e4fb9c98/scripts/dhall-lsp-server-wrapper
+      sha256:f82defc79d7e9ca5058c34e0dec63e23343f8f8a02aa035da0b59288d818aa6a
       as Text
       ''
 
