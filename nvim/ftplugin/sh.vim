@@ -2,7 +2,7 @@
 " want to avoid shebang, but we may still provide ShellCheck directive for it
 " to use the correct shell.  If that is present we can set proper syntax
 " highlighting based on it.
-if getline(1) =~ '^#\s*shellcheck\s+shell=bash'
+if getline(1) =~ '^#\s*shellcheck\s\+shell=bash'
   let b:is_bash = 1
 endif
 
