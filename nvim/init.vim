@@ -41,6 +41,9 @@ set showcmd
 " Show the effects of a command incrementally, as you type.
 set inccommand=nosplit
 
+" Highlighting line where the cursor is.
+set cursorline
+
 " Ripgrep is a smart and fast alternative to recursive grep.  It's not
 " available on all systems and plugin that we are using is not fetching it on
 " its own.
