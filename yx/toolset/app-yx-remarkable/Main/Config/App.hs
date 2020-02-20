@@ -21,7 +21,7 @@ import Data.Proxy (Proxy(..))
 import Data.String (fromString)
 import GHC.Generics (Generic)
 
-import CommandWrapper.Internal.Dhall
+import CommandWrapper.Core.Dhall
     ( interpretStrictByteString
     , interpretWord
     )
