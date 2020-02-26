@@ -62,6 +62,7 @@ dependencies:
   - verbosity >=0.3
 
   - command-wrapper
+  - command-wrapper-core
   - host-and-port
   - mainplate
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env stack
 {- stack script
-    --resolver lts-14.27
+    --resolver lts-15.1
     --package directory
     --package executable-path
     --package shake
@@ -23,7 +23,7 @@
 -- Module:      Main
 -- Description: Initialise configuration for applications that do not support
 --              XDG Base Directory Specification
--- Copyright:   (c) 2018-2019 Peter Trško
+-- Copyright:   (c) 2018-2020 Peter Trško
 -- License:     BSD3
 --
 -- Maintainer:  peter.trsko@gmail.com
