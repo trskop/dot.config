@@ -150,7 +150,7 @@ install Directories{..} opts = shakeArgs opts $ do
     let commandWrapperDir = configDir </> "command-wrapper"
         binDir = home </> "bin"
         yxDir = configDir </> "yx"
-        habitDir = configDir </> "habit"
+--      habitDir = configDir </> "habit"
         dotLocalDir = home </> ".local"
         yxLibDir = dotLocalDir </> "lib" </> "yx"
         commandWrapperLibDir = dotLocalDir </> "lib" </> "command-wrapper"
@@ -197,7 +197,7 @@ install Directories{..} opts = shakeArgs opts $ do
         , yxDir </> "default" <.> "dhall"
         , yxLibDir </> "yx-jmp"
 
-        , habitDir </> "default.dhall"
+--      , habitDir </> "default.dhall"
 --      , habitDir </> "pgpass.conf"
 
         , binDir </> "fzf"
@@ -322,11 +322,11 @@ install Directories{..} opts = shakeArgs opts $ do
         , dotLocalDir
         }
 
-    habitRules HabitRulesParamams
-        { configDir = habitDir
-        , dotLocalDir
-        , commandWrapperLibDir
-        }
+--  habitRules HabitRulesParamams
+--      { configDir = habitDir
+--      , dotLocalDir
+--      , commandWrapperLibDir
+--      }
 
     -- }}} CommandWrapper -----------------------------------------------------
 
@@ -455,6 +455,8 @@ data HabitRulesParamams = HabitRulesParamams
     , commandWrapperLibDir :: FilePath
     }
 
+{- TODO: Currently unused, will need to be revisited.
+
 -- | CommandWrapper toolset `habit` is used at work. Most of the configuration
 -- is not actually in the repository, only the skeleton.
 habitRules :: HabitRulesParamams -> Rules ()
@@ -488,6 +490,7 @@ habitRules HabitRulesParamams{..} = do
                 need srcs
                 cmd_ (FileStdout out) "sed" ["/^#/d"] srcs
                 cmd_ "chmod" "u=rw,go=" [out]
+-}
 
 data NixParams = NixParams
     { home :: FilePath
