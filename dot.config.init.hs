@@ -449,13 +449,13 @@ yxRules YxRulesParams{..} = do
         let src = commandWrapperLibDir </> "command-wrapper"
         symlink src out
 
+{- TODO: Currently unused, will need to be revisited.
+
 data HabitRulesParamams = HabitRulesParamams
     { configDir :: FilePath
     , dotLocalDir :: FilePath
     , commandWrapperLibDir :: FilePath
     }
-
-{- TODO: Currently unused, will need to be revisited.
 
 -- | CommandWrapper toolset `habit` is used at work. Most of the configuration
 -- is not actually in the repository, only the skeleton.
