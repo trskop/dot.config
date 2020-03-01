@@ -63,6 +63,7 @@ dependencies:
 
   - command-wrapper
   - command-wrapper-core
+  - command-wrapper-subcommand
   - host-and-port
   - mainplate
 

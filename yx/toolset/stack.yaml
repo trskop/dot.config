@@ -14,7 +14,8 @@ extra-deps:
   - dhall-1.30.0
   - dhall-bash-1.0.28
   - dhall-json-1.6.2
-  - aeson-yaml-1.0.5.0
+  - aeson-yaml-1.0.6.0
+  - prettyprinter-1.6.1
 
 # Keeping the following in case of new Dhall release:
   # Dhall dependencies:
@@ -38,8 +39,9 @@ extra-deps:
   - git: https://github.com/trskop/command-wrapper.git
     subdirs:
       - command-wrapper-core
+      - command-wrapper-subcommand
       - command-wrapper
-    commit: 1a8f4fa4a917e3a4790641c1f414d60792869635
+    commit: 1f78186da4cc92b6daacf945e122a7d1c42a912a
 
   - git: https://github.com/trskop/genbashrc.git
     commit: 87edf5f77320d716a39376b6a0e210ab46802ff4

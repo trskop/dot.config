@@ -47,12 +47,19 @@ packages:
   original:
     hackage: dhall-json-1.6.2
 - completed:
-    hackage: aeson-yaml-1.0.5.0@sha256:5786f021c1e088d6a5aa259120ec5b1f22bb1757f4427c1a87e0513d00f17f31,1975
+    hackage: aeson-yaml-1.0.6.0@sha256:bdf6d67265d9a3e251122fa53d2f0f19e0b9865d928e5d6efb77d4754ca3f6cb,1975
     pantry-tree:
-      size: 450
-      sha256: abc06de688cab0956ed76bfb88e8c845158d2f3debf9812cb002d9f4db5d3695
+      size: 451
+      sha256: 959322f98d04221b5680efafb75a9009fd3c5a2d737d46330be9c466091619f7
   original:
-    hackage: aeson-yaml-1.0.5.0
+    hackage: aeson-yaml-1.0.6.0
+- completed:
+    hackage: prettyprinter-1.6.1@sha256:11876ec94a79048e1d2942a99bfaa6f2be5222eafeedac6a9545673a79465009,5459
+    pantry-tree:
+      size: 2194
+      sha256: b8ddc48e267da0bc8da3082929b478df80c3c986865394f93e7bc7631c0031cf
+  original:
+    hackage: prettyprinter-1.6.1
 - completed:
     hackage: lock-file-0.7.0.0@sha256:3ad84b5e454145e1d928063b56abb96db24a99a21b493989520e58fa0ab37b00,4484
     pantry-tree:
@@ -105,35 +112,51 @@ packages:
 - completed:
     subdir: command-wrapper-core
     cabal-file:
-      size: 4748
-      sha256: d18e8dd696290ce0748ad68b425aecb1ea0006b7c6fad43db20790ac6927d666
+      size: 4089
+      sha256: a0f34245ea7056258d34fa093b45d2fc086e98fe3ee6dc5083f6ce0ceb3faf1a
     name: command-wrapper-core
     version: 0.1.0.0
     git: https://github.com/trskop/command-wrapper.git
     pantry-tree:
-      size: 1549
-      sha256: 0fd8dde849d4eb03ab9cc0f9a8b0be21b01db56ffa91e34ba413d75cae916b6e
-    commit: 1a8f4fa4a917e3a4790641c1f414d60792869635
+      size: 1802
+      sha256: fccb4d4c1e165ad45fe7937cca23575f8a2f08fe262ab96fbb9837cb74c70f3a
+    commit: 1f78186da4cc92b6daacf945e122a7d1c42a912a
   original:
     subdir: command-wrapper-core
     git: https://github.com/trskop/command-wrapper.git
-    commit: 1a8f4fa4a917e3a4790641c1f414d60792869635
+    commit: 1f78186da4cc92b6daacf945e122a7d1c42a912a
+- completed:
+    subdir: command-wrapper-subcommand
+    cabal-file:
+      size: 3139
+      sha256: f36563d6b00fa8359671fb374482d044c6247d3967d0e0e1d64177059cbd1cb9
+    name: command-wrapper-subcommand
+    version: 0.1.0.0
+    git: https://github.com/trskop/command-wrapper.git
+    pantry-tree:
+      size: 533
+      sha256: 1917b0075630cb1fb378fcf4c52531870441280b533ec506f9736065c4ae717e
+    commit: 1f78186da4cc92b6daacf945e122a7d1c42a912a
+  original:
+    subdir: command-wrapper-subcommand
+    git: https://github.com/trskop/command-wrapper.git
+    commit: 1f78186da4cc92b6daacf945e122a7d1c42a912a
 - completed:
     subdir: command-wrapper
     cabal-file:
-      size: 27043
-      sha256: 5b0498070ee8aade1378a56c67cdf9b88872fb79cd3d75021618e68fd813c1a6
+      size: 27326
+      sha256: 194549b64a54e83fa9c0b1a589997f810aaea977400d72c09e661c14d496ee68
     name: command-wrapper
     version: 0.1.0.0
     git: https://github.com/trskop/command-wrapper.git
     pantry-tree:
-      size: 31419
-      sha256: 9c96acf480043a2b8fa29d5e17b529163eced2997c290da694fc022e1cf5e387
-    commit: 1a8f4fa4a917e3a4790641c1f414d60792869635
+      size: 31430
+      sha256: f26f5c3dbb0d13f9c26a2e6e86180faed58f01fe9a809fe5d92b861af31958c9
+    commit: 1f78186da4cc92b6daacf945e122a7d1c42a912a
   original:
     subdir: command-wrapper
     git: https://github.com/trskop/command-wrapper.git
-    commit: 1a8f4fa4a917e3a4790641c1f414d60792869635
+    commit: 1f78186da4cc92b6daacf945e122a7d1c42a912a
 - completed:
     cabal-file:
       size: 2042
