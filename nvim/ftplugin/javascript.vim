@@ -3,4 +3,12 @@ setlocal shiftwidth=4
 setlocal expandtab
 setlocal colorcolumn=80
 setlocal number
-autocmd BufWritePre * %s/\s\+$//e
+
+augroup filetype_javascript
+  autocmd! * <buffer>
+
+  autocmd BufWritePre <buffer> %s/\s\+$//e
+
+  " Long or badly placed multi-line strings cause syntax highlighting to fail.
+  autocmd BufEnter <buffer> syntax sync fromstart
+augroup END

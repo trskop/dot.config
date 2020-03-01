@@ -3,7 +3,6 @@ setlocal shiftwidth=4
 setlocal expandtab
 setlocal colorcolumn=80
 setlocal number
-autocmd BufWritePre * %s/\s\+$//e
 
 setlocal makeprg=stack\ test\ --no-run-tests\ --fast
 setlocal errorformat=
@@ -15,3 +14,12 @@ setlocal errorformat=
   \%+C\ \ %#%m,
   \%W%>%f:%l:%c:,
   \%+C\ \ %#%tarning:\ %m,
+
+augroup filetype_lhaskell
+  autocmd! * <buffer>
+
+  autocmd BufWritePre <buffer> %s/\s\+$//e
+
+  " Long or badly placed multi-line strings cause syntax highlighting to fail.
+  autocmd BufEnter <buffer> syntax sync fromstart
+augroup END

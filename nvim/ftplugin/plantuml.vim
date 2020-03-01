@@ -3,6 +3,11 @@ setlocal shiftwidth=4
 setlocal expandtab
 setlocal colorcolumn=80
 setlocal number
-autocmd BufWritePre * %s/\s\+$//e
 
 setlocal makeprg=plantuml\ %
+
+augroup filetype_plantuml
+  autocmd! * <buffer>
+
+  autocmd BufWritePre <buffer> %s/\s\+$//e
+augroup END

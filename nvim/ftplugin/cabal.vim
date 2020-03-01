@@ -3,4 +3,8 @@ setlocal shiftwidth=2
 setlocal expandtab
 setlocal colorcolumn=80
 setlocal number
-autocmd BufWritePre * %s/\s\+$//e
+
+augroup filetype_cabal
+  autocmd! * <buffer>
+  autocmd BufWritePre <buffer> %s/\s\+$//e
+augroup END
