@@ -20,17 +20,7 @@ let join =
         , helpMessage = "${a.helpMessage}${b.helpMessage}"
         }
 
-let helpMessage =
-      ''
-
-      YX Subcommands:
-
-        env
-        jmp
-        new
-        path
-        this
-      ''
+let helpMessage = ""
 
 let home = env:HOME as Text
 
