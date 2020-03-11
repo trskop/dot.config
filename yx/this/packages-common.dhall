@@ -35,10 +35,7 @@ let osSpecificPackages =
           [ "neovim"
           , "python-dev", "python-pip"
           , "python3-dev", "python3-pip"
-
-          -- Currently doesn't work on Debian:
-          , "gcc-doc"
-          ] : List Text
+          ]
       }
 
 in
@@ -141,7 +138,7 @@ in
   -- {{{ Development ----------------------------------------------------------
 
   , "build-essential"
-  -- , "gcc-doc"  -- Includes manual pages for gcc.
+  , "gcc-doc"  -- Includes manual pages for gcc.
   , "git", "git-doc", "git-gui", "gitk"
   , "sqlite3"
   , "strace"
