@@ -41,7 +41,7 @@ extra-deps:
       - command-wrapper-core
       - command-wrapper-subcommand
       - command-wrapper
-    commit: 1f78186da4cc92b6daacf945e122a7d1c42a912a
+    commit: 4fe5e509094c47db4ae4eae7b4010029a34e2798
 
   - git: https://github.com/trskop/genbashrc.git
     commit: 87edf5f77320d716a39376b6a0e210ab46802ff4

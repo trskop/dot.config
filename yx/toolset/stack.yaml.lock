@@ -119,12 +119,12 @@ packages:
     git: https://github.com/trskop/command-wrapper.git
     pantry-tree:
       size: 1802
-      sha256: fccb4d4c1e165ad45fe7937cca23575f8a2f08fe262ab96fbb9837cb74c70f3a
-    commit: 1f78186da4cc92b6daacf945e122a7d1c42a912a
+      sha256: 3b4e200d40c6ff08789255f56abe818cf437287c478251bb1d7bf0261dd96eb9
+    commit: 4fe5e509094c47db4ae4eae7b4010029a34e2798
   original:
     subdir: command-wrapper-core
     git: https://github.com/trskop/command-wrapper.git
-    commit: 1f78186da4cc92b6daacf945e122a7d1c42a912a
+    commit: 4fe5e509094c47db4ae4eae7b4010029a34e2798
 - completed:
     subdir: command-wrapper-subcommand
     cabal-file:
@@ -136,27 +136,27 @@ packages:
     pantry-tree:
       size: 533
       sha256: 1917b0075630cb1fb378fcf4c52531870441280b533ec506f9736065c4ae717e
-    commit: 1f78186da4cc92b6daacf945e122a7d1c42a912a
+    commit: 4fe5e509094c47db4ae4eae7b4010029a34e2798
   original:
     subdir: command-wrapper-subcommand
     git: https://github.com/trskop/command-wrapper.git
-    commit: 1f78186da4cc92b6daacf945e122a7d1c42a912a
+    commit: 4fe5e509094c47db4ae4eae7b4010029a34e2798
 - completed:
     subdir: command-wrapper
     cabal-file:
-      size: 27326
-      sha256: 194549b64a54e83fa9c0b1a589997f810aaea977400d72c09e661c14d496ee68
+      size: 27444
+      sha256: 41dd3db4fd0ab4d75417ef9c918b588127914546fe98841501fc3f90ba461301
     name: command-wrapper
     version: 0.1.0.0
     git: https://github.com/trskop/command-wrapper.git
     pantry-tree:
-      size: 31430
-      sha256: f26f5c3dbb0d13f9c26a2e6e86180faed58f01fe9a809fe5d92b861af31958c9
-    commit: 1f78186da4cc92b6daacf945e122a7d1c42a912a
+      size: 31691
+      sha256: 1d020ddf20c3e2e2f58b1453c3ef14d72e4c6b11a8f1a180ec88ec5a5300e776
+    commit: 4fe5e509094c47db4ae4eae7b4010029a34e2798
   original:
     subdir: command-wrapper
     git: https://github.com/trskop/command-wrapper.git
-    commit: 1f78186da4cc92b6daacf945e122a7d1c42a912a
+    commit: 4fe5e509094c47db4ae4eae7b4010029a34e2798
 - completed:
     cabal-file:
       size: 2042
