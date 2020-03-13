@@ -150,7 +150,7 @@ install Directories{..} opts = shakeArgs opts $ do
     let commandWrapperDir = configDir </> "command-wrapper"
         binDir = home </> "bin"
         yxDir = configDir </> "yx"
---      habitDir = configDir </> "habit"
+        habitDir = configDir </> "habit"
         dotLocalDir = home </> ".local"
         yxLibDir = dotLocalDir </> "lib" </> "yx"
         commandWrapperLibDir = dotLocalDir </> "lib" </> "command-wrapper"
@@ -197,7 +197,7 @@ install Directories{..} opts = shakeArgs opts $ do
         , yxDir </> "default" <.> "dhall"
         , yxLibDir </> "yx-jmp"
 
---      , habitDir </> "default.dhall"
+        , habitDir </> "default.dhall"
 --      , habitDir </> "pgpass.conf"
 
         , binDir </> "fzf"
@@ -322,11 +322,11 @@ install Directories{..} opts = shakeArgs opts $ do
         , dotLocalDir
         }
 
---  habitRules HabitRulesParamams
---      { configDir = habitDir
---      , dotLocalDir
---      , commandWrapperLibDir
---      }
+    habitRules HabitRulesParamams
+        { configDir = habitDir
+        , dotLocalDir
+        , commandWrapperLibDir
+        }
 
     -- }}} CommandWrapper -----------------------------------------------------
 
@@ -449,7 +449,6 @@ yxRules YxRulesParams{..} = do
         let src = commandWrapperLibDir </> "command-wrapper"
         symlink src out
 
-{- TODO: Currently unused, will need to be revisited.
 
 data HabitRulesParamams = HabitRulesParamams
     { configDir :: FilePath
@@ -479,6 +478,7 @@ habitRules HabitRulesParamams{..} = do
             , "--no-remote-only"
             ]
 
+{- TODO: Currently unused, will need to be revisited.
     -- See `psql(1)` for more details about `pgpass` file.
     (configDir </> "pgpass.conf") %> \out -> do
         let pgpassDir = configDir </> "pgpass.d"
