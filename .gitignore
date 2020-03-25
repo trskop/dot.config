@@ -18,12 +18,12 @@
 !/sensible-editor/
 !/stack/
 !/tmux/
-!README.md
-!Xresources
-!dot.config.init.hs
-!init-host-specific-config-repo.bash
-!user-dirs.dirs
-!user-dirs.locale
+!/README.md
+!/Xresources
+!/dot.config.init.hs
+!/init-host-specific-config-repo.bash
+!/user-dirs.dirs
+!/user-dirs.locale
 
 # Machine specific configuration of Kitty.  See ./kitty/README.md for more
 # details.
