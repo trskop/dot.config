@@ -11,9 +11,9 @@ extra-deps:
   - fuzzy-0.1.0.0
   - verbosity-0.4.0.0
 
-  - dhall-1.30.0
-  - dhall-bash-1.0.28
-  - dhall-json-1.6.2
+  - dhall-1.31.1
+  - dhall-bash-1.0.29
+  - dhall-json-1.6.3
   - aeson-yaml-1.0.6.0
   - prettyprinter-1.6.1
 
@@ -41,7 +41,7 @@ extra-deps:
       - command-wrapper-core
       - command-wrapper-subcommand
       - command-wrapper
-    commit: 4fe5e509094c47db4ae4eae7b4010029a34e2798
+    commit: e64ae8f463a75256b316b039652cc1364c9cd088 # rc8 with Dhall 1.31.1
 
   - git: https://github.com/trskop/genbashrc.git
     commit: 87edf5f77320d716a39376b6a0e210ab46802ff4

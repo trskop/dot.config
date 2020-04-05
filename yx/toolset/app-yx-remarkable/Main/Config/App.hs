@@ -39,7 +39,9 @@ import qualified Data.Text as Text (null)
 import qualified Dhall
     ( Decoder
     , FromDhall(autoWith)
+    , InputNormalizer
     , InterpretOptions(InterpretOptions, fieldModifier)
+    , defaultInterpretOptions
     , auto
     , input
     , maybe
@@ -54,10 +56,13 @@ newtype ConnectToRemarkableViaSsh
   deriving stock (Generic, Show)
 
 instance Dhall.FromDhall ConnectToRemarkableViaSsh where
-    autoWith :: Dhall.InterpretOptions -> Dhall.Decoder ConnectToRemarkableViaSsh
-    autoWith opts = ConnectToRemarkableViaSsh
-        <$> interpretHostAndPort (Proxy @"remarkable-ssh") opts
-                interpretStrictByteString (Dhall.maybe interpretWord)
+    autoWith
+        :: Dhall.InputNormalizer
+        -> Dhall.Decoder ConnectToRemarkableViaSsh
+    autoWith _normalizer = ConnectToRemarkableViaSsh
+        <$> interpretHostAndPort (Proxy @"remarkable-ssh")
+                Dhall.defaultInterpretOptions interpretStrictByteString
+                (Dhall.maybe interpretWord)
 
 newtype ConnectToRemarkableViaWebUi
     = ConnectToRemarkableViaWebUi
@@ -66,11 +71,12 @@ newtype ConnectToRemarkableViaWebUi
 
 instance Dhall.FromDhall ConnectToRemarkableViaWebUi where
     autoWith
-        :: Dhall.InterpretOptions
+        :: Dhall.InputNormalizer
         -> Dhall.Decoder ConnectToRemarkableViaWebUi
-    autoWith opts = ConnectToRemarkableViaWebUi
-        <$> interpretHostAndPort (Proxy @"remarkable-web-ui") opts
-                interpretStrictByteString (Dhall.maybe interpretWord)
+    autoWith _normalizer = ConnectToRemarkableViaWebUi
+        <$> interpretHostAndPort (Proxy @"remarkable-web-ui")
+                Dhall.defaultInterpretOptions interpretStrictByteString
+                (Dhall.maybe interpretWord)
 
 interpretHostAndPort
     :: forall (tag :: k) host port
