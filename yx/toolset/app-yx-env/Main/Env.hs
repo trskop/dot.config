@@ -28,7 +28,7 @@ import Data.Maybe (isNothing, mapMaybe)
 import Data.Monoid (Endo(..))
 import GHC.Generics (Generic)
 
-import Data.Algorithm.Diff (Diff(..), getDiffBy)
+import Data.Algorithm.Diff (PolyDiff(..), getDiffBy)
 import Data.HashMap.Strict (HashMap)
 import qualified Data.HashMap.Strict as HashMap (delete, insert, lookup)
 import Data.Text (Text)
