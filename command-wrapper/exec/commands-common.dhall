@@ -6,7 +6,7 @@ let docker = Exec.docker
 
 let Environment/empty = CommandWrapper.Environment.empty
 
-let List/head-and-tail = CommandWrapper.List.head-and-tail
+let List/headAndTail = CommandWrapper.List.headAndTail
 
 in  -- {{{ Docker -------------------------------------------------------------
     [ CommandWrapper.ExecNamedCommand::{
@@ -20,7 +20,7 @@ in  -- {{{ Docker -------------------------------------------------------------
             λ(verbosity : CommandWrapper.Verbosity.Type)
           → λ(colourOutput : CommandWrapper.ColourOutput.Type)
           → λ(arguments : List Text)
-          → let args = List/head-and-tail Text arguments
+          → let args = List/headAndTail Text arguments
 
             in  Optional/fold
                   Text
@@ -37,7 +37,7 @@ in  -- {{{ Docker -------------------------------------------------------------
                           → λ(verbosity : CommandWrapper.Verbosity.Type)
                           → λ(colourOutput : CommandWrapper.ColourOutput.Type)
                           → λ(arguments : List Text)
-                          → let cmd = List/head-and-tail Text arguments
+                          → let cmd = List/headAndTail Text arguments
 
                             in  CommandWrapper.ExecCommand::{
                                 , command =
