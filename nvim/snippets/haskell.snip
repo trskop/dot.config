@@ -2,7 +2,7 @@ snippet #!
 abbr    #!/usr/bin/env stack ...
 	#!/usr/bin/env stack
 	{- stack script
-		--resolver ${1:lts-15.6}
+		--resolver ${1:lts-15.9}
 		--package ${0:turtle}
 		--
 	-}
@@ -108,7 +108,7 @@ snippet info
 	-- |
 	-- Module:      ${1:`substitute(substitute(expand('%:r'), '[/\\]','.','g'),'^\%(\l*\.\)\?','','')`}
 	-- Description: ${2:TODO: Module synopsis}
-	-- Copyright:   (c) ${3:2019} ${4:Peter Trško}
+	-- Copyright:   (c) ${3:2020} ${4:Peter Trško}
 	-- License:     ${5:BSD3}
 	--
 	-- Maintainer:  ${6:peter.trsko@gmail.com}
@@ -121,7 +121,7 @@ snippet module
 	-- |
 	-- Module:      ${1:`substitute(substitute(expand('%:r'), '[/\\]','.','g'),'^\%(\l*\.\)\?','','')`}
 	-- Description: ${2:TODO: Module synopsis}
-	-- Copyright:   (c) ${3:2019} ${4:Peter Trško}
+	-- Copyright:   (c) ${3:2020} ${4:Peter Trško}
 	-- License:     ${5:BSD3}
 	--
 	-- Maintainer:  ${6:peter.trsko@gmail.com}

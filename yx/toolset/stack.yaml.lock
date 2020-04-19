@@ -119,12 +119,12 @@ packages:
     git: https://github.com/trskop/command-wrapper.git
     pantry-tree:
       size: 1802
-      sha256: efd17f8c50372e7bb64a1ee8ea5de32938852746b2af12ce15d74faa9e273367
-    commit: e64ae8f463a75256b316b039652cc1364c9cd088
+      sha256: c284ff9759678cc3605f6391a2842f3b329a85352524d70dc9bdf5ef79e95e94
+    commit: 106160a0d79e1d55df8e5942fbd38acca067ee00
   original:
     subdir: command-wrapper-core
     git: https://github.com/trskop/command-wrapper.git
-    commit: e64ae8f463a75256b316b039652cc1364c9cd088
+    commit: 106160a0d79e1d55df8e5942fbd38acca067ee00
 - completed:
     subdir: command-wrapper-subcommand
     cabal-file:
@@ -136,27 +136,27 @@ packages:
     pantry-tree:
       size: 533
       sha256: 5f6cda24ee83196289b10d4c6f84cf3e6a34502e0a4d67e47ef27097b83444a2
-    commit: e64ae8f463a75256b316b039652cc1364c9cd088
+    commit: 106160a0d79e1d55df8e5942fbd38acca067ee00
   original:
     subdir: command-wrapper-subcommand
     git: https://github.com/trskop/command-wrapper.git
-    commit: e64ae8f463a75256b316b039652cc1364c9cd088
+    commit: 106160a0d79e1d55df8e5942fbd38acca067ee00
 - completed:
     subdir: command-wrapper
     cabal-file:
-      size: 27451
-      sha256: 1e82dd674fd47c87ca6da5766db65f1112c75594d86000b0c73bc66e2ec1825c
+      size: 28102
+      sha256: 6cb60a818fb268362077a60a9623aecc765e73ad4fd3193b52699b09c797d471
     name: command-wrapper
     version: 0.1.0.0
     git: https://github.com/trskop/command-wrapper.git
     pantry-tree:
-      size: 31814
-      sha256: 9c26eb9c59e957cd8be0a75a386471201faa6bc39ea8a659b6b67aa33d87e29c
-    commit: e64ae8f463a75256b316b039652cc1364c9cd088
+      size: 32994
+      sha256: c7c6832a1c469a4fb1303fbf0d33a2f60481314d84040ba06d921de178c4a2b7
+    commit: 106160a0d79e1d55df8e5942fbd38acca067ee00
   original:
     subdir: command-wrapper
     git: https://github.com/trskop/command-wrapper.git
-    commit: e64ae8f463a75256b316b039652cc1364c9cd088
+    commit: 106160a0d79e1d55df8e5942fbd38acca067ee00
 - completed:
     cabal-file:
       size: 2042
@@ -173,7 +173,7 @@ packages:
     commit: 87edf5f77320d716a39376b6a0e210ab46802ff4
 snapshots:
 - completed:
-    size: 491387
-    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/15/6.yaml
-    sha256: 8d81505a6de861e167a58534ab62330afb75bfa108735c7db1204f7ef2a39d79
-  original: lts-15.6
+    size: 492027
+    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/15/9.yaml
+    sha256: 11394dc975e96c2fea90f7f2b3229630d46351a092ebcec78f0a56403930b429
+  original: lts-15.9

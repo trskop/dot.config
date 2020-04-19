@@ -1,7 +1,8 @@
 # For advanced use and comprehensive documentation of the format, please see:
 # https://docs.haskellstack.org/en/stable/yaml_configuration/
 
-resolver: lts-15.6
+# GHC 8.8.3
+resolver: lts-15.9
 
 packages:
   - '.'
@@ -41,7 +42,7 @@ extra-deps:
       - command-wrapper-core
       - command-wrapper-subcommand
       - command-wrapper
-    commit: e64ae8f463a75256b316b039652cc1364c9cd088 # rc8 with Dhall 1.31.1
+    commit: 106160a0d79e1d55df8e5942fbd38acca067ee00 # rc9 with Dhall 1.31.1
 
   - git: https://github.com/trskop/genbashrc.git
     commit: 87edf5f77320d716a39376b6a0e210ab46802ff4
