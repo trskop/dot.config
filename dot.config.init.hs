@@ -285,6 +285,7 @@ install Directories{..} opts = shakeArgs opts $ do
         let GitRepoConfig{directory} = commandWrapperRepoConfig
         cmd_ "git -C" [directory] "pull"
         cmd_ (Cwd directory) "./install"
+        cmd_ "mandb --user-db /home/peter/.local/share/man"
 
     [commandWrapperDir </> "default.dhall", commandWrapperDir </> "command-wrapper-*.dhall"]
       |%> \out -> do

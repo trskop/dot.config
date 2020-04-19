@@ -187,6 +187,9 @@ shakeMain Directories{..} opts = shakeArgs opts $ do
         cmd_ "pandoc --standalone --to=man" ["--output=" <> tempOut, src]
         cmd_ "gzip --force -9" [tempOut]
 
+        -- Generate DB for `yx help --search`
+        cmd_ "mandb --user-db /home/peter/.local/share/man"
+
     scriptTargets &%> \outs ->
         forM_ outs $ \out ->
             cmd_ "ln -sf"
