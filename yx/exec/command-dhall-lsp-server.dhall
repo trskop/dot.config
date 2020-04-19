@@ -2,10 +2,14 @@ let CommandWrapper = ../../command-wrapper/library.dhall
 
 let toolset = env:COMMAND_WRAPPER_EXE as Text ? "yx"
 
+let home = env:HOME as Text
+
+let xdgConfigDir = env:XDG_CONFIG_HOME as Text ? "${home}/.config"
+
 let script =
       ''
-      https://raw.githubusercontent.com/trskop/dot.config/2b589e34c18df01478b3997792229fd7e4fb9c98/scripts/dhall-lsp-server-wrapper
-      sha256:f82defc79d7e9ca5058c34e0dec63e23343f8f8a02aa035da0b59288d818aa6a
+      ${xdgConfigDir}/scripts/dhall-lsp-server-wrapper
+      sha256:382fbb508caa1421e14c46e7a74d9f535ca09fd9875921f61e7484e8b3e05c26
       as Text
       ''
 
