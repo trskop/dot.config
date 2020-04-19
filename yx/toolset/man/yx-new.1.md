@@ -5,7 +5,7 @@
 
 # NAME
 
-`yx-new` -- Simple package/project templating application.
+`yx-new` - Simple package/project templating application.
 
 
 # USAGE

@@ -5,7 +5,7 @@
 
 # NAME
 
-`yx-githook` -- Wrapper for `githooks(5)`
+`yx-githook` - Wrapper for `githooks(5)`
 
 
 # USAGE

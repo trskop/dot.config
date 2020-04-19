@@ -5,7 +5,7 @@
 
 # NAME
 
-`yx-apt` -- Inteligent wrapper for *apt* package manager.
+`yx-apt` - Inteligent wrapper for *apt* package manager.
 
 
 # USAGE

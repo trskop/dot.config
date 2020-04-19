@@ -5,7 +5,7 @@
 
 # NAME
 
-`yx-xpdf` -- Compatibility wrapper that provides xpdf-like command line
+`yx-xpdf` - Compatibility wrapper that provides xpdf-like command line
 interface for other PDF viewers.
 
 

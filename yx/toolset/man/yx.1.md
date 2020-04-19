@@ -2,9 +2,10 @@
 % Peter Trsko
 % 10th March 2019
 
+
 # NAME
 
-`yx` -- Command Wrapper toolset intended for personal productivity tools.
+`yx` - Command Wrapper toolset intended for personal productivity tools.
 
 
 # USAGE

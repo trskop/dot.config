@@ -5,7 +5,7 @@
 
 # NAME
 
-`yx-remarkable` -- Better UI for existing reMarkable tools.
+`yx-remarkable` - Better UI for existing reMarkable tools.
 
 
 # USAGE

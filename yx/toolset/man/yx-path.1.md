@@ -5,7 +5,7 @@
 
 # NAME
 
-`yx-path` -- **TODO**
+`yx-path` - **TODO**
 
 
 # USAGE

@@ -5,7 +5,7 @@
 
 # NAME
 
-`yx-jmp` -- Let user select a relevant file to edit based on various sorces.
+`yx-jmp` - Let user select a relevant file to edit based on various sources.
 
 
 # USAGE

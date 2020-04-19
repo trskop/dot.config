@@ -5,7 +5,7 @@
 
 # NAME
 
-`yx-this` -- Simplify system management and common system operations.
+`yx-this` - Simplify system management and common system operations.
 
 
 # USAGE

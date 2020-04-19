@@ -5,7 +5,7 @@
 
 # NAME
 
-`yx-download` -- Wrapper for `curl(1)`/`wget(1)` with the sole purpose of
+`yx-download` - Wrapper for `curl(1)`/`wget(1)` with the sole purpose of
 downloading files.
 
 
