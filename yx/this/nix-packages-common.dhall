@@ -1,4 +1,4 @@
-[ "ShellCheck"  -- A static analysis tool for shell scripts.
+[ "shellcheck"  -- A static analysis tool for shell scripts.
                 -- <https://github.com/koalaman/shellcheck>
 
 , "bat" -- Enhanced variant of `cat`. See ../../bat/README.md for more.
