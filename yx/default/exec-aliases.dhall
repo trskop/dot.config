@@ -1,10 +1,7 @@
 let CommandWrapper = ../../command-wrapper/library.dhall
 
-let empty = CommandWrapper.ExecNamedCommand.emptyCommands
+let constructor = ../exec/constructor.dhall
 
-let commands =
-        ../exec/commands-common.dhall
-      # (../exec/commands.dhall ? empty)
-      # (../exec/commands-local.dhall ? empty)
+let commands = (constructor CommandWrapper.ExecConfig::{=}).commands
 
 in  CommandWrapper.ExecNamedCommand.namedCommandsToAliases commands
