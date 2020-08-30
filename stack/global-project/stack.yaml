@@ -6,8 +6,8 @@
 # For more information about stack's configuration, see
 # http://docs.haskellstack.org/en/stable/yaml_configuration/
 
-resolver: ghc-8.8.3
-#resolver: lts-15.9
+resolver: ghc-8.8.4
+#resolver: lts-16.12
 packages: []
 
 #extra-deps: []

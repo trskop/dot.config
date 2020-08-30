@@ -68,9 +68,6 @@ packages:
   original:
     hackage: lock-file-0.7.0.0
 - completed:
-    cabal-file:
-      size: 2334
-      sha256: 33b2754a627b9c0971e8188d2751b73f6590e75b1f740893c6909a18707988f6
     name: host-and-port
     version: 0.0.1.0
     git: https://github.com/trskop/host-and-port.git
@@ -82,9 +79,6 @@ packages:
     git: https://github.com/trskop/host-and-port.git
     commit: e934d338b8ba6b5ce6c0e16e1d1a46d2d5099808
 - completed:
-    cabal-file:
-      size: 1744
-      sha256: a5eb034128f648a6531e4e2880fe27c856a608dc837c0030d0d31577d73b5719
     name: mainplate
     version: 0.0.1.0
     git: https://github.com/trskop/mainplate.git
@@ -96,9 +90,6 @@ packages:
     git: https://github.com/trskop/mainplate.git
     commit: 118acdb919e7bd7aaa07e7554a2d1eabde86acf5
 - completed:
-    cabal-file:
-      size: 1473
-      sha256: 7a69e28a52a5c9d4bf98c95ea2c256b74025afda9b349df932a183f91c45bc4c
     name: open-in-editor
     version: 0.1.0.0
     git: https://github.com/trskop/open-in-editor.git
@@ -111,9 +102,6 @@ packages:
     commit: eec72c9c99fd8bd89866bdd85a23343a4a6fbae8
 - completed:
     subdir: command-wrapper-core
-    cabal-file:
-      size: 4093
-      sha256: e2ac8c69efe9cf8947599b221231d1ced3924a6e67a50f9f9627148e0b2bb2f6
     name: command-wrapper-core
     version: 0.1.0.0
     git: https://github.com/trskop/command-wrapper.git
@@ -127,9 +115,6 @@ packages:
     commit: 106160a0d79e1d55df8e5942fbd38acca067ee00
 - completed:
     subdir: command-wrapper-subcommand
-    cabal-file:
-      size: 3143
-      sha256: d18d8bb20a69a46acdc4fecaae27d4971d6b5d11d2e03fb85b8e381261bb8511
     name: command-wrapper-subcommand
     version: 0.1.0.0
     git: https://github.com/trskop/command-wrapper.git
@@ -143,9 +128,6 @@ packages:
     commit: 106160a0d79e1d55df8e5942fbd38acca067ee00
 - completed:
     subdir: command-wrapper
-    cabal-file:
-      size: 28102
-      sha256: 6cb60a818fb268362077a60a9623aecc765e73ad4fd3193b52699b09c797d471
     name: command-wrapper
     version: 0.1.0.0
     git: https://github.com/trskop/command-wrapper.git
@@ -158,9 +140,6 @@ packages:
     git: https://github.com/trskop/command-wrapper.git
     commit: 106160a0d79e1d55df8e5942fbd38acca067ee00
 - completed:
-    cabal-file:
-      size: 2042
-      sha256: c71fb49b4130db23b2dfb2f904eb2414ec34ab336fde656b52186912bbd62553
     name: genbashrc
     version: 0.1.0.0
     git: https://github.com/trskop/genbashrc.git
@@ -173,7 +152,7 @@ packages:
     commit: 87edf5f77320d716a39376b6a0e210ab46802ff4
 snapshots:
 - completed:
-    size: 492027
-    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/15/9.yaml
-    sha256: 11394dc975e96c2fea90f7f2b3229630d46351a092ebcec78f0a56403930b429
-  original: lts-15.9
+    size: 532377
+    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/16/12.yaml
+    sha256: f914cfa23fef85bdf895e300a8234d9d0edc2dbec67f4bc9c53f85867c50eab6
+  original: lts-16.12

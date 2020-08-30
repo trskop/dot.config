@@ -1,6 +1,6 @@
 #!/usr/bin/env stack
 {- stack script
-    --resolver lts-15.9
+    --resolver lts-16.12
     --package directory
     --package executable-path
     --package shake
@@ -533,10 +533,14 @@ nixRules params@NixParams{cacheDir} = do
             "--no-daemon"
         writeFile' out ""
   where
-    installerSh = cacheDir </> "installer"
-    installerUrl = "https://nixos.org/nix/install"
-    installerSigUrl = "https://nixos.org/nix/install.sig"
+    version = "2.3.7"
     signingKeyFingerprint = "B541D55301270E0BCF15CA5D8170B4726D7198DE"
+
+    baseUrl = "https://releases.nixos.org/nix"
+    installerUrl = baseUrl <> "/nix-" <> version <> "/install"
+    installerSigUrl = baseUrl <> "/nix-" <> version <> "/install.asc"
+
+    installerSh = cacheDir </> "installer"
 
 dropPrefixDir :: FilePath -> FilePath -> FilePath
 dropPrefixDir path prefix = dropPrefix' path' prefix'
