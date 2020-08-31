@@ -124,6 +124,15 @@ copied. Individual fields of the generic syntax are:
 
 # KEY BINDINGS
 
+`ALT+c`
+:   Runs directory search and selection via `fzf` resulting in:
+
+    ```
+    cd DIRECTORY
+    ```
+
+    Where `DIRECTORY` is what user selected in `fzf` menu.
+
 `CTRL+f`
 :   Calls and expands:
 
@@ -178,14 +187,8 @@ copied. Individual fields of the generic syntax are:
 `CTRL+r`
 :   Runs Bash history search using `fzf`.
 
-`ALT+c`
-:   Runs directory search and selection via `fzf` resulting in:
-
-    ```
-    cd DIRECTORY
-    ```
-
-    Where `DIRECTORY` is what user selected in `fzf` menu.
+`CTRL-t`
+:   Runs `fzf` and pastes the selected file path into the command line.
 
 
 # ALIASES
