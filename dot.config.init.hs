@@ -42,6 +42,7 @@ import GHC.TypeLits (KnownSymbol, Symbol, symbolVal)
 
 import System.Directory
     ( XdgDirectory(XdgCache, XdgConfig)
+    , createDirectoryIfMissing
     , getHomeDirectory
     , getXdgDirectory
     , pathIsSymbolicLink
@@ -374,6 +375,8 @@ install Directories{..} opts = shakeArgs opts $ do
         need [src]
         symlink (src `dropPrefixDir` home) out
 
+    manualPages ManualPagesParams{..}
+
 data StackRulesParams = StackRulesParams
     { home :: FilePath
     , srcDir :: FilePath
@@ -541,6 +544,35 @@ nixRules params@NixParams{cacheDir} = do
     installerSigUrl = baseUrl <> "/nix-" <> version <> "/install.asc"
 
     installerSh = cacheDir </> "installer"
+
+data ManualPagesParams = ManualPagesParams
+    { home :: FilePath
+    , srcDir :: FilePath
+    }
+
+manualPages :: ManualPagesParams -> Rules ()
+manualPages ManualPagesParams{..} = do
+    let dotBashrc7 = home </> ".local/share/man/man7/dot-bashrc.7.gz"
+
+    -- Pandoc may not be installed yet so we don't want to install these from
+    -- the get go.
+    "man" ~> do
+        need
+            [ dotBashrc7
+            ]
+
+    dotBashrc7 %> \out -> do
+        let tempOut = dropExtension out
+            src = srcDir </> "bash" </> "dot-bashrc.7.md"
+            dst = takeDirectory out
+
+        need [src]
+
+        liftIO (createDirectoryIfMissing True dst)
+
+        cmd_ "pandoc --standalone --to=man" ["--output=" <> tempOut, src]
+        cmd_ "gzip --force -9" [tempOut]
+        cmd_ "mandb --user-db " [home </> ".local/share/man"]
 
 dropPrefixDir :: FilePath -> FilePath -> FilePath
 dropPrefixDir path prefix = dropPrefix' path' prefix'

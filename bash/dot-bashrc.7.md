@@ -1,0 +1,311 @@
+% DOT-BASHRC(7) User's Bashrc | User's Dot Files
+% Peter Trsko
+% 31th August 2020
+
+# NAME
+
+bashrc - Documentation of user's Bashrc setup
+
+
+# DESCRIPTION
+
+Documentation of User's `bashrc` as generated using `genbashrc`.  For it to
+work correctly following files must be present:
+
+`$HOME/.bashrc`
+:   A symbolic link pointing to `$HOME/.config/bash/dot.bashrc`.
+
+`$HOME/.config/bash/dot.bashrc`
+:   Real `bashrc` file that calls `genbashrc` command, if available, to
+    generate most of what is described here.
+
+
+# BASH SETTINGS
+
+`set -b`
+:   Notify immediately of job termination instead of waiting for prompt to be
+    redrawn.
+
+`set -o vi`
+:   Use vi-style line editing interface.
+
+`set bell-style visible`
+:   Make the terminal "blink" instead of beeping when bell character is
+    printed.
+
+`shopt -s checkwinsize`
+:   Check the terminal window size after each command and, if necessary, update
+    the values of `LINES` and `COLUMNS`.
+
+`shopt -s histappend`
+:   Append to the Bash history file, don't overwrite it.
+
+`HISTCONTROL=ignoredups`
+:   Don't put duplicate lines into Bash history.
+
+`HISTSIZE`
+:   Set to 100 000 lines.
+
+`HISTFILESIZE`
+:   Not set, let it grow as needed.
+
+`HISTIGNORE`
+:   Don't add following lines into Bash history:
+
+    * `ls`
+    * `pwd`
+
+
+# PROMPT
+
+Generic format:
+
+```
+#[NIX]USER@HOSTNAME[#SCREEN_WINDOW]:DIRECTORY[GIT_PS1][⟦CD_LEVEL⟧][∃] ⊢
+```
+
+Standard prompt when nothing special is applied is therefore:
+
+```
+#USER@HOSTNAME:DIRECTORY ⊢
+```
+
+Reason for it to start with `#` is that it is a comment in Bash if accidentally
+copied. Individual fields of the generic syntax are:
+
+`NIX`
+:   If in Nix shell (detected using `IN_NIX_SHELL` environment variable) then the
+    prompt is prefixed with `⟪nix⟫` as follows
+
+    ```
+    #⟪nix⟫user@host:~ ⊢
+    ```
+
+    Normally Nix sets its own prompt, but we made sure that the user's prompt
+    definition is restored.
+
+`#SCREEN_WINDOW`
+:   When inside a `screen` session then prompt will contain the Screen window
+    number (value taken from `WINDOW` environment variable):
+
+    ```
+    #user@hostname#1:~⟦1⟧ ⊢
+    ```
+
+`DIRECTORY`
+:   Is just the last path element or `~`:
+
+    ```
+    #user@hostname:~ ⊢
+    #user@hostname:~ ⊢ cd /tmp
+    #user@hostname:tmp ⊢
+    ```
+
+`GIT_PS1`
+:   Expanded value of `__git_ps1` provided by Git installation itself.
+
+`⟦CD_LEVEL⟧`
+:   When Command Wrapper's `cd` subcommand was used to enter a subshell then
+    the level of nesting (taken from `CD_LEVEL` environment variable) will be
+    shown in the prompt:
+
+    ```
+    #user@hostname:~⟦1⟧ ⊢
+    ```
+
+`∃`
+:   In case of being inside `direnv` or `yx env` environment there will be `∃`
+    present in the prompt:
+
+    ```
+    #user@hostname:~∃ ⊢
+    ```
+
+
+# KEY BINDINGS
+
+`CTRL+f`
+:   Calls and expands:
+
+    ```
+    yx cd --self-command --shell
+    ```
+
+    Into following command which ends up being executed and stored in Bash
+    history:
+
+    ```
+    yx cd --shell DIRECTORY
+    ```
+
+    Where `DIRECTORY` is what user selected during expansion of the original
+    command.
+
+`CTRL+ALT+f`
+:   Calls and expands
+
+    ```
+    yx cd --bash-command
+    ```
+
+    Into following command which ends up being executed and stored in Bash
+    history:
+
+    ```
+    cd DIRECTORY
+    ```
+
+    Where `DIRECTORY` is what user selected during expansion of the original
+    command.
+
+`CTRL+k`
+:   Calls and expands:
+
+    ```
+    yx cd --self-command
+    ```
+
+    Into following command which ends up being executed and stored in Bash
+    history:
+
+    ```
+    yx cd DIRECTORY
+    ```
+
+    Where `DIRECTORY` is what user selected during expansion of the original
+    command.
+
+`CTRL+r`
+:   Runs Bash history search using `fzf`.
+
+`ALT+c`
+:   Runs directory search and selection via `fzf` resulting in:
+
+    ```
+    cd DIRECTORY
+    ```
+
+    Where `DIRECTORY` is what user selected in `fzf` menu.
+
+
+# ALIASES
+
+To list all aliases just type `alias` without any arguments. Some important
+ones are listed here:
+
+`evil`
+:   Open root login shell by invoking
+
+    ```
+    sudo su -
+    ```
+
+`term-title` TITLE
+:   Set terminal title. Alias for:
+
+    ```
+    printf "\033]2;%s\007"
+    ```
+
+`this`
+:   Alias for:
+
+    ```
+    yx this
+    ```
+
+    For more details see `yx-this(1)` or:
+
+    ```
+    yx help [--man] this
+    ```
+
+`tmux`
+:   Alias for `tmux` that makes sure that `${HOME}/.config/tmux/tmux.conf`
+    configuration file is used and that `TERM` is set to something `tmux` can
+    handle.
+
+`xpdf`
+:   Alias for:
+
+    ```
+    yx xpdf
+    ```
+    For more information see `yx-xpdf(1)` or:
+
+    ```
+    yx help [--man] xpdf
+    ```
+
+`yank`
+:   Alias for `yank-cli` since Debian disambiguates its packages.
+
+
+## APT
+
+Following aliases for `yx apt` are present:
+
+* `apt`
+* `apt-cache`
+* `apt-get`
+
+For more information see `yx-apt(1)` or:
+
+```
+yx help [--man] apt
+```
+
+
+## DHALL
+
+`dhall`
+:   Alias for:
+
+    ```
+    yx config --dhall
+    ```
+
+    For more information see `command-wrapper-config(1)` or:
+
+    ```
+    yx help [--man] config
+    ```
+
+`dhall-{bash|diff|exec|filter|format|freeze|hash|lint|repl|resolve|text}`
+:   Alias for:
+
+    ```
+    yx config --dhall-{bash|diff|exec|filter|format|freeze|hash|lint|repl|resolve|text}
+    ```
+
+    For more information see `command-wrapper-config(1)` or:
+
+    ```
+    yx help [--man] config
+    ```
+
+
+# EDITOR
+
+Value of `EDITOR` is set to (in specified order of precedence):
+
+* `nvim` if Neovim is installed.
+
+* `vim` if Vim is installed.
+
+* Not set if none of the above.
+
+
+# SEE ALSO
+
+command-wrapper(1),
+command-wrapper-cd(1),
+command-wrapper-config(1),
+yx-apt(1),
+yx-this(1),
+yx-xpdf(1)
+
+
+# BUGS
+
+<https://github.com/trskop/dot.config/issues>
