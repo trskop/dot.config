@@ -552,18 +552,17 @@ data ManualPagesParams = ManualPagesParams
 
 manualPages :: ManualPagesParams -> Rules ()
 manualPages ManualPagesParams{..} = do
-    let dotBashrc7 = home </> ".local/share/man/man7/dot-bashrc.7.gz"
-
     -- Pandoc may not be installed yet so we don't want to install these from
     -- the get go.
     "man" ~> do
         need
-            [ dotBashrc7
+            [ home </> ".local/share/man/man7/dot.bashrc.7.gz"
+            , home </> ".local/share/man/man7/dot.config.7.gz"
             ]
 
-    dotBashrc7 %> \out -> do
+    (home </> ".local/share/man/man7/*.7.gz") %> \out -> do
         let tempOut = dropExtension out
-            src = srcDir </> "bash" </> "dot-bashrc.7.md"
+            src = srcDir </> "man" </> takeBaseName out <.> "md"
             dst = takeDirectory out
 
         need [src]

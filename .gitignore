@@ -25,6 +25,9 @@
 !/user-dirs.dirs
 !/user-dirs.locale
 
+# Manual pages documenting stuff in this repo:
+!/man/
+
 # Machine specific configuration of Kitty.  See ./kitty/README.md for more
 # details.
 /kitty/kitty-local.conf
