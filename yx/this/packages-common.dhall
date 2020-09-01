@@ -2,6 +2,7 @@ let SystemInfo = ./SystemInfo.dhall
 
 let osSpecificPackages =
       { DebianLinux =
+          -- Neovim is the editor of choice.
           [ "neovim/unstable", "lua-nvim"
           -- Neovim Python provider is required by some plugins that I'm using:
           , "python-neovim", "python3-neovim"
@@ -11,23 +12,37 @@ let osSpecificPackages =
           --, "python-dev", "python-pip"
           --, "python3-dev", "python3-pip"
 
+          -- Terminal emulator of choice.
+          , "kitty", "kitty-doc"
+
           -- TODO: Test that these packages are available on Buntish distros:
 
-          , "fzy" -- Fuzzy text selector like `fzf`, but simpler.  The
-                  -- algorithm, it uses, is slightly different, which may
-                  -- be better in some cases.
+          -- Fuzzy text selector like `fzf`, but simpler.  The algorithm, it
+          -- uses, is slightly different, which may be better in some cases.
+          , "fzy"
 
-          , "ripgrep" -- Grep alternative that is faster and uses recursive
-                      -- search by default.
-                      -- <https://github.com/BurntSushi/ripgrep>
+          -- Grep alternative that is faster and uses recursive search by
+          -- default. <https://github.com/BurntSushi/ripgrep>
+          -- There's also Vim/Neovim plugin for it.
+          , "ripgrep"
 
-          , "bfs" -- a variant of the UNIX `find` command that operates
-                  -- breadth-first rather than depth-first.
+          -- a variant of the UNIX `find` command that operates breadth-first
+          -- rather than depth-first.
+          , "bfs"
 
-          , "mbuffer" -- Stream buffering tool that also shows the I/O rate
-                      -- and summary to the user.
+          -- Stream buffering tool that also shows the I/O rate and summary to
+          -- the user.
+          , "mbuffer"
 
-          , "fd-find" -- Simple, fast and user-friendly alternative to find.
+          -- Simple, fast and user-friendly alternative to find.
+          , "fd-find"
+
+          -- Tools to record TTY session and convert it into a GIF image.
+          , "ttyrec", "ttygif", "gifsicle"
+
+          -- Mercurial is a SCM (Source Control Management) system. There are
+          -- few old mercurial repos that I need to interact with.
+          , "mercurial"
           ]
 
       , BuntishLinux =
@@ -43,11 +58,15 @@ in
 
   -- {{{ System ---------------------------------------------------------------
 
-→ [ "psmisc"  -- Contains pstree.
-  , "cifs-utils"  -- Utilities for managing mounts of SMB/CIFS (Common
-                  -- Internet File System) filesystems.
+→ -- Contains pstree.
+  [ "psmisc"
 
-  , "cgroup-tools"  -- Tools to control and monitor control groups.
+  -- Utilities for managing mounts of SMB/CIFS (Common
+  -- Internet File System) filesystems.
+  , "cifs-utils"
+
+  -- Tools to control and monitor control groups.
+  , "cgroup-tools"
 
   -- }}} System ---------------------------------------------------------------
   -- {{{ Editors --------------------------------------------------------------
@@ -60,6 +79,7 @@ in
   -- }}} Editors --------------------------------------------------------------
   -- {{{ Terminal emulators and multiplexers ----------------------------------
 
+  -- RXVT unicode is used as a fallback terminal emulator.
   , "rxvt-unicode-256color"
   , "screen", "tmux"
 
@@ -73,39 +93,50 @@ in
   , "zip"
   , "p7zip-full", "p7zip-rar" -- Command line version of 7-Zip file archiver.
 
-  , "xinput"  -- Utility to configure and test X input devices.
+  -- Utility to configure and test X input devices.
+  , "xinput"
 
-  , "xclip", "xsel" -- Command line utilities for clipboard manipulation.
+  -- Command line utilities for clipboard manipulation.
+  , "xclip", "xsel"
 
-  , "renameutils" -- Renaming utilities designed to make renaming of files
-                  --   faster and less cumbersome. Includes "qmv" command.
+  -- Renaming utilities designed to make renaming of files faster and less
+  -- cumbersome. Includes "qmv" command.
+  , "renameutils" 
 
-  , "librsvg2-bin"  -- Command-line utility to convert the SVG files to the
-                    --   PNG format and a graphical SVG viewer.
+  -- Command-line utility to convert the SVG files to the PNG format and a
+  -- graphical SVG viewer.
+  , "librsvg2-bin"
 
-  , "jq"  -- JSON processor; like sed for JSON data.
+  -- JSON processor; like sed for JSON data.
+  , "jq"
 
-  , "inotify-tools" -- Command-line programs providing a simple interface
-                    --   to inotify.
+  -- Command-line programs providing a simple interface to inotify.
+  , "inotify-tools"
 
-  , "ftp"  -- Simple command-line FTP client.
+  -- Simple command-line FTP client.
+  , "ftp"
 
-  , "colordiff" -- Wrapper for diff command which adds clours.
+  -- Wrapper for diff command which adds clours.
+  , "colordiff"
 
-  , "apache2-utils"  -- Contains 'host' DNS lookup utility.
+  -- Contains 'host' DNS lookup utility.
+  , "apache2-utils"
 
   , "graphviz"
 
-  , "uuid-runtime" -- Useful UUID commands built using libuuid.
+  -- Useful UUID commands built using libuuid. Contains `uuidgen`.
+  , "uuid-runtime"
 
-  , "pwgen" -- Random password generator.
+  -- Random password generator.
+  , "pwgen"
 
-  , "yank"  -- Reads input from stdin and allows data to be selected
-            -- and copied to the clipboard.
+  -- Reads input from stdin and allows data to be selected and copied to the
+  -- clipboard.
+  , "yank"
 
-  , "bup" -- Backup tool which stores the backups in a system based around the
-          -- packfile format from Git.
-          -- <https://bup.github.io/>
+  -- Backup tool which stores the backups in a system based around the packfile
+  -- format from Git. <https://bup.github.io/>
+  , "bup"
 
   -- Using Nix fore these:
   --, "pandoc"
@@ -114,25 +145,28 @@ in
   -- }}} Command line utilities -----------------------------------------------
   -- {{{ Networking -----------------------------------------------------------
 
-  , "net-tools"  -- Contains 'netstat'.
+  -- Contains 'netstat'.
+  , "net-tools"
 
-  , "netcat-traditional"  -- A simple Unix utility which reads and writes data
-                          --   across network connections using TCP o UDP
-                          --   protocol.
+  -- A simple Unix utility which reads and writes data across network
+  -- connections using TCP o UDP protocol.
+  , "netcat-traditional"
 
-  , "netcat-openbsd"  -- OpenBSD rewrite of netcat, it includes support for
-                      --   IPv6, proxies, and Unix sockets
+  -- OpenBSD rewrite of netcat, it includes support for IPv6, proxies, and Unix
+  -- sockets
+  , "netcat-openbsd"
 
-  , "socat"  -- Socat (for SOcket CAT) establishes two bidirectional byte
-             --   streams and transfers data between them. Data channels may
-             --   be files, pipes, devices (terminal or modem, etc.), or
-             --   sockets (Unix, IPv4, IPv6, raw, UDP, TCP, SSL). It provides
-             --   forking, logging and tracing, different modes for
-             --   interprocess communication and many more options.
+  -- Socat (for SOcket CAT) establishes two bidirectional byte streams and 
+  -- transfers data between them. Data channels may be files, pipes, devices
+  -- (terminal or modem, etc.), or sockets (Unix, IPv4, IPv6, raw, UDP, TCP,
+  -- SSL). It provides forking, logging and tracing, different modes for
+  -- interprocess communication and many more options.
+  , "socat"
 
-  , "corkscrew"  -- A simple tool to tunnel TCP connections through an HTTP
-                 --   proxy supporting the CONNECT method. It reads stdin and
-                 --   writes to stdout during the connection, just like netcat.
+  -- A simple tool to tunnel TCP connections through an HTTP proxy supporting
+  -- the CONNECT method. It reads stdin and writes to stdout during the
+  -- connection, just like netcat.
+  , "corkscrew"
 
   -- }}} Networking -----------------------------------------------------------
   -- {{{ Development ----------------------------------------------------------

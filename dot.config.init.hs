@@ -172,44 +172,58 @@ install Directories{..} opts = shakeArgs opts $ do
             }
         nixTarget = mkNixTarget nixParams
 
-    want
-        [ home </> ".bashrc"
+        bootstrapTargets =
+            [ home </> ".bashrc"
 
-        , home </> ".ghc/ghci.conf"
-        , home </> ".haskeline"
-        , home </> ".selected_editor"
-        , home </> ".Xresources"
-        , home </> ".psqlrc"
-        , home </> ".inputrc"
+            , home </> ".ghc/ghci.conf"
+            , home </> ".haskeline"
+            , home </> ".selected_editor"
+            , home </> ".Xresources"
+            , home </> ".psqlrc"
+            , home </> ".inputrc"
 
-        , home </> ".stack/config.yaml"
-        , home </> ".stack/global-project/README.txt"
-        , home </> ".stack/global-project/stack.yaml"
-        , binDir </> "stack-help"
+            , home </> ".stack/config.yaml"
+            , home </> ".stack/global-project/README.txt"
+            , home </> ".stack/global-project/stack.yaml"
+            , binDir </> "stack-help"
 
-        , dejaVuSansMonoNerdFontTtf
+            , dotLocalDir </> "bin" </> "genbashrc"
 
-        , dotLocalDir </> "bin" </> "genbashrc"
+            , commandWrapperLibDir </> "command-wrapper"
+            , commandWrapperDir </> "default" <.> "dhall"
 
-        , commandWrapperLibDir </> "command-wrapper"
-        , commandWrapperDir </> "default" <.> "dhall"
+            , binDir </> "yx"
+            , yxDir </> "default" <.> "dhall"
+            , yxLibDir </> "yx-jmp"
 
-        , binDir </> "yx"
-        , yxDir </> "default" <.> "dhall"
-        , yxLibDir </> "yx-jmp"
+            -- A lot of tools are using `fzf` including `genbashrc` when
+            -- generating bashrc.
+            , binDir </> "fzf"
 
-        , habitDir </> "default.dhall"
---      , habitDir </> "pgpass.conf"
+            , nixTarget
+            ]
 
-        , binDir </> "fzf"
+    want $ mconcat
+        [ bootstrapTargets
+        , [ dejaVuSansMonoNerdFontTtf
 
-        -- Dein is a Vim/Neovim plugin manager.
-        , deinInstallDir </> "installed.lock"
+          -- Dein is a Vim/Neovim plugin manager.
+          , deinInstallDir </> "installed.lock"
 
-        , home </> ".bazelrc"
+          , habitDir </> "default.dhall"
+--        , habitDir </> "pgpass.conf"
 
-        , nixTarget
+          , home </> ".bazelrc"
+
+          , "man"
+          ]
         ]
+
+    "bootstrap" ~> do
+        need bootstrapTargets
+
+        -- Install `yx` toolset commands, that includes `yx this`.
+        cmd_ (srcDir </> "yx" </> "toolset" </> "install")
 
     (home </> ".bashrc") %> \out ->
         symlink (srcDir </> "bash" </> ("dot" <> takeFileName out)) out

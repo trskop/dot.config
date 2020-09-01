@@ -99,11 +99,28 @@ pristine system.  Just reconfigure remote URL afterwards.
 git clone https://github.com/trskop/dot.config.git ~/.config
 ```
 
+Make sure that `stack` installed through the system package is sufficiently
+new. If not then run:
+
+```Bash
+stack upgrade
+```
+
+To avoid long bootstrapping sequence when calling Haskell scripts it may be a
+good idea to run:
+
+```Bash
+stack setup 8.8.4
+```
+
+Where `8.8.4` is GHC version used by `~/.config/dot.config.init.hs`. Please
+check the Stackage LTS version specified in it to be sure as this documentation
+may be out of date.
+
 Now we need to install everything:
 
 ```Bash
-~/.config/dot.config.init.hs
-~/.config/yx/toolset/install
+~/.config/dot.config.init.hs bootstrap
 yx this -Uusin
 ```
 
