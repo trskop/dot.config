@@ -1,8 +1,4 @@
-Git supports hierarchy of configuration files which is described in it's
-[git-config documentation](https://git-scm.com/docs/git-config#FILES).
+# User's Git configuration
 
-Syntax of Git configuration file is described in [git-config: Configuration
-File](https://git-scm.com/docs/git-config#_configuration_file).
-
-Includes/imports are documented in [git-config: Configuration File: Includes
-](https://git-scm.com/docs/git-config#_includes).
+See `dot.gitconfig(7)` or [`../man/dot.gitconfig.7.md`
+](../man/dot.gitconfig.7.md) for more information.

@@ -127,7 +127,7 @@ copied. Individual fields of the generic syntax are:
 `ALT+c`
 :   Runs directory search and selection via `fzf` resulting in:
 
-    ```
+    ```Bash
     cd DIRECTORY
     ```
 
@@ -136,14 +136,14 @@ copied. Individual fields of the generic syntax are:
 `CTRL+f`
 :   Calls and expands:
 
-    ```
+    ```Bash
     yx cd --self-command --shell
     ```
 
     Into following command which ends up being executed and stored in Bash
     history:
 
-    ```
+    ```Bash
     yx cd --shell DIRECTORY
     ```
 
@@ -153,14 +153,14 @@ copied. Individual fields of the generic syntax are:
 `CTRL+ALT+f`
 :   Calls and expands
 
-    ```
+    ```Bash
     yx cd --bash-command
     ```
 
     Into following command which ends up being executed and stored in Bash
     history:
 
-    ```
+    ```Bash
     cd DIRECTORY
     ```
 
@@ -170,14 +170,14 @@ copied. Individual fields of the generic syntax are:
 `CTRL+k`
 :   Calls and expands:
 
-    ```
+    ```Bash
     yx cd --self-command
     ```
 
     Into following command which ends up being executed and stored in Bash
     history:
 
-    ```
+    ```Bash
     yx cd DIRECTORY
     ```
 

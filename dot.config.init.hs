@@ -572,6 +572,7 @@ manualPages ManualPagesParams{..} = do
         need
             [ home </> ".local/share/man/man7/dot.bashrc.7.gz"
             , home </> ".local/share/man/man7/dot.config.7.gz"
+            , home </> ".local/share/man/man7/dot.gitconfig.7.gz"
             ]
 
     (home </> ".local/share/man/man7/*.7.gz") %> \out -> do

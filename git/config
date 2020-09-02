@@ -1,7 +1,17 @@
 # This is Git's per-user configuration file.
+# 
+# Documentation available in `git-config(1)` or:
+#
+# ```Bash
+# git help config
+# ```
+#
+# Or online at <https://git-scm.com/docs/git-config>
+
 [user]
 	name = Peter Trško
 	email = peter.trsko@gmail.com
+
 [alias]
 	pretty-log = log --graph --decorate --stat
 	co = checkout
@@ -9,26 +19,43 @@
 	amend = commit --amend
 	push-force = push --force-with-lease --prune
 	push-prune = push --prune
+	pull-rebase = pull --rebase --prune
+
 [grep]
 	lineNumber = true
+
 [commit]
 	verbose = true
+
 [push]
 	default = simple
+
 [pull]
+	# Don't do merge or even rebase automatically.
 	ff = only
+
 [rebase]
 	autoStash = true
+	# Warn if commits have been dropped in '--interactive'
+	missingCommitsCheck = warn
+
 [merge]
 	ff = only
 	tool = vimdiff
-	conflictstyle = merge # diff3 was terrible
-[mergetool]
-	prompt = true
-[mergetool "vimdiff"]
-	cmd = nvim -d -O ${LOCAL} ${REMOTE} ${MERGED}
+	# Tried 'conflictstyle = diff3' and it was terrible
+	conflictstyle = merge
+
 [fetch]
 	prune = true
 	pruneTags = true
+
+[diff]
+	# Detect copies as well as renames
+	renames = copies
+	colorMoved = true
+	algorithm = patience
+
 [include]
+	path = mergetool.gitconfig
+	path = delta.gitconfig
 	path = local.gitconfig

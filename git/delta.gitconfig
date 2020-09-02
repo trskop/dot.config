@@ -1,0 +1,33 @@
+# vim: filetype=gitconfig
+#
+# Delta uses same syntax definitions as `bat` does, i.e.
+# `${XDG_CONFIG_HOME:-${HOME}/.config}/bat/syntaxes/*` will be included.
+
+[core]
+	pager = delta
+
+[pager]
+	# Don't use delta as a pager for 'git log'
+	log = less
+
+[interactive]
+	diffFilter = delta --color-only
+
+[diff]
+	colorMoved = default
+
+[delta]
+	# Side by side is sometimes useful, but on a big monitor it's actually
+	# hard to read.
+	side-by-side = false
+	line-numbers = true
+	features = decorations
+	whitespace-error-style = 22 reverse
+	syntax-theme = zenburn
+
+[delta "decorations"]
+	#commit-decoration-style = bold yellow box ul
+	commit-decoration-style = bold yellow ul
+	file-style = bold yellow box
+	file-decoration-style = none
+	hunk-header-decoration-style = blue ul
