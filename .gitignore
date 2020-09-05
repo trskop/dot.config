@@ -46,6 +46,9 @@
 # Machine-specific, i.e. local, Git configuration.
 /git/local.gitconfig
 
+# Spell files are actually quite revealing.
+/nvim/spell/
+
 # {{{ Command Wrapper #########################################################
 
 !/command-wrapper/
