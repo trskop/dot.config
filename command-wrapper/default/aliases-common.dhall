@@ -9,8 +9,8 @@ let dhallAliases =
       List/map
         Text
         CommandWrapper.SubcommandAlias.Type
-        (   λ(_ : Text)
-          → SubcommandAlias::{
+        ( λ(_ : Text) →
+            SubcommandAlias::{
             , alias = "dhall${_}"
             , description = Some "Shorthand for \"config --dhall${_}\"."
             , command = "config"
