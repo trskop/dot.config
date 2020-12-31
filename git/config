@@ -21,6 +21,12 @@
 	push-prune = push --prune
 	pull-rebase = pull --rebase --prune
 
+[init]
+	# Use this branch name instead of 'master' when initialising new
+	# repository. Other good option is to use 'trunk', which is standard
+	# for e.g. Subversion.
+	defaultBranch = main
+
 [grep]
 	lineNumber = true
 
