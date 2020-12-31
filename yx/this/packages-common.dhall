@@ -4,8 +4,10 @@ let osSpecificPackages =
       { DebianLinux =
           -- Neovim is the editor of choice.
           [ "neovim/unstable", "lua-nvim"
-          -- Neovim Python provider is required by some plugins that I'm using:
-          , "python-neovim", "python3-neovim"
+          -- Neovim Python provider is required by some plugins that I'm using.
+          -- This package was previously installed via: "python-neovim" and
+          -- later "python3-neovim".
+          , "python3-pynvim"
 
           -- Neovim Python provider dependencies for the case when they
           -- needed to be installed via Pip:
@@ -43,6 +45,9 @@ let osSpecificPackages =
           -- Mercurial is a SCM (Source Control Management) system. There are
           -- few old mercurial repos that I need to interact with.
           , "mercurial"
+
+          -- Manage compile and link flags for libraries.
+          , "pkg-config"
           ]
 
       , BuntishLinux =
