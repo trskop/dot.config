@@ -20,7 +20,8 @@
 " │   ├── scrooloose/nerdcommenter
 " │   ├── nathanaelkane/vim-indent-guides
 " │   ├── raichoo/purescript-vim
-" │   └── jremmen/vim-ripgrep
+" │   ├── jremmen/vim-ripgrep
+" │   └── tpope/vim-abolish
 " │
 " ├── Terminal
 " │
@@ -318,6 +319,15 @@ if dein#load_state('~/.cache/dein.vim')
   if g:have_ripgrep
     call dein#add('jremmen/vim-ripgrep')
   endif
+
+  " Set of commands for doing corrections and substitutions
+  "
+  " :help abolish
+  " :help :Abolish
+  " :help :Subvert
+  "
+  " <https://github.com/tpope/vim-abolish>
+  call dein#add('tpope/vim-abolish')
 
   " }}} Plugin -- Dein.vim -- Plugins to Install ------------------------------
 
