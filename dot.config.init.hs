@@ -1,6 +1,6 @@
 #!/usr/bin/env stack
 {- stack script
-    --resolver lts-16.12
+    --resolver lts-17.15
     --package directory
     --package executable-path
     --package shake
@@ -23,7 +23,7 @@
 -- Module:      Main
 -- Description: Initialise configuration for applications that do not support
 --              XDG Base Directory Specification
--- Copyright:   (c) 2018-2020 Peter Trško
+-- Copyright:   (c) 2018-2021 Peter Trško
 -- License:     BSD3
 --
 -- Maintainer:  peter.trsko@gmail.com
@@ -153,6 +153,7 @@ install Directories{..} opts = shakeArgs opts $ do
         yxDir = configDir </> "yx"
         habitDir = configDir </> "habit"
         dotLocalDir = home </> ".local"
+        dotLocalManDir = dotLocalDir </> "share/man"
         yxLibDir = dotLocalDir </> "lib" </> "yx"
         commandWrapperLibDir = dotLocalDir </> "lib" </> "command-wrapper"
         commandWrapperRepoConfig = mkCommandWrapperRepoConfig dotLocalDir
@@ -167,7 +168,9 @@ install Directories{..} opts = shakeArgs opts $ do
         deinInstallDir = cacheDir </> "dein.vim"
 
         nixParams = NixParams
-            { home
+            { version = "2.3.10"
+            , signingKeyFingerprint = "B541D55301270E0BCF15CA5D8170B4726D7198DE"
+            , home
             , cacheDir = stateDir </> "nix"
             }
         nixTarget = mkNixTarget nixParams
@@ -300,7 +303,7 @@ install Directories{..} opts = shakeArgs opts $ do
         let GitRepoConfig{directory} = commandWrapperRepoConfig
         cmd_ "git -C" [directory] "pull"
         cmd_ (Cwd directory) "./install"
-        cmd_ "mandb --user-db /home/peter/.local/share/man"
+        cmd_ "mandb --user-db" [dotLocalManDir]
 
     [commandWrapperDir </> "default.dhall", commandWrapperDir </> "command-wrapper-*.dhall"]
       |%> \out -> do
@@ -389,7 +392,15 @@ install Directories{..} opts = shakeArgs opts $ do
         need [src]
         symlink (src `dropPrefixDir` home) out
 
-    manualPages ManualPagesParams{..}
+    manualPages ManualPagesParams
+        { manDir = dotLocalManDir
+        , manPages =
+            [ (Section7, "dot.bashrc")
+            , (Section7, "dot.config")
+            , (Section7, "dot.gitconfig")
+            ]
+        , ..
+        }
 
 data StackRulesParams = StackRulesParams
     { home :: FilePath
@@ -513,33 +524,23 @@ habitRules HabitRulesParamams{..} = do
 data NixParams = NixParams
     { home :: FilePath
     , cacheDir :: FilePath
+    , version :: String
+    , signingKeyFingerprint :: String
     }
 
 mkNixTarget :: NixParams -> FilePath
-mkNixTarget NixParams{cacheDir} = cacheDir </> "nix-installed.lock"
+mkNixTarget NixParams{cacheDir, version} =
+    cacheDir </> version <> "-nix-installed.lock"
 
 nixRules :: NixParams -> Rules ()
-nixRules params@NixParams{cacheDir} = do
+nixRules params@NixParams{cacheDir, signingKeyFingerprint, version} = do
     installerSh %> \out -> do
         Stdout installer <- cmd "curl" [installerUrl]
         writeFile' out installer
 
         Stdout installerSig <- cmd "curl" [installerSigUrl]
         writeFile' (out <.> "sig") installerSig
-
-        Stdout distro' <- cmd "lsb_release --short --id"
-        let distro = takeWhile (/= '\n') distro'
-        case distro of
-            "Ubuntu" -> do
-                cmd_ "gpg2 --recv-keys --keyserver hkp://keyserver.ubuntu.com" [signingKeyFingerprint]
-                cmd_ "gpg2 --verify" [out <.> "sig"]
-
-            "Debian" -> do
-                cmd_ "gpg --recv-keys" [signingKeyFingerprint]
-                cmd_ "gpg --verify" [out <.> "sig"]
-
-            _ ->
-                error (show distro <> ": Distribution not supported!")
+        gpgVerify (out <.> "sig")
 
     mkNixTarget params %> \out -> do
         need [installerSh]
@@ -550,18 +551,51 @@ nixRules params@NixParams{cacheDir} = do
             "--no-daemon"
         writeFile' out ""
   where
-    version = "2.3.7"
-    signingKeyFingerprint = "B541D55301270E0BCF15CA5D8170B4726D7198DE"
-
     baseUrl = "https://releases.nixos.org/nix"
     installerUrl = baseUrl <> "/nix-" <> version <> "/install"
     installerSigUrl = baseUrl <> "/nix-" <> version <> "/install.asc"
 
-    installerSh = cacheDir </> "installer"
+    installerSh = cacheDir </> version <> "-installer"
+
+    gpgVerify sig = do
+        Stdout distro <- cmd "lsb_release --short --id"
+        let (gpgCmd, recvKeysOptions) = case takeWhile (/= '\n') distro of
+                "Ubuntu" ->
+                    ("gpg2", ["--keyserver", "hkp://keyserver.ubuntu.com"])
+
+                "Debian" -> do
+                    ("gpg", [signingKeyFingerprint])
+
+                _ ->
+                    error (show distro <> ": Distribution not supported!")
+
+        cmd_ gpgCmd "--recv-keys" recvKeysOptions [signingKeyFingerprint]
+        cmd_ gpgCmd ["--verify", sig]
+
+data ManualSection
+    = Section1
+    -- ^ Executable programs or shell commands.
+    | Section5
+    -- ^ File formats and conventions.
+    | Section7
+    -- ^ Miscellaneous (including macro packages and conventions).
+
+renderManualSection :: ManualSection -> String
+renderManualSection = \case
+    Section1 -> "1"
+    Section5 -> "5"
+    Section7 -> "7"
+
+manualPageToPath :: FilePath -> ManualSection -> String -> FilePath
+manualPageToPath dir section page =
+    dir </> "man" <> section' </> page <.> section'
+  where
+    section' = renderManualSection section
 
 data ManualPagesParams = ManualPagesParams
-    { home :: FilePath
-    , srcDir :: FilePath
+    { srcDir :: FilePath
+    , manDir :: FilePath
+    , manPages :: [(ManualSection, String)]
     }
 
 manualPages :: ManualPagesParams -> Rules ()
@@ -569,13 +603,10 @@ manualPages ManualPagesParams{..} = do
     -- Pandoc may not be installed yet so we don't want to install these from
     -- the get go.
     "man" ~> do
-        need
-            [ home </> ".local/share/man/man7/dot.bashrc.7.gz"
-            , home </> ".local/share/man/man7/dot.config.7.gz"
-            , home </> ".local/share/man/man7/dot.gitconfig.7.gz"
-            ]
+        need $ manPages <&> \(section, page) ->
+            manualPageToPath manDir section page <.> "gz"
 
-    (home </> ".local/share/man/man7/*.7.gz") %> \out -> do
+    (sections <&> \s -> manualPageToPath manDir s "*" <.> "gz") |%> \out -> do
         let tempOut = dropExtension out
             src = srcDir </> "man" </> takeBaseName out <.> "md"
             dst = takeDirectory out
@@ -586,7 +617,9 @@ manualPages ManualPagesParams{..} = do
 
         cmd_ "pandoc --standalone --to=man" ["--output=" <> tempOut, src]
         cmd_ "gzip --force -9" [tempOut]
-        cmd_ "mandb --user-db " [home </> ".local/share/man"]
+        cmd_ "mandb --user-db " [manDir]
+  where
+    sections = [Section1, Section5, Section7]
 
 dropPrefixDir :: FilePath -> FilePath -> FilePath
 dropPrefixDir path prefix = dropPrefix' path' prefix'
