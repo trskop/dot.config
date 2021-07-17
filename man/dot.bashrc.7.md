@@ -1,6 +1,6 @@
 % DOT-BASHRC(7) User's Bashrc | User's Dot Files
 % Peter Trsko
-% 31th August 2020
+% 17th July 2021
 
 # NAME
 
@@ -12,12 +12,18 @@ bashrc - Documentation of user's Bashrc setup
 Documentation of User's `bashrc` as generated using `genbashrc`.  For it to
 work correctly following files must be present:
 
-`$HOME/.bashrc`
-:   A symbolic link pointing to `$HOME/.config/bash/dot.bashrc`.
+`${HOME}/.bashrc`
+:   A symbolic link pointing to:
 
-`$HOME/.config/bash/dot.bashrc`
+    ```
+    ${XDG_CONFIG_HOME:-${HOME}/.config}/bash/dot.bashrc
+    ```
+
+`${XDG_CONFIG_HOME:-${HOME}/.config}/bash/dot.bashrc`
 :   Real `bashrc` file that calls `genbashrc` command, if available, to
     generate most of what is described here.
+
+    See also `file-hierarchy(7)` section HOME DIRECTORY for more information.
 
 
 # BASH SETTINGS
@@ -304,6 +310,7 @@ Value of `EDITOR` is set to (in specified order of precedence):
 command-wrapper(1),
 command-wrapper-cd(1),
 command-wrapper-config(1),
+file-hierarchy(7),
 yx-apt(1),
 yx-this(1),
 yx-xpdf(1)

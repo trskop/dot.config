@@ -1,6 +1,6 @@
 % DOT-GITCONFIG(7) User's gitconfig | User's Dot Files
 % Peter Trsko
-% 2nd September 2020
+% 17th July 2021
 
 # NAME
 
@@ -32,6 +32,8 @@ Includes/imports are documented in [git-config: Configuration File: Includes
     git help config
     ```
 
+    See also `file-hierarchy(7)` section HOME DIRECTORY for more information.
+
 `${XDG_CONFIG_HOME:-${HOME}/.config}/git/local.gitconfig`
 :   Git configuration file included by
 
@@ -43,6 +45,8 @@ Includes/imports are documented in [git-config: Configuration File: Includes
     intended to be used for machine-specific or experimental configuration. In
     other words, options specified in this file are not shared across machines.
 
+    See also `file-hierarchy(7)` section HOME DIRECTORY for more information.
+
 `${XDG_CONFIG_HOME:-${HOME}/.config}/git/*.gitconfig`
 :   Other Git configuration files included by:
 
@@ -52,12 +56,14 @@ Includes/imports are documented in [git-config: Configuration File: Includes
 
     These are committed into the "dot.config" repository
 
+    See also `file-hierarchy(7)` section HOME DIRECTORY for more information.
 
 # SEE ALSO
 
 command-wrapper(1),
 command-wrapper-cd(1),
 command-wrapper-config(1),
+file-hierarchy(7),
 git-config(1),
 yx-apt(1),
 yx-this(1),

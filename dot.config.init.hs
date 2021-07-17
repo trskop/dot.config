@@ -41,7 +41,7 @@ import Data.List (isPrefixOf)
 import GHC.TypeLits (KnownSymbol, Symbol, symbolVal)
 
 import System.Directory
-    ( XdgDirectory(XdgCache, XdgConfig)
+    ( XdgDirectory(XdgCache, XdgConfig, XdgData)
     , createDirectoryIfMissing
     , getHomeDirectory
     , getXdgDirectory
@@ -125,6 +125,7 @@ data Directories = Directories
     , srcDir :: FilePath
     , configDir :: FilePath
     , cacheDir :: FilePath
+    , dataDir :: FilePath
     , stateDir :: FilePath
     }
 
@@ -137,8 +138,11 @@ main = do
 
     stateDir <- getXdgDirectory XdgCache "dot.config"
 
-    cacheDir <- getXdgDirectory XdgCache ""
-    configDir <- getXdgDirectory XdgConfig ""
+    -- Directory locations as defined by XDG Base Directory Specification. See
+    -- also `file-hierarchy(7)` section HOME DIRECTORY.
+    cacheDir <- getXdgDirectory XdgCache "" -- ~/.cache by default
+    configDir <- getXdgDirectory XdgConfig "" -- ~/.config by default
+    dataDir <- getXdgDirectory XdgData "" -- ~/.local/share by default
     home <- getHomeDirectory
 
     setCurrentDirectory home
@@ -148,21 +152,34 @@ main = do
 
 install :: Directories -> ShakeOptions -> IO ()
 install Directories{..} opts = shakeArgs opts $ do
-    let commandWrapperDir = configDir </> "command-wrapper"
-        binDir = home </> "bin"
+    let -- Locations based on XDG Base Directory Specification.
+        commandWrapperDir = configDir </> "command-wrapper"
         yxDir = configDir </> "yx"
         habitDir = configDir </> "habit"
+        userManDir = dataDir </> "man"
+
+        -- TODO: Transition from "${HOME}/bin" to "${HOME}/.local/bin" and make
+        -- "${HOME}/bin" a symbolic link.
+        binDir = home </> "bin"
+
+        -- See manual page `file-hierarchy(7)` section HOME DIRECTORY for more
+        -- details.
+        --
+        -- TODO: Consider renaming some of these variables, e.g.
+        -- `dotLocalLibDir → userLibDir`.
         dotLocalDir = home </> ".local"
-        dotLocalManDir = dotLocalDir </> "share/man"
-        yxLibDir = dotLocalDir </> "lib" </> "yx"
-        commandWrapperLibDir = dotLocalDir </> "lib" </> "command-wrapper"
+        dotLocalLibDir = dotLocalDir </> "lib"
+        dotLocalBinDir = dotLocalDir </> "bin"
+
+        yxLibDir = dotLocalLibDir </> "yx"
+        commandWrapperLibDir = dotLocalLibDir </> "command-wrapper"
         commandWrapperRepoConfig = mkCommandWrapperRepoConfig dotLocalDir
         genbashrcRepoConfig = mkGenbashrcRepoConfig dotLocalDir
         nerdFontsRepoConfig = mkNerdFontsRepoConfig dotLocalDir
         fzfRepoConfig = mkFzfRepoConfig dotLocalDir
 
         dejaVuSansMonoNerdFontTtf =
-            dotLocalDir </> "share" </> "fonts" </> "NerdFonts"
+            dataDir </> "fonts" </> "NerdFonts"
             </> "DejaVu Sans Mono Nerd Font Complete Mono.ttf"
 
         deinInstallDir = cacheDir </> "dein.vim"
@@ -190,7 +207,7 @@ install Directories{..} opts = shakeArgs opts $ do
             , home </> ".stack/global-project/stack.yaml"
             , binDir </> "stack-help"
 
-            , dotLocalDir </> "bin" </> "genbashrc"
+            , dotLocalBinDir </> "genbashrc"
 
             , commandWrapperLibDir </> "command-wrapper"
             , commandWrapperDir </> "default" <.> "dhall"
@@ -280,7 +297,7 @@ install Directories{..} opts = shakeArgs opts $ do
 
     genbashrcUpToDate <- addOracle (gitRepo genbashrcRepoConfig)
 
-    (dotLocalDir </> "bin" </> "genbashrc") %> \_ -> do
+    (dotLocalBinDir </> "genbashrc") %> \_ -> do
         _ <- genbashrcUpToDate (GitRepo ())
         let GitRepoConfig{directory} = genbashrcRepoConfig
         cmd_ "git -C" directory "pull"
@@ -303,7 +320,7 @@ install Directories{..} opts = shakeArgs opts $ do
         let GitRepoConfig{directory} = commandWrapperRepoConfig
         cmd_ "git -C" [directory] "pull"
         cmd_ (Cwd directory) "./install"
-        cmd_ "mandb --user-db" [dotLocalManDir]
+        cmd_ "mandb --user-db" [userManDir]
 
     [commandWrapperDir </> "default.dhall", commandWrapperDir </> "command-wrapper-*.dhall"]
       |%> \out -> do
@@ -393,7 +410,7 @@ install Directories{..} opts = shakeArgs opts $ do
         symlink (src `dropPrefixDir` home) out
 
     manualPages ManualPagesParams
-        { manDir = dotLocalManDir
+        { manDir = userManDir
         , manPages =
             [ (Section7, "dot.bashrc")
             , (Section7, "dot.config")
