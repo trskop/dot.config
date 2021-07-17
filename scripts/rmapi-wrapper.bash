@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Copyright (c) 2020, Peter Trsko
+# Copyright (c) 2020-2021, Peter Trsko
 #
 # All rights reserved.
 #
@@ -34,10 +34,10 @@
 set -euo pipefail
 
 declare -r repoUrl='https://github.com/juruen/rmapi'
-declare -r version='0.0.12'
+declare -r version='0.0.15'
 declare -r arch='linuxx86-64' # TODO: Support other?
 declare -r downloadUrl="${repoUrl}/releases/download/v${version}/rmapi-${arch}.tar.gz"
-declare -r downloadSha256='6a997d23677520b4147156f2576a5608361c07658cd949e1a8a9d814bd3d8187'
+declare -r downloadSha256='bfe1d3430276804066ee58b6ea733bdfdcb2ad06e687bfc14ca0d2c33663f5fc'
 
 # Usage:
 #

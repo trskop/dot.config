@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Copyright (c) 2019-2020, Peter Trsko
+# Copyright (c) 2019-2021, Peter Trsko
 #
 # All rights reserved.
 #
@@ -34,11 +34,11 @@
 set -euo pipefail
 
 declare -r repoUrl="https://github.com/dhall-lang/dhall-haskell"
-declare -r dhallVersion='1.35.0'
-declare -r dhallLspServerVersion='1.0.10'
+declare -r dhallVersion='1.39.0'
+declare -r dhallLspServerVersion='1.0.15'
 declare -r arch='x86_64-linux' # TODO: Support other?
 declare -r downloadUrl="${repoUrl}/releases/download/${dhallVersion}/dhall-lsp-server-${dhallLspServerVersion}-${arch}.tar.bz2"
-declare -r downloadSha256='e17c07c186d40abf75177b17c9e7974d3ad5a742042c2f40cb7c360db1087a0d'
+declare -r downloadSha256='e5f9f892212a5e9176fef468af5c02ba8ca4b12f160d3e36ca3a842cc82b67be'
 
 # Usage:
 #
