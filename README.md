@@ -110,10 +110,10 @@ To avoid long bootstrapping sequence when calling Haskell scripts it may be a
 good idea to run:
 
 ```Bash
-stack setup 8.8.4
+stack setup 8.10.4
 ```
 
-Where `8.8.4` is GHC version used by `~/.config/dot.config.init.hs`. Please
+Where `8.10.4` is GHC version used by `~/.config/dot.config.init.hs`. Please
 check the Stackage LTS version specified in it to be sure as this documentation
 may be out of date.
 

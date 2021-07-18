@@ -414,6 +414,7 @@ install Directories{..} opts = shakeArgs opts $ do
         , manPages =
             [ (Section7, "dot.bashrc")
             , (Section7, "dot.config")
+            , (Section7, "dot.config.kitty")
             , (Section7, "dot.gitconfig")
             ]
         , ..
