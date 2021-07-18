@@ -184,8 +184,11 @@ install Directories{..} opts = shakeArgs opts $ do
 
         deinInstallDir = cacheDir </> "dein.vim"
 
+        -- To bump Nix version just visit https://nixos.org/download.html, see
+        -- what is the latest version and then update the `version` field in
+        -- here:
         nixParams = NixParams
-            { version = "2.3.10"
+            { version = "2.3.14"
             , signingKeyFingerprint = "B541D55301270E0BCF15CA5D8170B4726D7198DE"
             , home
             , cacheDir = stateDir </> "nix"
