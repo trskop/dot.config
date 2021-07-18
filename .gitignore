@@ -49,6 +49,11 @@
 # Spell files are actually quite revealing.
 /nvim/spell/
 
+# MPlayer doesn't respect XDG Base Directory Specification and we need to use
+# symbolic link to ~/.config/mplayer/, but we don't want to store the data
+# here.
+!/mplayer/
+
 # {{{ Command Wrapper #########################################################
 
 !/command-wrapper/

@@ -30,6 +30,9 @@ User configuration files (dot–files)
 *   [`kitty/`](./kitty/) – Kitty terminal emulator configuration, see
     [`kitty/README.md`](./kitty/README.md).
 
+*   [`mplayer/`](./mplayer/) – MPlayer configuration, see
+    [`mplayer/README.md`](./mplayer/README.md) for more information.
+
 *   [`nvim/`](./nvim/) – Neovim configuration, see
     [`nvim/README.md`](./nvim/README.md) for more information.
 
