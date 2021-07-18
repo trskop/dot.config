@@ -158,21 +158,14 @@ install Directories{..} opts = shakeArgs opts $ do
         habitDir = configDir </> "habit"
         userManDir = dataDir </> "man"
 
-        -- TODO: Transition from "${HOME}/bin" to "${HOME}/.local/bin" and make
-        -- "${HOME}/bin" a symbolic link.
-        binDir = home </> "bin"
-
         -- See manual page `file-hierarchy(7)` section HOME DIRECTORY for more
         -- details.
-        --
-        -- TODO: Consider renaming some of these variables, e.g.
-        -- `dotLocalLibDir → userLibDir`.
         dotLocalDir = home </> ".local"
-        dotLocalLibDir = dotLocalDir </> "lib"
-        dotLocalBinDir = dotLocalDir </> "bin"
+        userLibDir = dotLocalDir </> "lib"
+        userBinDir = dotLocalDir </> "bin"
 
-        yxLibDir = dotLocalLibDir </> "yx"
-        commandWrapperLibDir = dotLocalLibDir </> "command-wrapper"
+        yxLibDir = userLibDir </> "yx"
+        commandWrapperLibDir = userLibDir </> "command-wrapper"
         commandWrapperRepoConfig = mkCommandWrapperRepoConfig dotLocalDir
         genbashrcRepoConfig = mkGenbashrcRepoConfig dotLocalDir
         nerdFontsRepoConfig = mkNerdFontsRepoConfig dotLocalDir
@@ -208,20 +201,20 @@ install Directories{..} opts = shakeArgs opts $ do
             , home </> ".stack/config.yaml"
             , home </> ".stack/global-project/README.txt"
             , home </> ".stack/global-project/stack.yaml"
-            , binDir </> "stack-help"
+            , userBinDir </> "stack-help"
 
-            , dotLocalBinDir </> "genbashrc"
+            , userBinDir </> "genbashrc"
 
             , commandWrapperLibDir </> "command-wrapper"
             , commandWrapperDir </> "default" <.> "dhall"
 
-            , binDir </> "yx"
+            , userBinDir </> "yx"
             , yxDir </> "default" <.> "dhall"
             , yxLibDir </> "yx-jmp"
 
             -- A lot of tools are using `fzf` including `genbashrc` when
             -- generating bashrc.
-            , binDir </> "fzf"
+            , userBinDir </> "fzf"
 
             , nixTarget
             ]
@@ -295,12 +288,12 @@ install Directories{..} opts = shakeArgs opts $ do
     stackRules StackRulesParams
         { home
         , srcDir = srcDir </> "stack"
-        , binDir
+        , binDir = userBinDir
         }
 
     genbashrcUpToDate <- addOracle (gitRepo genbashrcRepoConfig)
 
-    (dotLocalBinDir </> "genbashrc") %> \_ -> do
+    (userBinDir </> "genbashrc") %> \_ -> do
         _ <- genbashrcUpToDate (GitRepo ())
         let GitRepoConfig{directory} = genbashrcRepoConfig
         cmd_ "git -C" directory "pull"
@@ -356,7 +349,7 @@ install Directories{..} opts = shakeArgs opts $ do
             [ commandWrapperDir </> "library.dhall"
             ]
         , libDir = yxLibDir
-        , binDir
+        , binDir = userBinDir
         , commandWrapperLibDir
         , dotLocalDir
         }
@@ -371,7 +364,7 @@ install Directories{..} opts = shakeArgs opts $ do
 
     fzfRepoUpToDate <- addOracle (gitRepo fzfRepoConfig)
 
-    (binDir </> "fzf") %> \out -> do
+    (userBinDir </> "fzf") %> \out -> do
         _ <- fzfRepoUpToDate (GitRepo ())
         let GitRepoConfig{directory} = fzfRepoConfig
         cmd_ (directory </> "install") "--all" "--xdg" "--no-update-rc"

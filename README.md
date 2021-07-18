@@ -102,6 +102,24 @@ pristine system.  Just reconfigure remote URL afterwards.
 git clone https://github.com/trskop/dot.config.git ~/.config
 ```
 
+Make sure to use `~/.local/bin` for your executables instead of `~/bin`:
+
+```Bash
+cd ~
+mkdir -p ~/.local/bin
+if [ -e ~/bin ]; then mv ~/bin/* ~/.local/bin/; fi
+rmdir bin
+```
+
+For backward compatibility it is possible to do this:
+
+```Bash
+ln -s .local/bin bin
+```
+
+Now make sure that `~/.profile` and `~/.bash_profile` add `~/.local/bin` into
+your `$PATH` instead of `~/bin`.
+
 Make sure that `stack` installed through the system package is sufficiently
 new. If not then run:
 
