@@ -1,3 +1,43 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-exec stack "$@" --help
+main() {
+    # Run pager only when stdout is a terminal as to avoid running pager when
+    # the output is piped to another program, for example:
+    #
+    #   stack help | grep -i ghci
+    if [[ -t 1 ]]; then
+        # Command sensible-pager is Debian specific and it handles PAGER
+        # environment variable. This way we can make sure that we not only use
+        # PAGER when appropriate but also Debian alternatives system. For more
+        # information see:
+        #
+        # * sensible-pager(1)
+        # * update-alternatives(1)
+        if command -v 'sensible-pager' &> /dev/null; then
+            stack "$@" --help | sensible-pager
+
+        # Value of PAGER environment variable may be a command, executable, or
+        # command/executable with arguments. This is the reason why we are
+        # using "sh -c" to execute it.
+        elif [[ -n "${PAGER}" ]]; then
+            stack "$@" --help | sh -c "${PAGER}"
+
+        # While "more" is commonly used as a default we prefer "less" to
+        # "more" when possible.
+        elif command -v 'less' &> /dev/null; then
+            stack "$@" --help | less
+
+        # The most commonly available pager is "more".
+        elif command -v 'more' &> /dev/null; then
+            stack "$@" --help | more
+
+        # No known pager is available.
+        else
+            stack "$@" --help
+        fi
+    else
+        stack "$@" --help
+    fi
+}
+
+main "$@"
