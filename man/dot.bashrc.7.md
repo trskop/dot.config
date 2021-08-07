@@ -193,7 +193,7 @@ copied. Individual fields of the generic syntax are:
 `CTRL+r`
 :   Runs Bash history search using `fzf`.
 
-`CTRL-t`
+`CTRL+t`
 :   Runs `fzf` and pastes the selected file path into the command line.
 
 
@@ -203,23 +203,32 @@ To list all aliases just type `alias` without any arguments. Some important
 ones are listed here:
 
 `evil`
-:   Open root login shell by invoking
+:   Open root login shell by invoking the following:
 
-    ```
+    ```bash
     sudo su -
+    ```
+
+`rg`
+:   Ripgrep doesn't read any configuration file unless `RIPGREP_CONFIG_PATH`
+    environment variable is set. This alias sets it to the following before
+    calling `rg` binary:
+
+    ```bash
+    RIPGREP_CONFIG_PATH="${XDG_CONFIG_HOME:-${HOME}/.config}/.config/ripgrep/ripgreprc"
     ```
 
 `term-title` TITLE
 :   Set terminal title. Alias for:
 
-    ```
+    ```bash
     printf "\033]2;%s\007"
     ```
 
 `this`
 :   Alias for:
 
-    ```
+    ```bash
     yx this
     ```
 
@@ -230,16 +239,22 @@ ones are listed here:
     ```
 
 `tmux`
-:   Alias for `tmux` that makes sure that `${HOME}/.config/tmux/tmux.conf`
-    configuration file is used and that `TERM` is set to something `tmux` can
-    handle.
+:   Tmux doesn't support XDG Base Directory standard. This alias makes sure
+    that correct configuration file is used:
+
+    ```
+    ${XDG_CONFIG_HOME:-${HOME}/.config}/.config/tmux/tmux.conf
+    ```
+
+    And that `TERM` is set to something `tmux` can handle.
 
 `xpdf`
 :   Alias for:
 
-    ```
+    ```bash
     yx xpdf
     ```
+
     For more information see `yx-xpdf(1)` or:
 
     ```
@@ -294,15 +309,35 @@ yx help [--man] apt
     ```
 
 
-# EDITOR
+# ENVIRONMENT VARIABLES
 
-Value of `EDITOR` is set to (in specified order of precedence):
+## EDITOR, VISUAL
+
+`EDITOR` and `VISUAL` environment variables are set to (in specified order of
+precedence):
 
 * `nvim` if Neovim is installed.
 
 * `vim` if Vim is installed.
 
 * Not set if none of the above.
+
+## ORIGINAL\_PS1
+
+This variable is set to the same value as `PS1` to allow resetting `PS1` if it
+gets modified. This is used for things like `nix-shell` which likes to override
+user defined `PS1`.
+
+## MPLAYER\_HOME
+
+MPlayer doesn't support XDG Base Directory Specification, but it does allow us
+to override directory path where it's looking for configuration:
+
+```
+MPLAYER_HOME="${XDG_CONFIG_HOME:-${HOME}/.config}/mplayer"
+```
+
+See `mplayer(1)` for more information.
 
 
 # SEE ALSO
