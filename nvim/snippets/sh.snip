@@ -2,13 +2,31 @@ snippet main
 abbr    #!/usr/bin/env bash
 options head
 	#!/usr/bin/env bash
-
-	# Copyright (c) 2018 Peter Trško
+	# shellcheck shell=bash 
+	
+	# Copyright (c) ${1:`strftime('%Y')`} ${2:Peter Trško}
 	#
 	# TODO: License
-
-	set -e
-
+	
+	# So called Bash strict mode.  See \`bash(1)\` documentation for more details.
+	set -eo pipefail
+	
+	if (( BASH_VERSINFO[0] > 4 || ( BASH_VERSINFO[0] == 4 && BASH_VERSINFO[1] >= 4 ) )); then
+	    # Treat unset variables and parameters as an error when expanding.  This
+	    # wasn't very reliable in older Bash versions, hence the version check.
+	    set -u
+	
+	    # Enable the behaviour of 'set -e' inside command substitution.  This
+	    # option is available since Bash 4.4.
+	    shopt -s inherit_errexit
+	fi
+	
+	# Print help message to standard output.
+	#
+	# Usage:
+	#
+	#   printHelp
+	#   printHelp 1>&2
 	function printHelp() {
 	    local -r progName="\${0##*/}"
 	
@@ -22,10 +40,14 @@ options head
 	Note, here, any prerequisites of this script for it to work.
 	__EOF__
 	}
-
+	
+	# Usage:
+	#
+	#   main {--help|-h}
+	#   main [OPTIONS] ARGUMENTS
 	function main() {
 	    local arg=''
-
+	
 	    while (( \$# )); do
 	        arg="\$1"; shift
 	        case "\${arg}" in
@@ -34,17 +56,30 @@ options head
 	            exit 0
 	            ;;
 	          -*)
-	            error - "\`%s': %s\n" "\${arg}" 'Unknown option.'
+	            printf '%s: Unknown option.\n\n' "\${arg}" 1>&2
 	            printHelp 1>&2
 	            exit 1
 	            ;;
 	          *)
-	            error - "\`%s': %s\n" "\${arg}" 'Unexpected argument.'
+	            printf '%s: Unexpected argument.\n\n' "\${arg}" 1>&2
 	            printHelp 1>&2
 	            exit 1
 	            ;;
 	        esac
 	    done
-
+	
 	    ${0}
+	}
+	
+	main "$@"
+
+snippet fn
+abbr    function name() {...
+	# TODO: Description
+	#
+	# Usage:
+	#
+	#   $1
+	function ${1:main}() {
+		${0}
 	}
