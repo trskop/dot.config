@@ -1,6 +1,6 @@
 % YX-THIS(1) YX Toolset 0.1.0 | YX Toolset
 % Peter Trsko
-% 1st January 2019
+% 28th August 2021
 
 
 # NAME
@@ -38,17 +38,17 @@ subcommand.**
 
 For documentation of *GLOBAL_OPTIONS* see `command-wrapper(1)` manual page.
 
--U, \--update
+\--update, -U
 :   Update system and user's tools.  What is updated can be restricted by
     specifying additional options:
 
-    -s, --system
+    \--system, -s
     :   Update/upgrade system.
 
-    -u, --user
+    \--user, -u
     :   Update only user tools, environment and configuration.
 
-    -i, --install
+    \--install, -i
     :   Install packages based on what is present in configuration file.
 
     We can consisder the default value to be as if we specified all options
@@ -56,7 +56,7 @@ For documentation of *GLOBAL_OPTIONS* see `command-wrapper(1)` manual page.
     configuration file.  See *FILES AND DIRECTORIES* section for more
     information on configuration file.
 
--e, \--edit
+\--edit, -e
 :   Edit configuration file using user's preferred editor.
     **TODO: Currently not implemented**
 
@@ -65,7 +65,7 @@ For documentation of *GLOBAL_OPTIONS* see `command-wrapper(1)` manual page.
     refuses to do so.  See *FIlES AND DIRECTORIES* section for more details
     about configuration file.
 
--h, \--help
+\--help, -h
 :   Print short help message and exit.  Same as: `yx help this`.
 
 

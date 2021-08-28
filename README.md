@@ -53,6 +53,9 @@ User configuration files (dot–files)
 *   [`stack/`](./stack/) – Haskell Stack, see
     [`stack/README.md`](./stack/README.md).
 
+*   [`tldr/`](./tldr/) — Configurable [tldr-pages](https://tldr.sh/) client
+    with support for custom pages, see [`tldr/README.md`](./tldr/README.md).
+
 *   [`tmux/`](./tmux/) – Tmux configuration, see
     [`tmux/README.md`](./tmux/README.md) for more information.
 
