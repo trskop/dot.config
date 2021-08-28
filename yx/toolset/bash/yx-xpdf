@@ -87,15 +87,20 @@ PDF viewers.
 
 Usage:
 
-  ${command} [--fullscreen] [PDF_FILE [PAGE_NUMBER|+NAMED_DESTINATION]]
+  ${command} [--fullscreen] [PDF_FILE [:PAGE_NUMBER|+NAMED_DESTINATION]]
   ${command} {--help|-h}
   $(helpCommand --man)
 
 Options:
 
-  --fullscreen, -fullscreen
+  :PAGE_NUMBER
+      Open PDF file on the specified PAGE_NUMBER.
 
-    Open PDF viewer in fullscreen mode if it's supported.
+  +NAMED_DESTINATION
+      Open PDF file on the specified NAMED_DESTINATION.
+
+  --fullscreen, -fullscreen
+      Open PDF viewer in fullscreen mode if it's supported.
 
   --help, -h, -?, -help
       Print short help message and exit.  Same as: $(commandHelp)
@@ -350,10 +355,11 @@ function main() {
                         # Doesn't make sense for pdftotext, ignored.
                         ;;
                       *)
-                        if grep -q -E '^[0-9]+$' <<< "${arg}"; then
-                            atrilOptions+=("--page-index=$arg")
-                            evinceOptions+=("--page-index=$arg")
-                            gvOptions+=("--page=$arg")
+                        # We accept both :PAGE_NUMBER and PAGE_NUMBER.
+                        if grep -q -E '^[0-9]+$' <<< "${arg#:}"; then
+                            atrilOptions+=("--page-index=${arg#:}")
+                            evinceOptions+=("--page-index=${arg#:}")
+                            gvOptions+=("--page=${arg#:}")
                         else
                             die 1 "'%s': Not a page number." "${arg}"
                         fi
