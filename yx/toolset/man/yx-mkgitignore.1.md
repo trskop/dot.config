@@ -64,7 +64,7 @@ mentioned there applies to this subcommand as well.
 :   If `VISUAL` environment variable is defined then its value is interpreted
     as an editor command. When this variable is not defined or we are on a dumb
     terminal (terminals with very limited capabilities, see [Wikipedia:
-    Computer terminal — Dub terminals
+    Computer terminal — Dumb terminals
     ](https://en.wikipedia.org/wiki/Computer_terminal#Dumb_terminals)) then we
     try the `EDITOR` environment variable.
 
@@ -74,7 +74,7 @@ mentioned there applies to this subcommand as well.
 `EDITOR`
 :   When `VISUAL` environment variable is not defined or if we are on a dumb
     terminal (terminals with very limited capabilities, see [Wikipedia:
-    Computer terminal — Dub terminals
+    Computer terminal — Dumb terminals
     ](https://en.wikipedia.org/wiki/Computer_terminal#Dumb_terminals)) then
     we interpret value of `EDITOR` environment variable as editor command to be
     used.
