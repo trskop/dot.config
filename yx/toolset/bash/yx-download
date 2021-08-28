@@ -161,31 +161,40 @@ function completion() {
         words=("")
     fi
 
-    local -r currentWord="${words[${index}]}"
-
-    local -i hadDashDash=0
-    local -a previousWords=()
-    if (( index )); then
-        previousWords=("${words[@]:0:$((index - 1))}")
+    local currentWord=''
+    if (( index < ${#words[@]} )); then
+        currentWord="${words[${index}]}"
     fi
 
-    for opt in "${previousWords[@]}"; do
-        if [[ "${opt}" = '--' ]]; then
-            hadDashDash=1
-            break
-        fi
-    done
+    local previousWord=''
+    if (( index > 0 )); then
+        previousWord="${words[$((index - 1))]}"
+    fi
 
     local -r -a options=(
+        --config= -c
+        --output= -o
+        --checksum --no-checksum
+        --check=
+        --sha1= --sha256= --sha512= --md5=
+        --http-proxy=
+        --download -d --no-download -n
         --help -h
     )
 
-    if (( ! hadDashDash )) && [[ "${currentWord}" == -* ]]; then
-        compgen -W "${options[*]}" -- "${currentWord}"
-    else
-        # File completion.
-        compgen -f -- "${currentWord}"
-    fi
+    case "${currentWord}" in
+        --config=*|--output=*|--check=*)
+            compgen -f -P "${currentWord%%=*}=" -- "${currentWord#*=}"
+            ;;
+        -*)
+            compgen -W "${options[*]}" -- "${currentWord}"
+            ;;
+        *)
+            if [[ "${previousWord}" == -[co] ]]; then
+                compgen -f -- "${currentWord}"
+            fi
+            ;;
+    esac
 }
 
 # Read configuration file in Dhall format and declare Bash variables based on
