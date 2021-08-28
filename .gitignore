@@ -54,6 +54,9 @@
 # here.
 !/mplayer/
 
+# TLDR client <https://github.com/trskop/tldr-client>
+!/tldr/
+
 # {{{ Command Wrapper #########################################################
 
 !/command-wrapper/
