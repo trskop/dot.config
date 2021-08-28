@@ -141,6 +141,7 @@ shakeMain Directories{..} opts = shakeArgs opts $ do
                 , "download"
                 , "githook"
                 , "jmp"
+                , "mkgitignore"
                 , "xpdf"
                 ]
 
@@ -154,12 +155,17 @@ shakeMain Directories{..} opts = shakeArgs opts $ do
     want scriptManTargets
 
     want
-        [ man1Dir </> "yx.1.gz"
+        [ man1Dir </> "yx-apt.1.gz"
+        , man1Dir </> "yx-download.1.gz"
         , man1Dir </> "yx-env.1.gz"
+        , man1Dir </> "yx-jmp.1.gz"
+        , man1Dir </> "yx-mkgitignore.1.gz"
         , man1Dir </> "yx-new.1.gz"
         , man1Dir </> "yx-path.1.gz"
         , man1Dir </> "yx-remarkable.1.gz"
         , man1Dir </> "yx-this.1.gz"
+        , man1Dir </> "yx-xpdf.1.gz"
+        , man1Dir </> "yx.1.gz"
         ]
 
     hasThisRepoChanged <- addOracle (thisGitRepo projectRoot)

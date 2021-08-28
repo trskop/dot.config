@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Copyright (c) 2010 - 2013, 2019 Peter Trsko <peter.trsko@gmail.com>
+# Copyright (c) 2010 - 2021 Peter Trsko <peter.trsko@gmail.com>
 #
 # All rights reserved.
 #
@@ -93,7 +93,7 @@ Options:
     are ignored when downloading file based on configuration file where these
     can be entered.
 
-  --http-proxy=[http://]HOST[:PORT]
+  --http-proxy=[http://]HOST[:PORT], --http-proxy [http://]HOST[:PORT]
     Use specified HTTP proxy server by exporting http_proxy environment
     variable for wget/curl. Warning: this script doesn't check if HOST and PORT
     are syntactically valid values.
@@ -184,14 +184,34 @@ function completion() {
 
     case "${currentWord}" in
         --config=*|--output=*|--check=*)
-            compgen -f -P "${currentWord%%=*}=" -- "${currentWord#*=}"
+            mapfile -t possibilities < <(
+                compgen -f -- "${currentWord#*=}"
+            )
+            for possibility in "${possibilities[@]}"; do
+                if [[ -d "${possibility}" ]]; then
+                    echo "${currentWord%%=*}=${possibility}/"
+                else
+                    echo "${currentWord%%=*}=${possibility}"
+                fi
+            done
+
             ;;
         -*)
             compgen -W "${options[*]}" -- "${currentWord}"
             ;;
         *)
             if [[ "${previousWord}" == -[co] ]]; then
-                compgen -f -- "${currentWord}"
+                local possibilities=()
+                mapfile -t possibilities < <(
+                    compgen -f -- "${currentWord}"
+                )
+                for possibility in "${possibilities[@]}"; do
+                    if [[ -d "${possibility}" ]]; then
+                        echo "${possibility}/"
+                    else
+                        echo "${possibility}"
+                    fi
+                done
             fi
             ;;
     esac

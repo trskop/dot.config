@@ -6,7 +6,7 @@
 # Based on:
 # <https://github.com/trskop/snippets/blob/master/scripts/xpdf-compat.sh>
 
-# Copyright (c) 2013, 2014, 2019, Peter Trsko <peter.trsko@gmail.com>
+# Copyright (c) 2013 - 2021, Peter Trsko <peter.trsko@gmail.com>
 #
 # All rights reserved.
 #
@@ -148,10 +148,29 @@ function completion() {
     if (( ! hadDashDash )) && [[ "${currentWord}" == -* ]]; then
         compgen -W '--help -h -fullscreen --fullscreen' -- "${currentWord}"
     else
-        compgen -d -- "${currentWord}" || true
+        local quote=''
+        case "${currentWord}" in
+            "'"*)
+                quote="'"
+                ;;
+            '"'*)
+                quote='"'
+        esac
+
+        compgen -d -P "${quote}" -S '/' -- "${currentWord#[\'\"]}" || true
         shopt -s extglob
-        compgen -f -X '!*.@(pdf|PDF|fdf|FDF)?(.@(gz|GZ|xz|XZ|Z|bz2|BZ2))' \
-            -- "${currentWord}"
+        if [[ -n "${quote}" ]]; then
+            compgen -f \
+                -P "${quote}" -S "${quote}" \
+                -X '!*.@(pdf|PDF|fdf|FDF)?(.@(gz|GZ|xz|XZ|Z|bz2|BZ2))' \
+                -- "${currentWord#[\'\"]}"
+        else
+            compgen -f \
+                -X '!*.@(pdf|PDF|fdf|FDF)?(.@(gz|GZ|xz|XZ|Z|bz2|BZ2))' \
+                -- "${currentWord}" \
+            | sed 's/ /\\ /g'
+            # TODO: Whate else do we need to quote?
+        fi
     fi
 }
 
