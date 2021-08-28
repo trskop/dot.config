@@ -59,7 +59,27 @@ source <(
 # Print help message to standard output.
 function printHelp() {
     local -r command="${COMMAND_WRAPPER_NAME} ${COMMAND_WRAPPER_SUBCOMMAND}"
-    local -r commandHelp="${COMMAND_WRAPPER_NAME} help ${COMMAND_WRAPPER_SUBCOMMAND}"
+
+    # Compose a help command.  If manual page is available then pass '--man'
+    # option.
+    #
+    # Usage:
+    #
+    #   helpCommand [--man]
+    function helpCommand() {
+        local -r prefix="${COMMAND_WRAPPER_NAME} help"
+
+        local opts=''
+        if (( $# )); then
+            case "$1" in
+                --man)
+                    opts='[--man]'
+                    ;;
+            esac
+        fi
+
+        echo "${prefix} ${opts:+${opts} }${COMMAND_WRAPPER_SUBCOMMAND}"
+    }
 
     cat <<EOF
 Compatibility wrapper that provides xpdf-like command line interface for other
@@ -69,7 +89,7 @@ Usage:
 
   ${command} [--fullscreen] [PDF_FILE [PAGE_NUMBER|+NAMED_DESTINATION]]
   ${command} {--help|-h}
-  ${commandHelp}
+  $(helpCommand --man)
 
 Options:
 
@@ -78,7 +98,7 @@ Options:
     Open PDF viewer in fullscreen mode if it's supported.
 
   --help, -h, -?, -help
-      Print short help message and exit.  Same as: ${commandHelp}
+      Print short help message and exit.  Same as: $(commandHelp)
 EOF
 }
 

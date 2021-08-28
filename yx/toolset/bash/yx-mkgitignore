@@ -116,7 +116,11 @@ function printHelp() {
 
         local opts=''
         if (( $# )); then
-            opts="$1"; shift
+            case "$1" in
+                --man)
+                    opts='[--man]'
+                    ;;
+            esac
         fi
 
         echo "${prefix} ${opts:+${opts} }${COMMAND_WRAPPER_SUBCOMMAND}"
@@ -311,7 +315,7 @@ function initOrUpdateCache() {
             'git' 'Please install Git on your system.'
     fi
 
-    if [[ ! -d "${cacheDir}/.git" ]]; then
+    if [[ ! -d "${repositoryDir}/.git" ]]; then
         git clone "${gitignoreRepo}" "${repositoryDir}"
     else
         git -C "${repositoryDir}" pull
@@ -481,6 +485,18 @@ function main() {
             #    constructInitialConfiguration
             #    exit 0
             #    ;;
+
+            --)
+                if (( ! $# )); then
+                    die 1 "'%s': Missing argument." 'FILE'
+                fi
+
+                arg="$1"; shift
+                if [[ -n "${outputFile}" ]]; then
+                    die 1 "'%s': Too many arguments." "${arg}"
+                fi
+                outputFile="${arg}"
+                ;;
 
             -*)
                 # Using exit code 1 here is required by Subcommand Protocol.
