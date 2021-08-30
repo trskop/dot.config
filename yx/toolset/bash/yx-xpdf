@@ -103,7 +103,9 @@ Options:
       Open PDF viewer in fullscreen mode if it's supported.
 
   --help, -h, -?, -help
-      Print short help message and exit.  Same as: $(commandHelp)
+      Print short help message and exit.  Same as:
+
+        $(helpCommand)
 EOF
 }
 
@@ -241,6 +243,8 @@ function sensiblePager() {
 }
 
 function sensiblePdfViewer() {
+    # TODO: This should be configurable. Configuration can provide a function
+    # to compose a command to execute.
     local -a -r knownCommands=(
         'evince'
         'atril'

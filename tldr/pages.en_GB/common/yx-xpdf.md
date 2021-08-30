@@ -13,3 +13,7 @@
 - Open a PDF file in full-screen mode:
 
 `yx xpdf {{--fullscreen|-fullscreen}} {{path/to/file.pdf}}`
+
+- Use textual viewer to open a PDF file:
+
+`DISPLAY= yx xpdf {{path/to/file.pdf}}`

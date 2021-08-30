@@ -1,6 +1,6 @@
 % YX-XPDF(1) YX Toolset 0.1.0 | YX Toolset
 % Peter Trsko
-% 13th July 2019
+% 30th August 2021
 
 
 # NAME
@@ -22,7 +22,44 @@ yx \[GLOBAL\_OPTIONS] help [\--man] xpdf
 # DESCRIPTION
 
 Compatibility wrapper that provides xpdf-like command line interface for other
-PDF viewers.
+PDF viewers. The feature set is highly limited to work with wide range of PDF
+viewers.
+
+Currently supported PDF viewers in the order as they are tried:
+
+*   Evince — GNOME Desktop document viewer for multiple document formats
+    ([wiki.gnome.org/Apps/Evince](https://wiki.gnome.org/Apps/Evince)).
+
+*   Atril — a fork of Evince for MATE Desktop Environment
+    ([github.com/mate-desktop/atril#atril](https://github.com/mate-desktop/atril#atril)).
+
+*   GNU GV — X Window System document viewer for PostScript and PDF documents
+    ([gnu.org/software/gv/](https://www.gnu.org/software/gv/))
+
+*   `pdftotext` — We default to this one if `DISPLAY` environment variable is
+    not set. See *ENVIRONMENT VARIABLES* section and `pdftotext(1)` manual
+    page.
+
+
+# EXAMPLES
+
+Open a document:
+
+```bash
+yx xpdf /path/to/a/paper.pdf
+```
+
+Open a document on a specific page:
+
+```bash
+yx xpdf /path/to/a/paper.pdf :42
+```
+
+Use textual viewer to open a document:
+
+```bash
+DISPLAY= yx xpdf /path/to/a/paper.pdf
+```
 
 
 # OPTIONS
@@ -60,8 +97,7 @@ mentioned there applies to this subcommand as well.
 
 # SEE ALSO
 
-yx-apt(1), yx-env(1), yx-jmp(1), yx-new(1), yx-path(1), yx-remarkable(1),
-yx-this(1), yx(1), command-wrapper(1)
+yx(1), command-wrapper(1), pdftotext(1)
 
 * [XDG Base Directory Specification
   ](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html)
