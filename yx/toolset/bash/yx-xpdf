@@ -221,7 +221,7 @@ function sensiblePager() {
     # system-wide prefered implementation.
     local -r -a pagerPreferences=(
         'sensible-pager'
-        "${PAGER}"
+        "${PAGER:-}"
         'pager'
         'less'
         'more'
