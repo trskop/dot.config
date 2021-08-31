@@ -34,11 +34,11 @@
 set -euo pipefail
 
 declare -r repoUrl="https://github.com/dhall-lang/dhall-haskell"
-declare -r dhallVersion='1.39.0'
-declare -r dhallLspServerVersion='1.0.15'
+declare -r dhallVersion='1.40.1'
+declare -r dhallLspServerVersion='1.0.16'
 declare -r arch='x86_64-linux' # TODO: Support other?
 declare -r downloadUrl="${repoUrl}/releases/download/${dhallVersion}/dhall-lsp-server-${dhallLspServerVersion}-${arch}.tar.bz2"
-declare -r downloadSha256='e5f9f892212a5e9176fef468af5c02ba8ca4b12f160d3e36ca3a842cc82b67be'
+declare -r downloadSha256='88b17e25cba8c3765f8388c880f285d27088ffa4832f96deb99a2cc1ff6bcf9c'
 
 # Usage:
 #
